@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 const http = require("http");
-const config = require("./config/config");
-const app = require("./server");
-const logger = require("./config/logger");
+const config = require("./src/config/config");
+const app = require("./src/server");
+const logger = require("./src/config/logger");
+const createInitialData = require('./src/database/initDb');
+
 mongoose
   .connect(config.dbConnection)
   .then(() => {
+    createInitialData();
     logger.info("Database connected");
   })
   .catch((error) => {
