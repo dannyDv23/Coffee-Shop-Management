@@ -50,8 +50,7 @@ deploy_to_server:
         npm install nodemon --save-dev &&
         npm install -g nodemon &&
         chmod 644 .env &&
-        pm2 stop coffee-shop &&
-        pm2 delete coffee-shop &&    
+        pm2 stop coffee-shop &&  
         pm2 start index.js --name coffee-shop -- run start -f
 
       "
