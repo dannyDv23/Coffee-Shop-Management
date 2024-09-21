@@ -45,7 +45,7 @@ deploy_to_server:
         kill -9 $(lsof -i :3000 | grep *:3000 | grep -v grep | awk '{print $2}')
       "
     - sudo -u coffeeshop bash -c "
-        cd /datas/coffeeshop &&
+        cd /datas/coffeeshop/server &&
         npm install &&
         npm install -g nodemon &&
         chmod 644 .env &&
