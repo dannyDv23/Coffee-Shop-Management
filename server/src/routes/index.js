@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.send("Continuous Deployment Successfully!");
+  res.send("Continuous Deployment Completed!");
 });
 
 module.exports = router;
