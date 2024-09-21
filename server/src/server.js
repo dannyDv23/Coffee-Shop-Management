@@ -4,12 +4,14 @@ const morgan = require('./config/morgan');
 const httpStatus = require('http-status');
 const ApiError = require('./utils/ApiError');
 const { errorHandler, errorConverter } = require('./middlewares/error');
+const testRoute = require('./routes/index');
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
 app.use(express.json());
 
 // routes
+app.use(testRoute);
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));

@@ -1,16 +1,66 @@
 stages:
-  - build
+  - install
   - test
   - deploy
+  - check_logs 
 
-build:
-  stage: build
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  # Install dotenv to load .env file 
+  - npm install dotenv-cli -g
+  - dotenv -e .env -- printenv  # Loads the environment variables if using .env
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+install_dependencies:
+  stage: install
   script:
-    - whoami
-    - pwf
-    - ls
-    - echo "Test CI"
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
 
-  tags:
-     - lab-server 
+run_tests:
+  stage: test
+  script:
+    - npm test
+  allow_failure: true
+  after_script:
+    - echo "Tests completed. Check logs for details."
 
+deploy_to_server:
+  stage: deploy
+  only:
+    - main 
+  script:
+    - ssh $SSH_USER@$SSH_HOST "
+        cd $APP_DIR &&
+        git pull origin main &&
+        npm install &&
+        pm2 delete $PM2_APP_NAME || true && 
+        pm2 start npm --name $PM2_APP_NAME -- run start
+      "
+  after_script:
+    - echo "Deployment complete"
+
+check_logs:
+  stage: check_logs
+  only:
+    - main  
+  script:
+    - ssh $SSH_USER@$SSH_HOST "tail -n 50 $APP_DIR/server/src/logs/access.log"
+  after_script:
+    - echo "Log check complete"
+
+failure_notification:
+  stage: .post
+  script:
+    - echo "Deployment failed. Please check the logs."
+  when: on_failure
