@@ -46,8 +46,8 @@ deploy_to_server:
         npm install &&
         npm install -g nodemon &&
         chmod 644 .env &&
-        pm2 delete 'index.js' || true &&
-        pm2 start npm --name 'index.js' -- run start
+        pm2 delete index.js || true &&
+        pm2 start npm --name index.js -- run start
       "
 
   after_script:
