@@ -42,11 +42,14 @@ deploy_to_server:
     - sudo cp -r /home/gitlab-runner/builds/igmn2Q5Qm/0/root/coffee-shop/* /datas/coffeeshop/
     - sudo chown -R coffeeshop:coffeeshop /datas/coffeeshop/
     - sudo -u coffeeshop bash -c "
+        kill -9 $(lsof -i :3000 | grep *:3000 | grep -v grep | awk '{print $2}')
+      "
+    - sudo -u coffeeshop bash -c "
         cd /datas/coffeeshop &&
         npm install &&
         npm install -g nodemon &&
         chmod 644 .env &&
-        pm2 delete index.js || true && pm2 start npm --name index.js -- run start
+        pm2 delete index.js || true && pm2 start index.js --name coffee-shop -- run start
       "
 
   after_script:
