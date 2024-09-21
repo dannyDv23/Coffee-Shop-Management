@@ -16,6 +16,8 @@ before_script:
 
 install_dependencies:
   stage: install
+  variables:
+    GIT_STRATEGY: clone
   script:
     - npm install
   artifacts:
@@ -32,11 +34,14 @@ run_tests:
 
 deploy_to_server:
   stage: deploy
+  variables:
+    GIT_STRATEGY: none
   only:
     - main  # Deploy only from the main branch
   script:
-    - echo "Deploying..."
-    - ssh -vvv $SSH_USER@$SSH_HOST "cd \"$APP_DIR\" && git pull origin main && npm install && pm2 delete \"$PM2_APP_NAME\" || true && pm2 start npm --name \"$PM2_APP_NAME\" -- run start"
+    - ls -la
+    - pwd
+    - whoami
   after_script:
     - echo "Deployment complete"
 
