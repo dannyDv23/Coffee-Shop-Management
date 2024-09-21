@@ -39,20 +39,27 @@ deploy_to_server:
   only:
     - main  # Deploy only from the main branch
   script:
-    - ls -la
-    - pwd
-    - whoami
+    - cp -r /home/gitlab-runner/builds/igmn2Q5Qm/0/root/coffee-shop/* /datas/coffeeshop/
+    - sudo chown -R coffeeshop:coffeeshop /datas/coffeeshop/
+    - sudo -u coffeeshop bash -c "
+        cd /datas/coffeeshop/server &&
+        npm install &&
+        npm install -g nodemon &&
+        chmod 644 .env &&
+        pm2 delete '$PM2_APP_NAME' || true &&
+        pm2 start npm --name '$PM2_APP_NAME' -- run start
+      "
   after_script:
     - echo "Deployment complete"
-
-
 
 check_logs:
   stage: check_logs
   only:
     - main  
   script:
-    - ssh $SSH_USER@$SSH_HOST "tail -n 50 $APP_DIR/server/src/logs/access.log"
+    - sudo -u coffeeshop bash -c "
+        tail -n 50 $APP_DIR/server/src/logs/access.log
+      "
   after_script:
     - echo "Log check complete"
 
