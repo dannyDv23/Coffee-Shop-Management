@@ -11,7 +11,7 @@ cache:
 before_script:
   # Install dotenv to load .env file 
   - npm install dotenv-cli --save-dev
-  - dotenv -e .env -- printenv
+  - npx dotenv -e .env -- printenv  
   - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
