@@ -33,17 +33,14 @@ run_tests:
 deploy_to_server:
   stage: deploy
   only:
-    - main 
+    - main  # Deploy only from the main branch
   script:
-    - ssh $SSH_USER@$SSH_HOST "
-        cd $APP_DIR &&
-        git pull origin main &&
-        npm install &&
-        pm2 delete $PM2_APP_NAME || true && 
-        pm2 start npm --name $PM2_APP_NAME -- run start
-      "
+    - echo "Deploying..."
+    - ssh -vvv $SSH_USER@$SSH_HOST "cd \"$APP_DIR\" && git pull origin main && npm install && pm2 delete \"$PM2_APP_NAME\" || true && pm2 start npm --name \"$PM2_APP_NAME\" -- run start"
   after_script:
     - echo "Deployment complete"
+
+
 
 check_logs:
   stage: check_logs
