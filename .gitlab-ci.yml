@@ -44,11 +44,11 @@ deploy_to_server:
     # - sudo bash -c "
     #     kill -9 $(lsof -i :3000 | grep *:3000 | grep -v grep | awk '{print $2}')
     #   "
+    - sudo npm install -g nodemon
     - sudo -u coffeeshop bash -c "
         cd /datas/coffeeshop/server &&
         npm install &&
         npm install nodemon --save-dev &&
-        npm install -g nodemon &&
         chmod 644 .env &&
         pm2 stop coffee-shop &&  
         pm2 start index.js --name coffee-shop -- run start -f
