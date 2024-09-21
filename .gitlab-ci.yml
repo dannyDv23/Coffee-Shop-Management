@@ -64,7 +64,7 @@ check_logs:
     - main  
   script:
     - sudo -u coffeeshop bash -c "
-        tail -n 50 /datas/coffeeshop/server/src/logs/access.logtouch
+        tail -n 50 /datas/coffeeshop/server/src/logs/access.log
       "
   after_script:
     - echo "Log check complete"
