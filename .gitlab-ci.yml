@@ -1,0 +1,16 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - whoami
+    - pwd
+    - ls
+    - echo "Test CI"
+
+  tags:
+     - lab-server 
+
