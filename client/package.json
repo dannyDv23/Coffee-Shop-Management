@@ -5,14 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js -e ejs,js",
-    "build": "npm run build"
+    "start": "nodemon --exec babel-node src/app.js -e ejs,js",
+    "build-src": "babel src -d build --copy-files",
+    "build": "node build/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/node": "^7.25.0",
+    "@babel/preset-env": "^7.25.4",
     "axios": "^1.7.7",
+    "babel": "^5.8.38",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
