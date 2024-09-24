@@ -1,6 +1,8 @@
+const express = require("express");
+const router = express.Router();
 
-module.exports = function applyRoutes(app)  {
-    app.get('/', (req, res) => {
-        res.send('Hello World!');
-    });
-};
+router.get("/", (req, res) => {
+  res.send("Continuous Deployment Completed!");
+});
+
+module.exports = router;

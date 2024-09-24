@@ -1,6 +1,5 @@
 stages:
   - install
-  - install
   - test
   - deploy
   - check_logs 
@@ -24,23 +23,17 @@ install_dependencies:
   artifacts:
     paths:
       - node_modules/
-  tags:
-    - lab-server
 
 run_tests:
   stage: test
   script:
     - echo "Testing..."
   allow_failure: true
-  tags:
-    - lab-server
   after_script:
     - echo "Tests completed. Check logs for details."
 
 deploy_to_server:
   stage: deploy
-  tags:
-    - lab-server
   variables:
     GIT_STRATEGY: none
   only:
@@ -75,8 +68,6 @@ check_logs:
       "
   after_script:
     - echo "Log check complete"
-  tags:
-    - lab-server
 
 failure_notification:
   stage: .post
