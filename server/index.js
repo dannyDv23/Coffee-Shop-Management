@@ -8,7 +8,7 @@ const createInitialData = require('./src/database/initDb');
 mongoose
   .connect(config.dbConnection)
   .then(() => {
-    createInitialData();
+    // createInitialData();
     logger.info("Database connected");
   })
   .catch((error) => {
