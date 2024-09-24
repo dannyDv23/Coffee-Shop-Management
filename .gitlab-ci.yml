@@ -1,16 +1,76 @@
 stages:
-  - build
+  - install
   - test
   - deploy
+  - check_logs 
 
-build:
-  stage: build
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  # Install dotenv to load .env file 
+  - npm install dotenv-cli --save-dev
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+
+install_dependencies:
+  stage: install
+  variables:
+    GIT_STRATEGY: clone
   script:
-    - whoami
-    - pwd
-    - ls
-    - echo "Test CI"
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
 
-  tags:
-     - lab-server 
+run_tests:
+  stage: test
+  script:
+    - echo "Testing..."
+  allow_failure: true
+  after_script:
+    - echo "Tests completed. Check logs for details."
 
+deploy_to_server:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  only:
+    - main  # Deploy only from the main branch
+  script:
+    - sudo cp -r /home/gitlab-runner/builds/igmn2Q5Qm/0/root/coffee-shop/* /datas/coffeeshop/
+    - sudo chown -R coffeeshop:coffeeshop /datas/coffeeshop/
+    # - sudo bash -c "
+    #     kill -9 $(lsof -i :3000 | grep *:3000 | grep -v grep | awk '{print $2}')
+    #   "
+    - sudo npm install -g nodemon
+    - sudo -u coffeeshop bash -c "
+        cd /datas/coffeeshop/server &&
+        npm install &&
+        npm install nodemon --save-dev &&
+        chmod 644 .env &&
+        pm2 stop coffee-shop &&  
+        pm2 start index.js --name coffee-shop -- run start -f
+
+      "
+
+  after_script:
+    - echo "Deployment complete"
+
+check_logs:
+  stage: check_logs
+  only:
+    - main  
+  script:
+    - sudo -u coffeeshop bash -c "
+        tail -n 50 /datas/coffeeshop/server/src/logs/access.log
+      "
+  after_script:
+    - echo "Log check complete"
+
+failure_notification:
+  stage: .post
+  script:
+    - echo "Deployment failed. Please check the logs."
+  when: on_failure
