@@ -1,5 +1,6 @@
 stages:
   - install
+  - install
   - test
   - deploy
   - check_logs 
