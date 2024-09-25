@@ -1,10 +1,22 @@
 const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const { tokenService, authService, employeeService } = require("../services");
-const e = require("express");
+const ApiError = require("../utils/ApiError");
 
 const register = catchAsync(async (req, res) => {
-  const { employee, authRecord } = await employeeService.createEmployee(req.body);
+  const {name, username, password, retypePassword } = req.body;
+  const existingEmployee = await employeeService.getEmployeeByUsername(username);
+  if (existingEmployee) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
+  }
+  if (password !== retypePassword) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Passwords do not match");
+  }
+  const { employee, authRecord } = await employeeService.createEmployee({
+    name,
+    username,
+    password,
+  });
   const tokens = await tokenService.generateAuthTokens(employee._id);
   res.status(httpStatus.CREATED).send({ employee, tokens, authRecord });
 });

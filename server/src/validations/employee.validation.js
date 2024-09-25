@@ -6,6 +6,7 @@ const createEmployeeSchema = {
     name: Joi.string().required(),
     username: Joi.string().required(),
     password: Joi.custom(password).required(),
+    retypePassword: Joi.custom(password).required(),
   }),
 };
 
