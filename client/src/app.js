@@ -18,7 +18,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
-console.log(path.join(__dirname, 'public'))
+
+// setup file css
+app.use(express.static(__dirname + '/src'));
+app.get('/assets/css/color.css', (req, res) => {
+  res.type('text/css');
+  res.sendFile(__dirname + '/assets/css/color.css');
+});
 
 // Use the blog routes
 app.use('/', homeRoutes); // Apply the blog routes
