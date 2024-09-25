@@ -1,18 +1,14 @@
-const mongoose = require('mongoose');
-
-const {
-    ROLES,
-    EMPLOYEE_STATUSES,
-} = require('./constants');
+const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ROLES, required: true },
-    salary: { type: Number, required: true },
-    address: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    status: { type: String, enum: EMPLOYEE_STATUSES, required: true }
+  name: { type: String, required: true, trim: true },
+  position: { type: String, required: false },
+  salary: { type: Number, required: false },
+  address: { type: String, required: false },
+  phoneNumber: { type: String, required: false },
+  avatar: { type: String, required: false },
 });
 
-module.exports = mongoose.model('Employee', employeeSchema);
+const Employee = mongoose.model("Employee", employeeSchema);
+
+module.exports = Employee;

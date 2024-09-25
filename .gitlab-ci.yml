@@ -16,6 +16,8 @@ before_script:
 
 install_dependencies:
   stage: install
+  variables:
+    GIT_STRATEGY: clone
   script:
     - npm install
   artifacts:
@@ -32,16 +34,27 @@ run_tests:
 
 deploy_to_server:
   stage: deploy
+  variables:
+    GIT_STRATEGY: none
   only:
-    - main 
+    - main  # Deploy only from the main branch
   script:
-    - ssh $SSH_USER@$SSH_HOST "
-        cd $APP_DIR &&
-        git pull origin main &&
+    - sudo cp -r /home/gitlab-runner/builds/igmn2Q5Qm/0/root/coffee-shop/* /datas/coffeeshop/
+    - sudo chown -R coffeeshop:coffeeshop /datas/coffeeshop/
+    # - sudo bash -c "
+    #     kill -9 $(lsof -i :3000 | grep *:3000 | grep -v grep | awk '{print $2}')
+    #   "
+    - sudo npm install -g nodemon
+    - sudo -u coffeeshop bash -c "
+        cd /datas/coffeeshop/server &&
         npm install &&
-        pm2 delete $PM2_APP_NAME || true && 
-        pm2 start npm --name $PM2_APP_NAME -- run start
+        npm install nodemon --save-dev &&
+        chmod 644 .env &&
+        pm2 stop coffee-shop &&  
+        pm2 start index.js --name coffee-shop -- run start -f
+
       "
+
   after_script:
     - echo "Deployment complete"
 
@@ -50,7 +63,9 @@ check_logs:
   only:
     - main  
   script:
-    - ssh $SSH_USER@$SSH_HOST "tail -n 50 $APP_DIR/server/src/logs/access.log"
+    - sudo -u coffeeshop bash -c "
+        tail -n 50 /datas/coffeeshop/server/src/logs/access.log
+      "
   after_script:
     - echo "Log check complete"
 
