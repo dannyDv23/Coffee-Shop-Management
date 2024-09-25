@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+// Import necessary modules
+const express = require('express');
+const path = require('path');
+const http = require('http');
+const reload = require('reload');
+require('dotenv').config(); // Load .env variables
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+// Import routers
+const homeRoutes = require('./routers/HomeRoutes');
 
-export default App;
+// Create the Express app
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Set the view engine to EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// setup file css
+app.use(express.static(__dirname + '/src'));
+app.get('/assets/css/color.css', (req, res) => {
+  res.type('text/css');
+  res.sendFile(__dirname + '/assets/css/color.css');
+});
+
+// Use the blog routes
+app.use('/', homeRoutes); // Apply the blog routes
+
+// Create an HTTP server
+const server = http.createServer(app);
+
+// Start the server
+server.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+
+// Enable live reload
+reload(app);
+
