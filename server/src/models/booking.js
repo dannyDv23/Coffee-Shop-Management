@@ -10,7 +10,7 @@ const bookingSchema = new mongoose.Schema({
     time: { type: String, required: true },
     reason: { type: String, default: null },
     status: { type: String, enum: BOOKING_STATUSES, required: true },
-    tableId: { type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true }
+    tableId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true }]
 });
 
 module.exports = mongoose.model('Booking', bookingSchema);
