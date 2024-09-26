@@ -18,8 +18,8 @@ const bookingData = [
 ];
 
 const employeeData = [
-  { username: 'johndoe', password: 'password123', role: 'Admin', salary: 50000, address: '123 Main St', phoneNumber: '987654321', status: 'Active' },
-  { username: 'janesmith', password: 'password456', role: 'Employee', salary: 30000, address: '456 Elm St', phoneNumber: '123456789', status: 'Active' }
+  { name: 'johndoe', position: 'Admin', salary: 50000, address: '123 Main St', phoneNumber: '987654321', status: 'Active' },
+  { name: 'janesmith', position: 'Employee', salary: 30000, address: '456 Elm St', phoneNumber: '123456789', status: 'Active' }
 ];
 
 const equipmentData = [
@@ -51,41 +51,57 @@ const tableData = [
   { tableNumber: 1, status: 'Available' },
   { tableNumber: 2, status: 'Empty' }
 ];
+
 const createInitialData = async () => {
   try {
-    const bookingCount = await Booking.countDocuments();
-    const employeeCount = await Employee.countDocuments();
-    const equipmentCount = await Equipment.countDocuments();
-    const materialCount = await Material.countDocuments();
-    const historyMoneyCount = await HistoryMoney.countDocuments();
-    const productCount = await Product.countDocuments();
-    const salesCount = await Sales.countDocuments();
-    const tableCount = await Table.countDocuments();
-    const productMaterialCount = await ProductMaterial.countDocuments();
-    const historyMaterialCount = await HistoryMaterial.countDocuments();
-    const orderCount = await Order.countDocuments();
+    console.log("wait create initial data")
+    // Clear existing data
+    await Booking.deleteMany({});
+    await Employee.deleteMany({});
+    await Equipment.deleteMany({});
+    await HistoryMaterial.deleteMany({});
+    await HistoryMoney.deleteMany({});
+    await Material.deleteMany({});
+    await Order.deleteMany({});
+    await Product.deleteMany({});
+    await ProductMaterial.deleteMany({});
+    await Sales.deleteMany({});
+    await Table.deleteMany({});
 
+    // Insert tables first if not already present
+    const tableCount = await Table.countDocuments();
+    let tables; // Define variable outside of condition
     if (!tableCount) {
-      const tables = await Table.insertMany(tableData);
+      tables = await Table.insertMany(tableData);
       bookingData[0].tableId = tables[0]._id;
       bookingData[1].tableId = tables[1]._id;
     }
 
+    // Insert bookings
+    const bookingCount = await Booking.countDocuments();
     if (!bookingCount) {
       await Booking.insertMany(bookingData);
     }
 
+    // Insert employees
+    const employeeCount = await Employee.countDocuments();
     if (!employeeCount) {
       await Employee.insertMany(employeeData);
     }
 
+    // Insert equipment
+    const equipmentCount = await Equipment.countDocuments();
     if (!equipmentCount) {
       await Equipment.insertMany(equipmentData);
     }
 
+    // Insert materials and then history material
+    const materialCount = await Material.countDocuments();
+    let materials; // Define variable outside of condition
     if (!materialCount) {
-      const materials = await Material.insertMany(materialData);
+      materials = await Material.insertMany(materialData);
 
+      const historyMaterialCount = await HistoryMaterial.countDocuments();
       if (!historyMaterialCount) {
         const historyMaterialData = [
           { materialId: materials[0]._id, batchId: 'B001', datePurchase: new Date(), dateShipment: new Date(), quantity: 50, remainingQuantity: 30, price: 100.00, status: 'InStock' },
@@ -95,13 +111,19 @@ const createInitialData = async () => {
       }
     }
 
+    // Insert history money
+    const historyMoneyCount = await HistoryMoney.countDocuments();
     if (!historyMoneyCount) {
       await HistoryMoney.insertMany(historyMoneyData);
     }
 
+    // Insert products and then product materials
+    const productCount = await Product.countDocuments();
+    let products; // Define variable outside of condition
     if (!productCount) {
-      const products = await Product.insertMany(productData);
+      products = await Product.insertMany(productData);
 
+      const productMaterialCount = await ProductMaterial.countDocuments();
       if (!productMaterialCount) {
         const productMaterialsData = [
           { productId: products[0]._id, materialId: materials[0]._id, quantityUsed: 10 },
@@ -111,10 +133,15 @@ const createInitialData = async () => {
       }
     }
 
+    // Insert sales
+    let sales;
+    const salesCount = await Sales.countDocuments();
     if (!salesCount) {
-      await Sales.insertMany(salesData);
+      sales = await Sales.insertMany(salesData);
     }
 
+    // Insert orders
+    const orderCount = await Order.countDocuments();
     if (!orderCount) {
       const orders = [
         { productId: products[0]._id, tableId: tables[0]._id, numberProduct: 2, saleId: null, price: 10.00, time: new Date(), status: 'Completed' },
