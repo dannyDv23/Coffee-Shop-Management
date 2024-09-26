@@ -8,7 +8,7 @@ const bookingSchema = new mongoose.Schema({
     phoneNumber: { type: String, required: true },
     date: { type: Date, required: true },
     time: { type: String, required: true },
-    reason: { type: String, default: null },
+    reason: { type: String, required: false },
     status: { type: String, enum: BOOKING_STATUSES, required: true },
     tableId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true }]
 });
