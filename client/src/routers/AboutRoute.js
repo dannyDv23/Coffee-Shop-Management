@@ -3,9 +3,9 @@ const router = express.Router();
 const path = require('path');
 const axios = require('axios');
 
-// Define a route for the about page
-router.get('/abc', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join('views', 'HomePage')});
+
+router.get('/', (req, res) => {
+  res.render('../MainLayout', { bodyPage: path.join('views', 'AboutPage')});
 });
 
 //example when call api
@@ -24,16 +24,6 @@ router.get('/abc', (req, res) => {
 //       });
 //   }
 // });
-
-// Define other route relate to this router
-router.get('/avatar', (req, res) => {
-    res.render('../MainLayout', { bodyPage: path.join('views', 'AvartarPage')});
-  });
-
-
-  router.get('/dashboard', (req, res) => {
-    res.render('../MainLayout', { bodyPage: path.join('views', 'Dashboard')});
-  });
 
 
 module.exports = router;
