@@ -6,3 +6,43 @@
 .bg-malibu {
     background-color: #7DC8F7;
 }
+
+.color-mint {
+    color: #9CE29C; /* Mint Green */
+}
+
+.bg-mint {
+    background-color: #9CE29C;
+}
+
+.color-sunset {
+    color: #F7A87D; /* Sunset Orange */
+}
+
+.bg-sunset {
+    background-color: #F7A87D;
+}
+
+.color-royal {
+    color: #6B5FAD; /* Royal Purple */
+}
+
+.bg-royal {
+    background-color: #6B5FAD;
+}
+
+.color-arylide-yellow {
+    color: #f0d179; /* Sunflower Yellow */
+}
+
+.bg-arylide-yellow {
+    background-color: #f0d179;
+}
+
+.color-sky {
+    color: #5D7CA6;
+}
+
+.bg-sky {
+    background-color: #5D7CA6;
+}
