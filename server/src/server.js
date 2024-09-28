@@ -7,9 +7,17 @@ const { errorHandler, errorConverter } = require('./middlewares/error');
 const passport = require('passport');
 const { jwtStrategy } = require('./config/passport');
 const authRouter = require('./routes/auth.roure');
+const cors = require('cors');
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
+
+// CORS
+app.use(cors({
+  origin: 'http://localhost:4000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}));
 
 //jwt authentication
 app.use(passport.initialize());
