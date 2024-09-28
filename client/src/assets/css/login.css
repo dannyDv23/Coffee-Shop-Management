@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Background image */
+    background-image: url('https://www.dragosroua.com/wp-content/uploads/2019/03/coffee-shop-1149155_1920.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background-color: rgba(34, 34, 34, 0.8); /* Slightly transparent background */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    width: 500px;
+    text-align: center;
+    backdrop-filter: blur(10px); /* Blur effect */
+}
+
+h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: 2px solid #333;
+    border-radius: 30px;
+    outline: none;
+    color: #fff;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #00b4d8;
+}
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    color: #00b4d8;
+    font-size: 14px;
+    margin-bottom: 30px;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #00b4d8;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #0096c7;
+}
+
+.error-message {
+    color: red;
+    margin-top: 20px;
+}
+
+.social-login {
+    margin-top: 30px;
+}
+
+.social-login a {
+    color: white;
+    font-size: 24px;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-login a:hover {
+    color: #00b4d8;
+}
