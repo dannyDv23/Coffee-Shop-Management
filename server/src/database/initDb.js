@@ -2,12 +2,10 @@ const mongoose = require('mongoose');
 const Booking = require('../models/booking');
 const Employee = require('../models/employee');
 const Equipment = require('../models/equipment');
-const HistoryMaterial = require('../models/historyMaterial');
 const HistoryMoney = require('../models/historyMoney');
 const Material = require('../models/material');
 const Order = require('../models/order');
 const Product = require('../models/product');
-const ProductMaterial = require('../models/productMaterial');
 const Sales = require('../models/sales');
 const Table = require('../models/table');
 
@@ -18,8 +16,8 @@ const bookingData = [
 ];
 
 const employeeData = [
-  { username: 'johndoe', password: 'password123', role: 'Admin', salary: 50000, address: '123 Main St', phoneNumber: '987654321', status: 'Active' },
-  { username: 'janesmith', password: 'password456', role: 'Employee', salary: 30000, address: '456 Elm St', phoneNumber: '123456789', status: 'Active' }
+  { name: 'johndoe', position: 'Admin', salary: 50000, address: '123 Main St', phoneNumber: '987654321', status: 'Active' },
+  { name: 'janesmith', position: 'Employee', salary: 30000, address: '456 Elm St', phoneNumber: '123456789', status: 'Active' }
 ];
 
 const equipmentData = [
@@ -28,8 +26,18 @@ const equipmentData = [
 ];
 
 const materialData = [
-  { name: 'Coffee Beans', unit: 'kg', totalQuantity: 100, status: 'Active' },
-  { name: 'Flour', unit: 'kg', totalQuantity: 50, status: 'Active' }
+  {
+    name: 'Coffee Beans', unit: 'kg', totalQuantity: 100, status: 'Active',
+    history: [
+      { datePurchase: new Date(), dateShipment: new Date(), newQuantity: 50, remainingQuantity: 30, price: 100.00, status: 'InStock' }
+    ]
+  },
+  {
+    name: 'Flour', unit: 'kg', totalQuantity: 50, status: 'Active',
+    history: [
+      { datePurchase: new Date(), dateShipment: new Date(), newQuantity: 20, remainingQuantity: 10, price: 50.00, status: 'InStock' }
+    ]
+  }
 ];
 
 const historyMoneyData = [
@@ -38,8 +46,14 @@ const historyMoneyData = [
 ];
 
 const productData = [
-  { name: 'Coffee', price: 5.00, status: 'Available' },
-  { name: 'Pastry', price: 3.00, status: 'Available' }
+  {
+    name: 'Coffee', price: 5.00, status: 'Available',
+    material: [{ materialId: null, quantityUsed: 10 }] // Will be updated later with material IDs
+  },
+  {
+    name: 'Pastry', price: 3.00, status: 'Available',
+    material: [{ materialId: null, quantityUsed: 5 }] // Will be updated later with material IDs
+  }
 ];
 
 const salesData = [
@@ -54,55 +68,102 @@ const tableData = [
 
 const createInitialData = async () => {
   try {
+    console.log("wait create initial data");
+    
     // Clear existing data
-    await Booking.deleteMany({});
-    await Employee.deleteMany({});
-    await Equipment.deleteMany({});
-    await HistoryMaterial.deleteMany({});
-    await HistoryMoney.deleteMany({});
-    await Material.deleteMany({});
-    await Order.deleteMany({});
-    await Product.deleteMany({});
-    await ProductMaterial.deleteMany({});
-    await Sales.deleteMany({});
-    await Table.deleteMany({});
+    // await Booking.deleteMany({});
+    // await Employee.deleteMany({});
+    // await Equipment.deleteMany({});
+    // await HistoryMoney.deleteMany({});
+    // await Material.deleteMany({});
+    // await Order.deleteMany({});
+    // await Product.deleteMany({});
+    // await Sales.deleteMany({});
+    // await Table.deleteMany({});
 
-    // Insert tables first
-    const tables = await Table.insertMany(tableData);
+    // Insert tables first if not already present
+    const tableCount = await Table.countDocuments();
+    let tables;
+    if (!tableCount) {
+      tables = await Table.insertMany(tableData);
+      bookingData[0].tableId = tables[0]._id;
+      bookingData[1].tableId = tables[1]._id;
+    }
 
-    // Now update bookingData with the correct tableIds
-    bookingData[0].tableId = tables[0]._id;
-    bookingData[1].tableId = tables[1]._id;
+    // Insert bookings
+    const bookingCount = await Booking.countDocuments();
+    if (!bookingCount) {
+      await Booking.insertMany(bookingData);
+    }
 
-    // Insert other data
-     await Booking.insertMany(bookingData);
-     await Employee.insertMany(employeeData);
-     await Equipment.insertMany(equipmentData);
-    const materials = await Material.insertMany(materialData);
-     await HistoryMoney.insertMany(historyMoneyData);
-    const products = await Product.insertMany(productData);
-    const sales = await Sales.insertMany(salesData);
+    // Insert employees
+    const employeeCount = await Employee.countDocuments();
+    if (!employeeCount) {
+      await Employee.insertMany(employeeData);
+    }
 
-    // Insert productMaterial data using product and material IDs
-    const productMaterialsData = [
-      { productId: products[0]._id, materialId: materials[0]._id, quantityUsed: 10 },
-      { productId: products[1]._id, materialId: materials[1]._id, quantityUsed: 5 }
-    ];
-    await ProductMaterial.insertMany(productMaterialsData);
+    // Insert equipment
+    const equipmentCount = await Equipment.countDocuments();
+    if (!equipmentCount) {
+      await Equipment.insertMany(equipmentData);
+    }
 
-    const historyMaterialData = [
-      { materialId: materials[0]._id, batchId: 'B001', datePurchase: new Date(), dateShipment: new Date(), quantity: 50, remainingQuantity: 30, price: 100.00, status: 'InStock' },
-      { materialId: materials[1]._id, batchId: 'B002', datePurchase: new Date(), dateShipment: new Date(), quantity: 20, remainingQuantity: 10, price: 50.00, status: 'InStock' }
-    ];
-    await HistoryMaterial.insertMany(historyMaterialData);
-    // Insert order data with product, table, and sale IDs
-    const orderData = [
-      { productId: products[0]._id, tableId: tables[0]._id, numberProduct: 2, saleId: null, price: 10.00, time: new Date(), status: 'Completed' },
-      { productId: products[1]._id, tableId: tables[1]._id, numberProduct: 1, saleId: sales[0]._id, price: 3.00, time: new Date(), status: 'Pending' }
-    ];
-    await Order.insertMany(orderData);
+    // Insert materials
+    const materialCount = await Material.countDocuments();
+    let materials;
+    if (!materialCount) {
+      materials = await Material.insertMany(materialData);
 
-    console.log('Data inserted successfully!');
+      // Update product materials with material IDs
+      productData[0].material[0].materialId = materials[0]._id;
+      productData[1].material[0].materialId = materials[1]._id;
+    }
+
+    // Insert history money
+    const historyMoneyCount = await HistoryMoney.countDocuments();
+    if (!historyMoneyCount) {
+      await HistoryMoney.insertMany(historyMoneyData);
+    }
+
+    // Insert products
+    const productCount = await Product.countDocuments();
+    let products;
+    if (!productCount) {
+      products = await Product.insertMany(productData);
+    }
+
+    // Insert sales
+    let sales;
+    const salesCount = await Sales.countDocuments();
+    if (!salesCount) {
+      sales = await Sales.insertMany(salesData);
+    }
+
+    // Insert orders
+    const orderCount = await Order.countDocuments();
+    if (!orderCount) {
+      const orders = [
+        {
+          product: [{ productId: products[0]._id, numberProduct: 2 }],
+          tableId: tables[0]._id,
+          saleId: null,
+          price: 10.00,
+          time: new Date(),
+          status: 'Completed'
+        },
+        {
+          product: [{ productId: products[1]._id, numberProduct: 1 }],
+          tableId: tables[1]._id,
+          saleId: sales[0]._id,
+          price: 3.00,
+          time: new Date(),
+          status: 'Pending'
+        }
+      ];
+      await Order.insertMany(orders);
+    }
+
+    console.log('Initial data insertion complete!');
   } catch (error) {
     console.error('Error inserting data:', error);
   }
