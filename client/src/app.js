@@ -1,12 +1,13 @@
 // Import necessary modules
-const express = require('express');
-const path = require('path');
-const http = require('http');
-const reload = require('reload');
-require('dotenv').config(); // Load .env variables
+const express = require("express");
+const path = require("path");
+const http = require("http");
+const reload = require("reload");
+require("dotenv").config(); // Load .env variables
 
 // Import routers
-const homeRoute = require('./routers/HomeRoute');
+const homeRoutes = require("./routers/HomeRoutes");
+const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
 
 // Create the Express app
@@ -14,16 +15,18 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Set the view engine to EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'assets')));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "assets")));
 
 // Use the blog routes
-app.use('/', homeRoute); // Apply the blog routes
+app.use("/", homeRoutes); // Apply the blog routes
+app.use("/login", loginRoute);
 app.use('/about', aboutRoute); 
+
 // Create an HTTP server
 const server = http.createServer(app);
 
@@ -34,4 +37,3 @@ server.listen(port, () => {
 
 // Enable live reload
 reload(app);
-

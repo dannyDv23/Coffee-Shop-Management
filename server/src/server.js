@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
-const morgan = require("./config/morgan");
-const httpStatus = require("http-status");
-const ApiError = require("./utils/ApiError");
-const { errorHandler, errorConverter } = require("./middlewares/error");
-const passport = require("passport");
-const { jwtStrategy } = require("./config/passport");
-const authRouter = require("./routes/auth.roure");
-const cors = require("cors");
+const morgan = require('./config/morgan');
+const httpStatus = require('http-status');
+const ApiError = require('./utils/ApiError');
+const { errorHandler, errorConverter } = require('./middlewares/error');
+const passport = require('passport');
+const { jwtStrategy } = require('./config/passport');
+const authRouter = require('./routes/auth.roure');
+const cors = require('cors');
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);

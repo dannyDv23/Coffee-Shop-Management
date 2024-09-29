@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body>
+    <div
+      class="container d-flex align-items-center justify-content-center vh-100"
+    >
+      <div class="login-box border rounded p-4 shadow">
+        <h2 class="text-center">LOGIN</h2>
+        <p class="text-center">Please login first to continue!</p>
+
+        <form onsubmit="loginUser(event)">
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              placeholder="Username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+
+          <a href="#" class="d-block text-right forgot-password"
+            >Forgot password?</a
+          >
+          <button type="submit" class="btn btn-primary btn-block">Login</button>
+          <div id="error" class="error-message text-danger mt-2"></div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      window.onload = function () {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          const userRole = getRoleFromToken(token);
+          redirectUserByRole(userRole);
+        }
+      };
+
+      async function loginUser(event) {
+        event.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const response = await fetch("http://127.0.0.1:3000/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            localStorage.setItem("accessToken", result.tokens.access.token);
+
+            const userRole = result.employee.role;
+
+            redirectUserByRole(userRole);
+          } else {
+            document.getElementById("error").textContent = result.message;
+          }
+        } catch (error) {
+          document.getElementById("error").textContent =
+            "An unexpected error occurred.";
+        }
+      }
+
+      function redirectUserByRole(role) {
+        if (role === "Employee") {
+          window.location.href = "/employee";
+        } else if (role === "Admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/";
+        }
+      }
+      function getRoleFromToken(token) {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map(function (c) {
+              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+        );
+        const decodedToken = JSON.parse(jsonPayload);
+
+        return decodedToken.sub.role;
+      }
+    </script>
+  </body>
+</html>

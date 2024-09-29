@@ -7,11 +7,7 @@
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
       name="viewport"
     />
-    <link
-      rel="icon"
-      href="/img/kaiadmin/favicon.ico"
-      type="image/x-icon"
-    />
+    <link rel="icon" href="/img/kaiadmin/favicon.ico" type="image/x-icon" />
 
     <!-- Fonts and icons -->
     <script src="/js/plugin/webfont/webfont.min.js"></script>
@@ -265,7 +261,7 @@
                 </div>
               </li>
               <!--TODO:  update status active for nav <li class="nav-item active"> -->
-                <li class="nav-item ">
+              <li class="nav-item">
                 <a href="widgets.html">
                   <i class="fas fa-desktop"></i>
                   <p>Widgets</p>
@@ -440,10 +436,7 @@
                         <div class="notif-center">
                           <a href="#">
                             <div class="notif-img">
-                              <img
-                                src="/img/jm_denis.jpg"
-                                alt="Img Profile"
-                              />
+                              <img src="/img/jm_denis.jpg" alt="Img Profile" />
                             </div>
                             <div class="notif-content">
                               <span class="subject">Jimmy Denis</span>
@@ -453,10 +446,7 @@
                           </a>
                           <a href="#">
                             <div class="notif-img">
-                              <img
-                                src="/img/chadengle.jpg"
-                                alt="Img Profile"
-                              />
+                              <img src="/img/chadengle.jpg" alt="Img Profile" />
                             </div>
                             <div class="notif-content">
                               <span class="subject">Chad</span>
@@ -466,10 +456,7 @@
                           </a>
                           <a href="#">
                             <div class="notif-img">
-                              <img
-                                src="/img/mlane.jpg"
-                                alt="Img Profile"
-                              />
+                              <img src="/img/mlane.jpg" alt="Img Profile" />
                             </div>
                             <div class="notif-content">
                               <span class="subject">Jhon Doe</span>
@@ -481,10 +468,7 @@
                           </a>
                           <a href="#">
                             <div class="notif-img">
-                              <img
-                                src="/img/talha.jpg"
-                                alt="Img Profile"
-                              />
+                              <img src="/img/talha.jpg" alt="Img Profile" />
                             </div>
                             <div class="notif-content">
                               <span class="subject">Talha</span>
@@ -549,10 +533,7 @@
                           </a>
                           <a href="#">
                             <div class="notif-img">
-                              <img
-                                src="/img/profile2.jpg"
-                                alt="Img Profile"
-                              />
+                              <img src="/img/profile2.jpg" alt="Img Profile" />
                             </div>
                             <div class="notif-content">
                               <span class="block">
@@ -708,7 +689,9 @@
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Account Setting</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Logout</a>
+                        <a class="dropdown-item" onclick="logoutUser()"
+                          >Logout</a
+                        >
                       </li>
                     </div>
                   </ul>
@@ -720,7 +703,7 @@
         </div>
 
         <div class="container">
-            <!-- //TODO: -->
+          <!-- //TODO: -->
           <%- include(bodyPage) %>
         </div>
 
@@ -996,5 +979,12 @@
       });
     </script>
     <script src="/reload/reload.js"></script>
+
+    <script>
+      function logoutUser() {
+        localStorage.clear();
+        window.location.href = "/login";
+      }
+    </script>
   </body>
 </html>
