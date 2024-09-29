@@ -6,10 +6,9 @@ const reload = require("reload");
 require("dotenv").config(); // Load .env variables
 
 // Import routers
-const homeRoute = require('./routers/HomeRoute');
-const aboutRoute =  require('./routers/AboutRoute');
+const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
-
+const aboutRoute =  require('./routers/AboutRoute');
 
 // Create the Express app
 const app = express();
@@ -20,13 +19,13 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'assets')));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "assets")));
 
 // Use the blog routes
 app.use("/", homeRoute); 
-app.use('/about', aboutRoute);
 app.use("/login", loginRoute);
+app.use('/about', aboutRoute); 
 
 // Create an HTTP server
 const server = http.createServer(app);

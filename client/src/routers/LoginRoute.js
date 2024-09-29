@@ -4,7 +4,7 @@ const path = require("path");
 const axios = require("axios");
 
 router.get("/", (req, res) => {
-  res.render("./LoginPage", { bodyPage: path.join("views", "LoginPage") });
+  res.render("../views/LoginPage", { bodyPage: path.join("views", "LoginPage") });
 });
 
 module.exports = router;
