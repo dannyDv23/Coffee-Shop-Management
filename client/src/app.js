@@ -6,7 +6,7 @@ const reload = require("reload");
 require("dotenv").config(); // Load .env variables
 
 // Import routers
-const homeRoutes = require("./routers/HomeRoutes");
+const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
 
@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "assets")));
 
 // Use the blog routes
-app.use("/", homeRoutes); // Apply the blog routes
+app.use("/", homeRoute); 
 app.use("/login", loginRoute);
 app.use('/about', aboutRoute); 
 
