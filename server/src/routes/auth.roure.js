@@ -5,12 +5,12 @@ const { authValidation, employeeValidation } = require("../validations");
 const authController = require("../controllers/auth.controller");
 
 router.post(
-    "/api/register",
+    "/register",
     validate(employeeValidation.createEmployeeSchema),
     authController.register
 )
 router.post(
-  "/api/login",
+  "/login",
   validate(authValidation.loginSchema),
   authController.login
 );
