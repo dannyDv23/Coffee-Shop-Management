@@ -1,13 +1,14 @@
 const express = require("express");
 const app = express();
-const morgan = require('./config/morgan');
-const httpStatus = require('http-status');
-const ApiError = require('./utils/ApiError');
-const { errorHandler, errorConverter } = require('./middlewares/error');
-const passport = require('passport');
-const { jwtStrategy } = require('./config/passport');
-const authRouter = require('./routes/auth.roure');
-const cors = require('cors');
+const morgan = require("./config/morgan");
+const httpStatus = require("http-status");
+const ApiError = require("./utils/ApiError");
+const { errorHandler, errorConverter } = require("./middlewares/error");
+const passport = require("passport");
+const { jwtStrategy } = require("./config/passport");
+const authRouter = require("./routes/auth.roure");
+const cors = require("cors");
+const config = require("./config/config");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -25,9 +26,13 @@ app.use(
 app.use(passport.initialize());
 passport.use(jwtStrategy);
 
+// root Route
+const rootRouter = express.Router();
+app.use(`/${config.rootRoute}`, rootRouter);
+
 // routes
-app.use(express.json());
-app.use(authRouter);
+rootRouter.use(express.json());
+rootRouter.use("/auth", authRouter);
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
