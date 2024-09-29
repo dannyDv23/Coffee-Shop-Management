@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'assets')));
 
 // Use the blog routes
-app.use('/', homeRoute); // Apply the blog routes
+app.use("/", homeRoute); 
 app.use('/about', aboutRoute);
 app.use("/login", loginRoute);
 
