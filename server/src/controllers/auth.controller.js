@@ -4,8 +4,10 @@ const { tokenService, authService, employeeService } = require("../services");
 const ApiError = require("../utils/ApiError");
 
 const register = catchAsync(async (req, res) => {
-  const {name, username, password, retypePassword } = req.body;
-  const existingEmployee = await employeeService.getEmployeeByUsername(username);
+  const { name, username, password, retypePassword } = req.body;
+  const existingEmployee = await employeeService.getEmployeeByUsername(
+    username
+  );
   if (existingEmployee) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
   }
@@ -24,7 +26,7 @@ const register = catchAsync(async (req, res) => {
 const login = catchAsync(async (req, res) => {
   const { username, password } = req.body;
   const employee = await authService.login(username, password);
-  const tokens = await tokenService.generateAuthTokens(employee);
+  const tokens = await tokenService.generateAuthTokens(employee.id);
   res.status(httpStatus.OK).send({ employee, tokens });
 });
 
