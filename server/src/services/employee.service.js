@@ -18,7 +18,12 @@ const getEmployeeByUsername = async (username) => {
   return await Auth.findOne({ username });
 };
 
+const getAuthById = async (id) => {
+  return await Auth.findById(id);
+};
+
 module.exports = {
   createEmployee,
   getEmployeeByUsername,
+  getAuthById,
 };
