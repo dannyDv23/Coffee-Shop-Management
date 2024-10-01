@@ -9,7 +9,7 @@ const { ROLES } = require("../models/constants");
 router.post(
   "/register",
   auth,
-  // roleFilter(["Admin"]),
+  roleFilter(["Admin"]),
   validate(employeeValidation.createEmployeeSchema),
   authController.register
 );
