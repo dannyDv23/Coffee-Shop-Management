@@ -7,6 +7,7 @@ const { errorHandler, errorConverter } = require("./middlewares/error");
 const passport = require("passport");
 const { jwtStrategy } = require("./config/passport");
 const authRouter = require("./routes/auth.roure");
+const equipmentRouter = require("./routes/equipment.route");
 const cors = require("cors");
 const config = require("./config/config");
 
@@ -33,7 +34,7 @@ app.use(`/${config.rootRoute}`, rootRouter);
 // routes
 rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
-
+rootRouter.use("/equipments", equipmentRouter);
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
