@@ -9,6 +9,8 @@ require("dotenv").config(); // Load .env variables
 const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
+const equipmentRoute = require('./routers/EquipmentRoute');
+const saleRoute = require('./routers/SaleRoute');
 
 // Create the Express app
 const app = express();
@@ -25,7 +27,9 @@ app.use(express.static(path.join(__dirname, "assets")));
 // Use the blog routes
 app.use("/", homeRoute); 
 app.use("/login", loginRoute);
-app.use('/about', aboutRoute); 
+app.use('/about', aboutRoute);
+app.use('/equipment', equipmentRoute);
+app.use('/sale', saleRoute);
 
 // Create an HTTP server
 const server = http.createServer(app);
