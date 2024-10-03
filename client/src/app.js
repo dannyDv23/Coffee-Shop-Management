@@ -9,7 +9,7 @@ require("dotenv").config(); // Load .env variables
 const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
-
+const tableRoute =  require('./routers/TableRoute');
 // Create the Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, "assets")));
 app.use("/", homeRoute); 
 app.use("/login", loginRoute);
 app.use('/about', aboutRoute); 
+app.use('/table', tableRoute); 
 
 // Create an HTTP server
 const server = http.createServer(app);

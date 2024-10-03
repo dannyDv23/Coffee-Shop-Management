@@ -58,15 +58,15 @@
               icon: "fas fa-chart-line",
               managementName: "Sales",
               subItems: [
-                { name: "View table", link: "./avatar" },
-                { name: "Move table", link: "components/buttons.html" },
-                { name: "Split table", link: "components/gridsystem.html" },
-                { name: "Merge tables", link: "components/panels.html" },
-                { name: "Cancel table", link: "components/notifications.html" },
-                { name: "Book table", link: "components/sweetalert.html" },
-                { name: "Select menu", link: "components/font-awesome-icons.html" },
-                { name: "Payment", link: "components/simple-line-icons.html" },
-                { name: "Print settings", link: "components/typography.html" },
+                { name: "View table", link: "/table/view" },
+                { name: "Move table", link: "/table/move" },
+                { name: "Split table", link: "/table/split" },
+                { name: "Merge tables", link: "/table/merge" },
+                { name: "Cancel table", link: "/table/cancel" },
+                { name: "Choose menu", link: "/table/chooseMenu" },
+                { name: "Booking table", link: "/table/booking" },
+                { name: "Payment", link: "/table/payment" },
+                { name: "Print settings", link: "/table/print" },
               ],
             },
             //TODO: quan ly trang thiet bi
@@ -823,6 +823,7 @@
     <script src="/js/core/jquery-3.7.1.min.js"></script>
     <script src="/js/core/popper.min.js"></script>
     <script src="/js/core/bootstrap.min.js"></script>
+    <script src="/js/plugin/sweetalert/sweetalert.min.js"></script>
     <!-- jQuery Scrollbar -->
     <script src="/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
     <!-- jQuery Sparkline -->
@@ -831,6 +832,7 @@
     <script src="/js/kaiadmin.min.js"></script>
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="/js/setting-demo.js"></script>
+    <script src="/js/customerModal.js"></script>
     <script>
       $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
         type: "line",

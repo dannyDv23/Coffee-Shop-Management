@@ -1,0 +1,7 @@
+<button type="button" class="btn btn-info view-table-button" data-table="<%= data.number %>"
+    data-status="<%= data.status %>" data-list-product='<%= JSON.stringify(data.listProduct) %>'>
+    <h4>
+        <%= data.number %>
+    </h4>
+    <div class="table-status fw-bold <%= data.textStyle %>">(<%= data.status %>)</div>
+</button>
