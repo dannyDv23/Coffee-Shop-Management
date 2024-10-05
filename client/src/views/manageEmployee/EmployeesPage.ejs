@@ -1,0 +1,63 @@
+<div class="page-inner">
+  <table class="table table-striped table-striped-bg-danger mt-4">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Position</th>
+        <th scope="col">Salary</th>
+        <th scope="col">Address</th>
+        <th scope="col">Phone Number</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (datas.length > 0) { %> <% datas.forEach((employee, index) => { %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><%= employee.name %></td>
+        <td><%= employee.position %></td>
+        <td><%= employee.salary %></td>
+        <td><%= employee.address %></td>
+        <td><%= employee.phoneNumber %></td>
+      </tr>
+      <% }); %> <% } else { %>
+      <tr>
+        <td colspan="6" class="text-center">No employees found</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+<script>
+  window.onload = function () {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      window.location.href = "/login";
+    }
+  };
+  fetch("http://localhost:3000/api/employees", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((resonse) => {
+      if (resonse.status === 401 || resonse.status === 403) {
+        swal("Unauthorized", "You are not authorized to view this page", {
+          icon: "error",
+          buttons: {
+            confirm: {
+              className: "btn btn-danger",
+            },
+          },
+        }).then((willConfirm) => {
+          if (willConfirm) {
+            window.location.href = "/";
+          }
+        });
+      }
+    });
+</script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
