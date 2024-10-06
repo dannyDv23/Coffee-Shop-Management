@@ -14,36 +14,34 @@ const verifyCallBack = (req, resolve, reject) => async (err, user, info) => {
 
 const passport = require("passport");
 
-const auth = async (req, res, next) => {
-  return new Promise((resolve, reject) => {
-    passport.authenticate(
-      "jwt",
-      { session: false },
-      verifyCallBack(req, resolve, reject)
-    )(req, res, next);
-  })
-    .then(() => {
-      req.role = req.user.role;
-      next();
+const auth =
+  (roles = []) =>
+  async (req, res, next) => {
+    return new Promise((resolve, reject) => {
+      passport.authenticate(
+        "jwt",
+        { session: false },
+        verifyCallBack(req, resolve, reject)
+      )(req, res, next);
     })
-    .catch((error) => next(error));
-};
+      .then(() => {
+        const userRole = req.user.role;
 
-const roleFilter = (roles = []) => {
-  if (typeof roles === "string") {
-    roles = [roles];
-  }
-  return (req, res, next) => {
-    if (roles.length > 0 && !roles.includes(req.role)) {
-      return next(
-        new ApiError(httpStatus.FORBIDDEN, "Forbidden! Role not allowed")
-      );
-    }
-    return next();
+        if (roles.length && !roles.includes(userRole)) {
+          return next(
+            new ApiError(
+              httpStatus.FORBIDDEN,
+              "Forbidden, you don't have permission"
+            )
+          );
+        }
+
+        req.role = userRole;
+        next();
+      })
+      .catch((error) => next(error));
   };
-};
 
 module.exports = {
   auth,
-  roleFilter,
 };

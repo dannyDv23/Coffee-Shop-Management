@@ -9,7 +9,7 @@ const { jwtStrategy } = require("./config/passport");
 const cors = require("cors");
 const config = require("./config/config");
 const cookieParser = require("cookie-parser");
-const { auth, roleFilter } = require("./middlewares/auth");
+const { auth } = require("./middlewares/auth");
 
 // define routes
 const authRouter = require("./routes/auth.roure");
@@ -46,7 +46,7 @@ app.use(`/${config.rootRoute}`, rootRouter);
 // routes
 rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
-rootRouter.use("/employee", manageEmployeeRouter); //auth, roleFilter(["Admin"]),
+rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
