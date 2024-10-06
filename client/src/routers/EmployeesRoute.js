@@ -33,4 +33,22 @@ router.get("/add", async (req, res) => {
   });
 });
 
+router.get("/edit/:id", async (req, res) => {
+  const id = req.params.id;
+  const employees = await getEmployees(req);
+  const employee = employees.find((employee) => employee._id === id);
+  res.render("../MainLayout", {
+    bodyPage: path.join("views", "manageEmployee", "EditEmployee"),
+    employee: employee,
+  });
+});
+
+router.get("/delete", async (req, res) => {
+  const employees = await getEmployees(req);
+  res.render("../MainLayout", {
+    bodyPage: path.join("views", "manageEmployee", "DeleteEmployee"),
+    datas: employees,
+  });
+});
+
 module.exports = router;

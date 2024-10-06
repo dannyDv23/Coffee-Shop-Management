@@ -29,11 +29,44 @@ const getAuthById = async (id) => {
 };
 
 const getEmployees = async () => {
-  return await Employee.find();
+  const employees = await Employee.find();
+
+  const employeeDetails = await Promise.all(
+    employees.map(async (employee) => {
+      const authRecord = await Auth.findOne({ employeeId: employee._id });
+      return {
+        ...employee._doc,
+        username: authRecord ? authRecord.username : null,
+      };
+    })
+  );
+
+  return employeeDetails;
 };
 
 const getEmployeeByPhoneNumber = async (phoneNumber) => {
   return await Employee.findOne({ phoneNumber });
+};
+
+const updateEmployee = async (employeeId, employeeBody) => {
+  const employee = await Employee.findByIdAndUpdate(employeeId, employeeBody, {
+    new: true,
+  });
+  const newPassword = employeeBody.password;
+  if (
+    newPassword &&
+    newPassword.length > 0 &&
+    newPassword === employeeBody.retypePassword
+  ) {
+    const authRecord = await Auth.findOne({ employeeId });
+    authRecord.password = newPassword;
+    await authRecord.save();
+  }
+  return employee;
+};
+
+const deleteEmployee = async (employeeId) => {
+  return await Employee.findByIdAndDelete(employeeId);
 };
 module.exports = {
   createEmployee,
@@ -41,4 +74,6 @@ module.exports = {
   getAuthById,
   getEmployees,
   getEmployeeByPhoneNumber,
+  updateEmployee,
+  deleteEmployee,
 };
