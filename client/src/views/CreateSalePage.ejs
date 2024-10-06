@@ -1,5 +1,5 @@
-<div class="page-inner"></div>
-    <h1 class=" mb-4">Create New Sale</h1>
+<div class="page-inner">
+    <h1 class="mb-4">Create New Sale</h1>
     <form onsubmit="createSale(event)">
         <div class="form-group mb-3">
             <label for="name">Name</label>
@@ -48,6 +48,22 @@
     async function createSale(event) {
         event.preventDefault();
 
+        const name = document.getElementById("name").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        const discount = document.getElementById("discount").value;
+
+        // Validate dates
+        if (new Date(startDate) >= new Date(endDate)) {
+                document.getElementById("error").textContent = "Start date must be before end date.";
+                return;
+            }
+
+        // Validate discount
+        if (discount <= 0 || discount >= 100) {
+            document.getElementById("error").textContent = "Discount must be between 0 and 100.";
+            return;
+        }
         try {
             const response = await fetch("http://127.0.0.1:3000/api/sales", {
                 method: "POST",

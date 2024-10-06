@@ -1,16 +1,17 @@
 const Equipment = require('../models/equipment');
 const ApiError = require('../utils/ApiError');
+const catchAsync = require("../utils/catchAsync");
 
-exports.getAllEquipments = async (req, res, next) => {
+exports.getAllEquipments = catchAsync(async (req, res, next) => {
     try {
         const equipments = await Equipment.find();
         res.status(200).json(equipments);
     } catch (error) {
         next(error);
     }
-};
+});
 
-exports.getEquipmentById = async (req, res, next) => {
+exports.getEquipmentById = catchAsync(async (req, res, next) => {
     try {
         const equipment = await Equipment.findById(req.params.id);
         if (!equipment) {
@@ -20,9 +21,9 @@ exports.getEquipmentById = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+});
 
-exports.createEquipment = async (req, res, next) => {
+exports.createEquipment = catchAsync(async (req, res, next) => {
     try {
         const {name} = req.body;
         const existingEquipment = await Equipment.findOne({name});
@@ -35,9 +36,9 @@ exports.createEquipment = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+});
 
-exports.updateEquipment = async (req, res, next) => {
+exports.updateEquipment = catchAsync(async (req, res, next) => {
     try {
         const equipment = await Equipment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         if (!equipment) {
@@ -47,9 +48,9 @@ exports.updateEquipment = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+});
 
-exports.deleteEquipment = async (req, res, next) => {
+exports.deleteEquipment = catchAsync(async (req, res, next) => {
     try {
         const equipment = await Equipment.findByIdAndDelete(req.params.id);
         if (!equipment) {
@@ -59,4 +60,4 @@ exports.deleteEquipment = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};
+});
