@@ -6,9 +6,14 @@ const ApiError = require("./utils/ApiError");
 const { errorHandler, errorConverter } = require("./middlewares/error");
 const passport = require("passport");
 const { jwtStrategy } = require("./config/passport");
-const authRouter = require("./routes/auth.roure");
 const cors = require("cors");
 const config = require("./config/config");
+const cookieParser = require("cookie-parser");
+const { auth, roleFilter } = require("./middlewares/auth");
+
+// define routes
+const authRouter = require("./routes/auth.roure");
+const manageEmployeeRouter = require("./routes/employee.route");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -16,12 +21,20 @@ app.use(morgan.errorHandler);
 // CORS
 app.use(
   cors({
-    origin: "http://localhost:4000",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    origin: (origin, callback) => {
+      const whiteList = config.whiteList ? config.whiteList.split(",") : [];
+      if (!origin || whiteList.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
   })
 );
 
+app.use(cookieParser());
 //jwt authentication
 app.use(passport.initialize());
 passport.use(jwtStrategy);
@@ -33,6 +46,7 @@ app.use(`/${config.rootRoute}`, rootRouter);
 // routes
 rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
+rootRouter.use("/employee", manageEmployeeRouter); //auth, roleFilter(["Admin"]),
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));

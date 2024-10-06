@@ -18,9 +18,11 @@
     "@babel/preset-env": "^7.25.4",
     "axios": "^1.7.7",
     "babel": "^5.8.38",
+    "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
     "reload": "^3.3.0"
   }
 }
