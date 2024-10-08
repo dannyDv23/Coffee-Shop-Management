@@ -2,59 +2,67 @@
   <!-- Card -->
   <h3 class="fw-bold mb-3">
     <span class="text-primary">Welcome</span>
-    <span id="typed-name" class="text-uppercase text-success fw-bold"></span>,&nbsp;
+    <span id="typed-name" class="text-uppercase text-success fw-bold"></span
+    >,&nbsp;
     <span id="typewriter-text" class="text-info fs-10"></span>
   </h3>
 
   <div class="row">
     <% datas.forEach(data=> { %>
-      <div class="col-md-4">
-        <div class="card card-stats card-primary card-round" style="min-height: 200px;">
-          <div class="card-body bg-malibu rounded">
-            <div class="row">
-              <div class="col-12">
-                <div class="icon-big justify-content-start">
-                  <i class="fas <%= data.icon %>" style="color: #f4e96a!important"></i>
-                  <div class="numbers ms-2">
-                    <p class="card-title">
-                      <%= data.name %>
-                    </p>
-                  </div>
+    <div class="col-md-4">
+      <div
+        class="card card-stats card-primary card-round"
+        style="min-height: 200px"
+      >
+        <div class="card-body bg-malibu rounded">
+          <div class="row">
+            <div class="col-12">
+              <div class="icon-big justify-content-start">
+                <i
+                  class="fas <%= data.icon %>"
+                  style="color: #f4e96a !important"
+                ></i>
+                <div class="numbers ms-2">
+                  <p class="card-title"><%= data.name %></p>
                 </div>
               </div>
-              <div class="col-12 col-stats">
-                <div class="numbers">
-                  <h4 class="fw-normal fst-italic tẽ">
-                    <%= data.description %>
-                  </h4>
-                </div>
+            </div>
+            <div class="col-12 col-stats">
+              <div class="numbers">
+                <h4 class="fw-normal fst-italic tẽ"><%= data.description %></h4>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <% }); %>
+    </div>
+    <% }); %>
   </div>
 </div>
-
 
 <script src="/js/core/jquery-3.7.1.min.js"></script>
 
 <script>
-  $(document).ready(function() {
+  // window.onload = function () {
+  //   const token = localStorage.getItem("accessToken");
+  //   if (!token) {
+  //     window.location.href = "/login";
+  //   }
+  // };
+  $(document).ready(function () {
     var phrase = "Have a good day";
     var colors = [
-      "text-danger",   
-      "text-warning",   
-      "text-success",  
-      "text-primary",  
-      "text-info",      
-      "text-secondary",  
-      "text-dark"      
+      "text-danger",
+      "text-warning",
+      "text-success",
+      "text-primary",
+      "text-info",
+      "text-secondary",
+      "text-dark",
     ];
-    
-    var colorIndex = 0; 
-    var textIndex = 0; 
+
+    var colorIndex = 0;
+    var textIndex = 0;
 
     function typeWriter() {
       var typewriterText = "";
@@ -62,14 +70,16 @@
       function typeNextCharacter() {
         if (textIndex < phrase.length) {
           typewriterText += phrase.charAt(textIndex);
-          $('#typewriter-text').html(`<span class="${colors[colorIndex]}">${typewriterText}<span class="${colors[colorIndex]} blink-cursor">|</span>`);
+          $("#typewriter-text").html(
+            `<span class="${colors[colorIndex]}">${typewriterText}<span class="${colors[colorIndex]} blink-cursor">|</span>`
+          );
           textIndex++;
 
           setTimeout(typeNextCharacter, 100);
         } else {
           colorIndex = (colorIndex + 1) % colors.length;
           textIndex = 0;
-          setTimeout(typeWriter, 1000); 
+          setTimeout(typeWriter, 1000);
         }
       }
 

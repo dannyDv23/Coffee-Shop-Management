@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const morgan = require("./config/morgan");
 const httpStatus = require("http-status");
@@ -19,9 +19,30 @@ const materialRouter = require("./routes/material.route");
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
 
+// CORS
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      const whiteList = config.whiteList ? config.whiteList.split(",") : [];
+      if (!origin || whiteList.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
 //jwt authentication
 app.use(passport.initialize());
 passport.use(jwtStrategy);
+
+// root Route
+const rootRouter = express.Router();
+app.use(`/${config.rootRoute}`, rootRouter);
 
 // routes
 rootRouter.use(express.json());
@@ -30,7 +51,7 @@ rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
 rootRouter.use("/material", materialRouter);
 
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
 
 app.use(errorConverter);
