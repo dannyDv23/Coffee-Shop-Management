@@ -1,0 +1,163 @@
+<style>
+.table-cell-fixed {
+    height: 100px; 
+    max-height: 100px;
+    overflow-y: hidden; 
+}
+
+.table-cell-content {
+    height: 100%; 
+    overflow-y: auto; 
+    display: block; 
+    padding-right: 10px;
+}
+</style>
+
+<div class="page-inner">
+    <div class="table-responsive">
+        <table id="add-row" class="display table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Import</th>
+                    <th>Export</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th style="width: 10%">Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Import</th>
+                    <th>Export</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+            <tbody>
+                <% materials.forEach((material, index) => { %>
+                    <tr>
+                        <td class="table-cell-fixed"><%= index + 1 %></td>
+                        <td class="table-cell-fixed"><%= material.name %></td>
+
+                        <td class="table-cell-fixed">
+                            <div class="table-cell-content">
+                            <% if (material.importHistory.length) { %>
+                                <ul>
+                                    <% material.importHistory.forEach((importItem) => { %>
+                                        <li>
+                                            Date: <%= importItem.dateImport.substring(0, 10) %><br>
+                                            Quantity: <%= importItem.quantity %> <%= material.unit %><br>
+                                            Price: $<%= importItem.price %>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            <% } else { %>
+                                N/A
+                            <% } %>
+                        </div>
+                        </td>
+
+                        <td class="table-cell-fixed"> <!-- Set class here -->
+                            <div class="table-cell-content">
+                            <% if (material.exportHistory.length) { %>
+                                <ul >
+                                    <% material.exportHistory.forEach((exportItem) => { %>
+                                        <li>
+                                            Date: <%= exportItem.dateExport.substring(0, 10) %><br>
+                                            Quantity: <%= exportItem.quantity %> <%= material.unit %><br>
+                                            Price: $<%= exportItem.price %>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            <% } else { %>
+                                N/A
+                            <% } %>
+                        </div>
+                        </td>
+
+                        <td class="table-cell-fixed"><%= material.totalQuantity %></td>
+                        <td class="table-cell-fixed"><%= material.unit %></td>
+                        <td class="table-cell-fixed">$<%= material.pricePerUnit %></td>
+                        <td class="table-cell-fixed">$<%= (material.totalQuantity * material.pricePerUnit) %></td>
+                        <td>
+                            <div class="form-button-action">
+                                <button type="button" class="btn btn-link btn-primary btn-lg" onclick="redirectToEdit('<%= material._id %>')">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-link btn-danger" onclick="confirmDeleteEmployee('<%= material._id %>', '<%= material.name %>');">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function redirectToEdit(id) {
+        window.location.href = `/inventory/edit?id=${id}`;
+    }
+</script>
+
+<script>
+    async function confirmDeleteEmployee(materialId, materialName) {
+    // Show confirmation modal
+    swal({
+        title: "Are you sure?",
+        text: `Do you really want to delete ${materialName}?`,
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then(async (willDelete) => {  // Use the parameter to check if the user confirmed
+        if (willDelete) {  // Proceed only if the user clicked "OK"
+            try {
+                const updatedMaterial = {
+                    status: 'Delete'  // Updating the status to 'Delete'
+                };
+
+                const response = await fetch(
+                    `http://localhost:3000/api/material/delete/${materialId}`,  // Use materialId to send the request
+                    {
+                        method: 'PUT',  // Use PUT method to update the material status
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(updatedMaterial),  // Send the updated status in the request body
+                    }
+                );
+
+                if (response.ok) {
+                    swal("Material status updated to Delete successfully!", {
+                        icon: "success",
+                    }).then(() => {
+                        window.location.reload();  // Reload the page after successful update
+                    });
+                } else {
+                    const errorData = await response.json();
+                    swal("Failed to delete material", errorData.message, "error");
+                }
+            } catch (error) {
+                swal("Error", "An error occurred while deleting the material.", "error");
+                console.error("Error deleting material:", error);
+            }
+        } else {
+            // Optionally show a message when the action is canceled
+            swal("Action canceled", "The material was not deleted.", "info");
+        }
+    });
+}
+
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
