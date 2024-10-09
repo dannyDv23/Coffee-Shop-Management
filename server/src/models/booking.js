@@ -13,4 +13,5 @@ const bookingSchema = new mongoose.Schema({
     tableId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true }]
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+ const Booking = mongoose.model('Booking', bookingSchema);
+ module.exports = Booking;

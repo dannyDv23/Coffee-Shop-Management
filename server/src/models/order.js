@@ -12,9 +12,10 @@ const orderSchema = new mongoose.Schema({
     tableId: { type: mongoose.Schema.Types.ObjectId, ref: 'Table', required: true }, // Reference to the table
     saleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sales', required: false },
     price: { type: Number, required: true }, // Total price, with or without sale
-    time: { type: Date, required: true }, // Order time
+    time: { type: String, required: true }, // Order time
     status: { type: String, enum: ORDER_STATUSES, required: true } // Order status
 });
 
 
-module.exports = mongoose.model('Order', orderSchema);
+const Order = mongoose.model('Order', orderSchema);
+module.exports = Order
