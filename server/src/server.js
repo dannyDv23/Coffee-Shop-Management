@@ -14,6 +14,8 @@ const { auth } = require("./middlewares/auth");
 // define routes
 const authRouter = require("./routes/auth.roure");
 const manageEmployeeRouter = require("./routes/employee.route");
+const equipmentRouter = require("./routes/equipment.route");
+const salesRouter = require("./routes/sales.route");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -46,6 +48,8 @@ app.use(`/${config.rootRoute}`, rootRouter);
 // routes
 rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
+rootRouter.use("/equipments", equipmentRouter);
+rootRouter.use("/sales", salesRouter);
 rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
 
 app.use((req, res, next) => {
