@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Charts</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .date-picker {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-inner">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Report</div>
+            <hr>
+            <div class="date-picker">
+              <label for="startDate">Start Date:</label>
+              <input type="date" id="startDate" name="startDate">
+              <label for="endDate">End Date:</label>
+              <input type="date" id="endDate" name="endDate">
+              <button onclick="fetchData()">Apply</button>
+              <button onclick="exportExcel()">Export Excel</button>
+              <button onclick="exportPDF()">Export PDF</button>
+            </div>
+            <!-- Bảng thống kê -->
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Table</div>
+                </div>
+                <div class="card-body">
+                  <table id="reportTable" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Dữ liệu sẽ được đổ vào đây từ hàm fetchReportTableData() -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Bar Chart</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="barChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Pie Chart</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="pieChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gán giá trị ngày hiện tại để ngăn người dùng chọn ngày trong tương lai
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').setAttribute('max', today);
+    document.getElementById('endDate').setAttribute('max', today);
+
+    let barChartInstance = null;
+    let pieChartInstance = null;
+
+    // Gọi API để lấy dữ liệu Bar Chart với ngày tùy chọn
+    async function fetchBarChartData(startDate, endDate) {
+      try {
+        const response = await fetch(`http://127.0.0.1:3000/api/report/bar-chart?startDate=${startDate}&endDate=${endDate}`, {
+          method: 'GET',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bar chart data');
+        }
+
+        const data = await response.json();
+        drawBarChart(data);
+      } catch (error) {
+        console.error('Error fetching bar chart data:', error);
+      }
+    }
+
+    // Gọi API để lấy dữ liệu Pie Chart với ngày tùy chọn
+    async function fetchPieChartData(startDate, endDate) {
+      try {
+        const response = await fetch(`http://127.0.0.1:3000/api/report/pie-chart?startDate=${startDate}&endDate=${endDate}`, {
+          method: 'GET',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch pie chart data');
+        }
+
+        const data = await response.json();
+        drawPieChart(data);
+      } catch (error) {
+        console.error('Error fetching pie chart data:', error);
+      }
+    }
+    // Gọi API để lấy dữ liệu Table với ngày tùy chọn
+    async function fetchReportTableData(startDate, endDate) {
+    try {
+      const response = await fetch(`http://127.0.0.1:3000/api/report/report-table?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch report table data');
+      }
+
+      const data = await response.json();
+      populateReportTable(data);
+    } catch (error) {
+      console.error('Error fetching report table data:', error);
+    }
+  }
+
+    // Xuất excel
+    async function exportExcel() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (startDate && endDate) {
+        const url = `http://127.0.0.1:3000/api/report/export-excel?startDate=${startDate}&endDate=${endDate}`;
+        window.open(url, '_blank'); // Mở file Excel trong tab mới hoặc tải về
+      } else {
+        alert('Please select a start and end date');
+      }
+    }
+
+    // Xuất PDF
+    async function exportPDF() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) {
+        alert('Please select a start and end date');
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      // Kiểm tra xem endDate có vượt quá ngày hiện tại không
+      if (endDate > today) {
+        alert('End date cannot be greater than today');
+        return;
+      }
+
+      // Kiểm tra xem endDate có nhỏ hơn startDate không
+      if (endDate < startDate) {
+        alert('End date cannot be earlier than start date');
+        return;
+      }
+
+      // Gọi API để xuất PDF
+      const url = `http://127.0.0.1:3000/api/report/export-pdf?startDate=${startDate}&endDate=${endDate}`;
+      window.open(url, '_blank'); // Mở file PDF trong tab mới hoặc tải về
+    }
+
+    const chartColors = {
+      'Income': 'rgba(255, 99, 132, 0.2)',     // Màu hồng
+      'Material Purchase': 'rgba(54, 162, 235, 0.2)', // Màu xanh dương
+      'Equipment Purchase': 'rgba(255, 206, 86, 0.2)',  // Màu vàng
+      'Employee Salary': 'rgba(75, 192, 192, 0.2)' // Màu xanh lá
+    };
+
+    const chartBorderColors = {
+      'Income': 'rgba(255, 99, 132, 1)',
+      'Material Purchase': 'rgba(54, 162, 235, 1)',
+      'Equipment Purchase': 'rgba(255, 206, 86, 1)',
+      'Employee Salary': 'rgba(75, 192, 192, 1)'
+    };
+
+    // Hàm vẽ Bar Chart
+    function drawBarChart(data) {
+      const ctx = document.getElementById('barChart').getContext('2d');
+
+      if (barChartInstance) {
+        barChartInstance.destroy(); // Hủy biểu đồ cũ nếu đã có
+      }
+
+      barChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels, // Labels từ API
+          datasets: [{
+            label: 'Income and Expense',
+            data: data.datasets[0].data, // Dữ liệu từ API
+            backgroundColor: data.labels.map(label => chartColors[label]), // Màu sắc từ mảng màu
+            borderColor: data.labels.map(label => chartBorderColors[label]), // Màu viền
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Hàm vẽ Pie Chart
+    function drawPieChart(data) {
+      const ctx = document.getElementById('pieChart').getContext('2d');
+
+      if (pieChartInstance) {
+        pieChartInstance.destroy(); // Hủy biểu đồ cũ nếu đã có
+      }
+
+      pieChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: data.labels, // Labels từ API
+          datasets: [{
+            label: 'Money',
+            data: data.data, // Dữ liệu từ API
+            backgroundColor: data.labels.map(label => chartColors[label]), // Màu sắc từ mảng màu
+            borderColor: data.labels.map(label => chartBorderColors[label]), // Màu viền
+            borderWidth: 1
+          }]
+        }
+      });
+    }
+    // Hàm tạo Table
+    function populateReportTable(data) {
+    const tableBody = document.querySelector('#reportTable tbody');
+    tableBody.innerHTML = ''; // Xóa dữ liệu cũ
+
+    data.forEach(row => {
+      const tableRow = document.createElement('tr');
+      const categoryCell = document.createElement('td');
+      const amountCell = document.createElement('td');
+
+      categoryCell.textContent = row.category;
+      amountCell.textContent = row.amount.toLocaleString('en-US'); // Định dạng số với dấu phẩy
+
+      tableRow.appendChild(categoryCell);
+      tableRow.appendChild(amountCell);
+      tableBody.appendChild(tableRow);
+    });
+  }
+
+    // Hàm lấy dữ liệu từ input ngày và gọi API
+    function fetchData() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      const today = new Date().toISOString().split('T')[0];
+
+      if (!startDate || !endDate) {
+        alert('Please select a start and end date');
+        return;
+      }
+
+      // Kiểm tra xem endDate có vượt quá ngày hiện tại không
+      if (endDate > today) {
+        alert('End date cannot be greater than today');
+        return;
+      }
+
+      // Kiểm tra xem endDate có nhỏ hơn startDate không
+      if (endDate < startDate) {
+        alert('End date cannot be earlier than start date');
+        return;
+      }
+
+      fetchBarChartData(startDate, endDate);
+      fetchPieChartData(startDate, endDate);
+      fetchReportTableData(startDate, endDate); 
+    }
+
+  </script>
+</body>
+
+</html>

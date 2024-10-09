@@ -15,6 +15,7 @@ const aboutRoute =  require('./routers/AboutRoute');
 const equipmentRoute = require('./routers/EquipmentRoute');
 const saleRoute = require('./routers/SaleRoute');
 const manageEmployeeRoute = require('./routers/EmployeesRoute');
+const reportRoute =  require('./routers/ReportRoute');
 
 // Create the Express app
 const app = express();
@@ -37,6 +38,7 @@ app.use('/equipment', equipmentRoute);
 app.use('/sale', saleRoute);
 app.use('/about', aboutRoute); 
 app.use('/manage-employee', manageEmployeeRoute);
+app.use('/report', reportRoute); 
 // Create an HTTP server
 const server = http.createServer(app);
 
