@@ -1,0 +1,68 @@
+<div class="page-inner container-fluid px-5">
+  <table class="table mt-4 table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Position</th>
+        <th scope="col">Salary</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (datas.length > 0) { %> <% datas.forEach((employee, index) => { %>
+      <tr
+        style="cursor: pointer"
+        onclick="window.location.href='/manage-employee/edit/<%= employee._id %>';"
+        onmouseover="this.style.backgroundColor='#f5f5f5';"
+        onmouseout="this.style.backgroundColor='';"
+      >
+        <td><%= index + 1 %></td>
+        <td><%= employee.name %></td>
+        <td><%= employee.position %></td>
+        <td><%= employee.salary %></td>
+      </tr>
+      <% }); %> <% } else { %>
+      <tr>
+        <td colspan="6" class="text-center">No employees found</td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  window.onload = function () {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      window.location.href = "/login";
+    }
+  };
+
+  fetch("http://localhost:3000/api/employees", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((resonse) => {
+      if (resonse.status === 401 || resonse.status === 403) {
+        swal("Unauthorized", "You are not authorized to view this page", {
+          icon: "error",
+          buttons: {
+            confirm: {
+              className: "btn btn-danger",
+            },
+          },
+        }).then((willConfirm) => {
+          if (willConfirm) {
+            window.location.href = "/";
+          }
+        });
+      }
+    });
+</script>
+
+<!-- SweetAlert -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

@@ -3,12 +3,14 @@ const router = express.Router();
 const validate = require("../middlewares/validate");
 const { authValidation, employeeValidation } = require("../validations");
 const authController = require("../controllers/auth.controller");
+const { auth } = require("../middlewares/auth");
 
 router.post(
-    "/register",
-    validate(employeeValidation.createEmployeeSchema),
-    authController.register
-)
+  "/register",
+  // auth["Admin"],
+  validate(employeeValidation.createEmployeeSchema),
+  authController.register
+);
 router.post(
   "/login",
   validate(authValidation.loginSchema),
