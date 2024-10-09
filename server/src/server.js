@@ -14,6 +14,7 @@ const { auth } = require("./middlewares/auth");
 // define routes
 const authRouter = require("./routes/auth.roure");
 const manageEmployeeRouter = require("./routes/employee.route");
+const reportRoutes = require("./routes/report.route");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -47,7 +48,7 @@ app.use(`/${config.rootRoute}`, rootRouter);
 rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
 rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
-
+rootRouter.use("/report", reportRoutes);// Report routes 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
 });
