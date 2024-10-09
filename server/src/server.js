@@ -14,6 +14,7 @@ const { auth } = require("./middlewares/auth");
 // define routes
 const authRouter = require("./routes/auth.roure");
 const manageEmployeeRouter = require("./routes/employee.route");
+const materialRouter = require("./routes/material.route");
 const reportRoutes = require("./routes/report.route");
 const equipmentRouter = require("./routes/equipment.route");
 const salesRouter = require("./routes/sales.route");
@@ -52,6 +53,7 @@ rootRouter.use("/auth", authRouter);
 rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
 rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
+rootRouter.use("/material", materialRouter);
 rootRouter.use("/report", reportRoutes);// Report routes 
 
 app.use((req, res, next) => {

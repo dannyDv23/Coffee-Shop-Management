@@ -1,0 +1,95 @@
+<div class="page-inner">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Edit Material</div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 col-lg-6">
+              <div class="form-group">
+                <label for="material2">Name material</label>
+                <input type="text" class="form-control" id="material2" placeholder="Enter Name Material"
+                  value="<%= material.name %>" />
+              </div>
+              <div class="form-group">
+                <label for="price2">Price</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text">$</span>
+                  <input type="number" id="price-input" class="form-control" aria-label="Amount (to the nearest dollar)"
+                    min="0" value="<%= material.pricePerUnit %>" />
+                  <span class="input-group-text">.000</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-6">
+              <div class="form-group">
+                <label for="quantity2">Quantity</label>
+                <input type="number" class="form-control" id="quantity2" placeholder="Enter Quantity" min="0"
+                  value="<%= material.totalQuantity %>" />
+              </div>
+              <div class="form-group">
+                <label for="defaultSelect">Unit</label>
+                <select class="form-select form-control" id="defaultSelect">
+                  <option value="kg" <%=material.unit==='kg' ? 'selected' : '' %>>kg</option>
+                  <option value="g" <%=material.unit==='g' ? 'selected' : '' %>>g</option>
+                  <option value="barrel" <%=material.unit==='barrel' ? 'selected' : '' %>>barrel</option>
+                  <option value="bottle" <%=material.unit==='bottle' ? 'selected' : '' %>>bottle</option>
+                  <option value="bag" <%=material.unit==='bag' ? 'selected' : '' %>>bag</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="card-action">
+            <button type="button" class="btn btn-success" id="submit-btn">Submit</button>
+            <button type="button" class="btn btn-danger" id="cancel-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('submit-btn').addEventListener('click', async function () {
+    const id = '<%= material._id %>'; // Assuming you have the material ID available in your template
+    const name = document.getElementById('material2').value;
+    const price = document.getElementById('price-input').value;
+    const quantity = document.getElementById('quantity2').value;
+    const unit = document.getElementById('defaultSelect').value;
+
+    const updatedMaterial = {
+      name: name,
+      pricePerUnit: price,
+      totalQuantity: quantity,
+      unit: unit
+    };
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/material/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedMaterial),
+      });
+
+      if (response.ok) {
+        // Optionally handle success (like redirecting to another page or showing a success message)
+        alert('Material updated successfully!');
+        window.location.href = '/inventory';
+      } else {
+        throw new Error('Failed to update material');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error updating material: ' + error.message);
+    }
+  });
+
+  document.getElementById('cancel-btn').addEventListener('click', function () {
+    // Optionally handle cancel (like redirecting back to the materials list)
+    window.location.href = '/inventory';
+  });
+</script>

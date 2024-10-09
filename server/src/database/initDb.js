@@ -27,16 +27,26 @@ const equipmentData = [
 
 const materialData = [
   {
-    name: 'Coffee Beans', unit: 'kg', totalQuantity: 100, status: 'Active',
-    history: [
-      { datePurchase: new Date(), dateShipment: new Date(), newQuantity: 50, remainingQuantity: 30, price: 100.00, status: 'InStock' }
-    ]
+    name: 'Coffee Beans', 
+    unit: 'kg', 
+    totalQuantity: 100, 
+    pricePerUnit: 10, 
+    status: 'Active', 
+    importHistory: [
+      { dateImport: new Date().toISOString(), quantity: 50, price: 500 }
+    ],
+    exportHistory: [] 
   },
   {
-    name: 'Flour', unit: 'kg', totalQuantity: 50, status: 'Active',
-    history: [
-      { datePurchase: new Date(), dateShipment: new Date(), newQuantity: 20, remainingQuantity: 10, price: 50.00, status: 'InStock' }
-    ]
+    name: 'Flour', 
+    unit: 'kg', 
+    totalQuantity: 50, 
+    pricePerUnit: 2, 
+    status: 'Active',
+    importHistory: [
+      { dateImport: new Date().toISOString(), quantity: 20, price: 40 } 
+    ],
+    exportHistory: []
   }
 ];
 
@@ -114,10 +124,11 @@ const createInitialData = async () => {
     if (!materialCount) {
       materials = await Material.insertMany(materialData);
 
-      // Update product materials with material IDs
-      productData[0].material[0].materialId = materials[0]._id;
-      productData[1].material[0].materialId = materials[1]._id;
+      // Update product materials with the new material IDs
+      productData[0].material[0].materialId = materials[0]._id;  // For Coffee Beans
+      productData[1].material[0].materialId = materials[1]._id;  // For Flour
     }
+
 
     // Insert history money
     const historyMoneyCount = await HistoryMoney.countDocuments();
