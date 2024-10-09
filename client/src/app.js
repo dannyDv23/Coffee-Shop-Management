@@ -10,6 +10,8 @@ const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
 const tableRoute =  require('./routers/TableRoute');
+const inventoryRoute = require('./routers/InventoryRoute');
+const reportRoute =  require('./routers/ReportRoute');
 // Create the Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -27,6 +29,9 @@ app.use("/", homeRoute);
 app.use("/login", loginRoute);
 app.use('/about', aboutRoute); 
 app.use('/table', tableRoute); 
+app.use('/inventory', inventoryRoute );
+app.use('/report', reportRoute); 
+
 
 // Create an HTTP server
 const server = http.createServer(app);

@@ -1,0 +1,92 @@
+<div class="page-inner">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Export Material</div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 col-lg-12">
+              <div class="form-group">
+                <label for="material-selected">Name material</label>
+                <select class="form-select form-control" id="material-selected">
+                  <% materials.forEach(material => { %>
+                    <option value="<%= material._id %>">
+                      <%= material.name %> - Available: <%= material.totalQuantity %> <%= material.unit %>
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="quantity-export">Quantity</label>
+                <input type="number" class="form-control" id="quantity-export" placeholder="Enter Quantity" min="0" />
+                <script>
+                  document.getElementById('quantity-export').addEventListener('input', function () {
+                    if (this.value < 0) {
+                      this.value = 0;
+                    }
+                  });
+                </script>
+              </div>
+              <div class="form-group">
+                <label for="Date">Date export</label>
+                <input type="date" class="form-control" id="Date" placeholder="Date" />
+                <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    var today = new Date().toISOString().split('T')[0];
+                    document.getElementById('Date').setAttribute('min', today);
+                  });
+                </script>
+              </div>
+            </div>
+          </div>
+          <div class="card-action">
+            <button class="btn btn-success" id="submit-export">Submit</button>
+            <button class="btn btn-danger">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('submit-export').addEventListener('click', async function () {
+    const selectedMaterialId = document.getElementById('material-selected').value;
+    const quantity = document.getElementById('quantity-export').value;
+    const dateExport = document.getElementById('Date').value;
+
+    const body = {
+      materialId: selectedMaterialId,
+      quantity,
+      dateExport
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/material/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to export material.');
+      }
+
+      console.log(data);
+      // Show success alert and reload the page
+      alert('Material exported successfully!');
+      location.reload(); // Reload the page
+
+    } catch (error) {
+      console.error('Error:', error);
+      // Show error alert
+      alert('Failed to export material because not enough quantity.');
+    }
+  });
+</script>

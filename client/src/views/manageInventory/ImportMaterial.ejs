@@ -1,0 +1,115 @@
+<div class="page-inner">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Import Material</div>
+        </div>
+        <div class="card-body">
+          <form id="importMaterialForm">
+            <div class="row">
+              <div class="col-md-6 col-lg-6">
+                <div class="form-group">
+                  <label for="material2">Name material</label>
+                  <input type="text" class="form-control" id="material2" placeholder="Enter Name Material" required />
+                </div>
+                <div class="form-group">
+                  <label for="price2">Price</label>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+                    <input type="number" id="price2" class="form-control" aria-label="Amount (to the nearest dollar)" min="0" required />
+                    <span class="input-group-text">.000</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="Date">Date import</label>
+                  <input type="date" class="form-control" id="Date" placeholder="Date" required />
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                      var today = new Date().toISOString().split('T')[0];
+                      document.getElementById('Date').setAttribute('min', today);
+                    });
+                  </script>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-6">
+                <div class="form-group">
+                  <label for="quantity2">Quantity</label>
+                  <input type="number" class="form-control" id="quantity2" placeholder="Enter Quantity" min="0" required />
+                </div>
+                <div class="form-group">
+                  <label for="defaultSelect">Unit</label>
+                  <select class="form-select form-control" id="defaultSelect">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="barrel">barrel</option>
+                    <option value="bottle">bottle</option>
+                    <option value="bag">bag</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="card-action">
+              <button type="submit" class="btn btn-success">Submit</button>
+              <button type="button" class="btn btn-danger">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('importMaterialForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    // Gather form data
+    const name = document.getElementById('material2').value;
+    const price = parseFloat(document.getElementById('price2').value);
+    const date = document.getElementById('Date').value;
+    const quantity = parseInt(document.getElementById('quantity2').value, 10);
+    const unit = document.getElementById('defaultSelect').value;
+
+    // Create the material data structure
+    const materialData = {
+      name: name,
+      unit: unit,
+      totalQuantity: quantity,
+      pricePerUnit: price,
+      importHistory: [
+        {
+          dateImport: date,
+          quantity: quantity,
+          price: price * quantity
+        }
+      ],
+      exportHistory: []
+    };
+
+    // Send the data to the API
+    try {
+      const response = await fetch('http://localhost:3000/api/material', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(materialData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error while importing material.');
+      }
+
+      const responseData = await response.json();
+      console.log('Material imported successfully:', responseData);
+
+      // Optionally, redirect or show a success message
+      alert('Material imported successfully!');
+      location.reload();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to import material.');
+    }
+  });
+</script>
