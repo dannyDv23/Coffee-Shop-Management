@@ -46,10 +46,10 @@
               icon: "fas fa-users",
               managementName: "Employee",
               subItems: [
-                { name: "View employee list", link: "./avatar" },
-                { name: "Add employee", link: "components/buttons.html" },
-                { name: "Edit employee", link: "components/gridsystem.html" },
-                { name: "Delete employee", link: "components/panels.html" },
+                { name: "View employee list", link: "/manage-employee" },
+                { name: "Add employee", link: "/manage-employee/add" },
+                { name: "Edit employee", link: "/manage-employee" },
+                { name: "Delete employee", link: "/manage-employee/delete" },
                 { name: "Find employee", link: "components/notifications.html" },
               ],
             },
@@ -74,10 +74,8 @@
               icon: "fas fa-toolbox",
               managementName: "Equipment",
               subItems: [
-                { name: "View equipment list", link: "./avatar" },
-                { name: "Add equipment", link: "components/buttons.html" },
-                { name: "Edit equipment", link: "components/gridsystem.html" },
-                { name: "Delete equipment", link: "components/panels.html" },
+                { name: "View All Equipment", link: "/equipment/view-all" },
+                { name: "Create new Equipment", link: "/equipment/create" },
               ],
             },
             //TODO: quan ly kho hang
@@ -108,10 +106,8 @@
               icon: "fas fa-bullhorn",
               managementName: "Marketing",
               subItems: [
-                { name: "View list of promotions", link: "./avatar" },
-                { name: "Add new promotion", link: "components/buttons.html" },
-                { name: "Edit promotion", link: "components/panels.html" },
-                { name: "Remove promotion", link: "components/gridsystem.html" },
+                { name: "View All Sale", link: "/sale/view-all" },
+                { name: "Create new Sale", link: "/sale/create" }
               ],
             },
             //TODO: quan ly ngan sach
@@ -894,5 +890,7 @@
         window.location.href = "/login";
       }
     </script>
+
+    
   </body>
 </html>

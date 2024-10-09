@@ -3,13 +3,11 @@ const router = express.Router();
 const validate = require("../middlewares/validate");
 const { authValidation, employeeValidation } = require("../validations");
 const authController = require("../controllers/auth.controller");
-const { auth, roleFilter } = require("../middlewares/auth");
-const { ROLES } = require("../models/constants");
+const { auth } = require("../middlewares/auth");
 
 router.post(
   "/register",
-  auth,
-  roleFilter(["Admin"]),
+  // auth["Admin"],
   validate(employeeValidation.createEmployeeSchema),
   authController.register
 );

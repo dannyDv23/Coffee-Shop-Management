@@ -8,7 +8,7 @@ const ORDER_STATUSES = ['Pending', 'Completed', 'Cancelled'];
 const PRODUCT_STATUSES = ['Available', 'Unavailable'];
 const EQUIPMENT_STATUSES = ['Active', 'Pending'];
 const HISTORY_MONEY_STATUSES = ['Spend', 'Collect'];
-const MATERIAL_STATUSES = ['Active', 'OutOfStock'];
+const MATERIAL_STATUSES = ['Active', 'Delete'];
 const HISTORY_MATERIAL_STATUSES = ['Used', 'OutOfStock','InStock','Reserved']; //InStock: Hàng hóa đã được nhập vào kho và sẵn sàng để bán. , Reserved: Hàng hóa đã được đặt trước hoặc giữ lại để phục vụ đơn hàng sắp tới.
 
 
