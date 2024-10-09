@@ -25,7 +25,13 @@ exports.getEquipmentById = catchAsync(async (req, res, next) => {
 
 exports.createEquipment = catchAsync(async (req, res, next) => {
     try {
-        const {name} = req.body;
+        const {name, quantity, price} = req.body;
+        if (quantity < 0) {
+            throw new ApiError('Quantity must be a positive number', 400);
+        }
+        if (price < 0) {
+            throw new ApiError('Price must be a positive number', 400);
+        }
         const existingEquipment = await Equipment.findOne({name});
         if (existingEquipment) {
             throw new ApiError('Equipment already exists', 400);

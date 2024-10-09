@@ -39,8 +39,17 @@
     };
     async function createEquipment(event) {
         event.preventDefault();
-
-        const totalPrice = document.getElementById("price").value * document.getElementById("quantity").value;
+        const quantity = parseInt(document.getElementById("quantity").value);
+        if (quantity <= 0) {
+            document.getElementById("error").textContent = "Quantity must be a positive number.";
+            return;
+        }
+        const price = parseFloat(document.getElementById("price").value);
+        if (price <= 0) {
+            document.getElementById("error").textContent = "Price must be a positive number.";
+            return;
+        }
+        const totalPrice = price * quantity;
         try {
             const response = await fetch("http://127.0.0.1:3000/api/equipments", {
                 method: "POST",
