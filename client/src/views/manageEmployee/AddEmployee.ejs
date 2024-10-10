@@ -2,149 +2,57 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="text-center">Add New Employee</h2>
-      <form onsubmit="addEmployee(event)">
+      <form onsubmit="addEmployee(event)" enctype="multipart/form-data">
+        <!-- Existing form fields -->
         <div class="form-group">
           <label for="name"><span style="color: red">*</span> Full Name:</label>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            name="name"
-            required
-          />
+          <input type="text" class="form-control" id="name" name="name" required />
         </div>
-
         <div class="form-group">
           <label for="address">Address:</label>
           <input type="text" class="form-control" id="address" name="address" />
         </div>
-
         <div class="form-group">
-          <label for="position"
-            ><span style="color: red">*</span> Position:</label
-          >
-          <input
-            type="text"
-            class="form-control"
-            id="position"
-            name="position"
-            required
-          />
+          <label for="position"><span style="color: red">*</span> Position:</label>
+          <input type="text" class="form-control" id="position" name="position" required />
         </div>
-
         <div class="form-group">
           <label for="salary"><span style="color: red">*</span> Salary:</label>
-          <input
-            type="number"
-            class="form-control"
-            id="salary"
-            name="salary"
-            required
-          />
+          <input type="number" class="form-control" id="salary" name="salary" required />
         </div>
-
         <div class="form-group">
-          <label for="phoneNumber"
-            ><span style="color: red">*</span> Phone Number:</label
-          >
-          <input
-            type="tel"
-            class="form-control"
-            id="phoneNumber"
-            name="phoneNumber"
-            required
-          />
+          <label for="phoneNumber"><span style="color: red">*</span> Phone Number:</label>
+          <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required />
         </div>
-
         <div class="form-group">
           <label for="username">Username:</label>
-          <input
-            type="text"
-            class="form-control"
-            id="username"
-            name="username"
-          />
+          <input type="text" class="form-control" id="username" name="username" />
         </div>
-
         <div class="form-group">
           <label for="password">Password:</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-          />
+          <input type="password" class="form-control" id="password" name="password" />
         </div>
-
         <div class="form-group">
-          <label for="password">Repeat Password:</label>
-          <input
-            type="password"
-            class="form-control"
-            id="retypePassword"
-            name="retypePassword"
-          />
+          <label for="retypePassword">Repeat Password:</label>
+          <input type="password" class="form-control" id="retypePassword" name="retypePassword" />
         </div>
-
-        <button type="submit" class="btn btn-primary" id="alert_demo_3_3">
-          Add
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          onclick="window.history.back();"
-        >
-          Cancel
-        </button>
+        <!-- Image upload field -->
+        <div class="form-group">
+          <label for="profilePicture">Profile Picture:</label>
+          <input type="file" class="form-control-file" id="profilePicture" name="profilePicture" />
+        </div>
+        <button type="submit" class="btn btn-primary" id="alert_demo_3_3">Add</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
         <p style="color: red">(*) Required fields</p>
         <p id="error" style="color: red"></p>
       </form>
     </div>
-
     <div class="col-md-6 mt-5 text-center">
       <div class="image-container">
-        <img
-          id="profile-picture"
-          src=""
-          class="img-thumbnail"
-          alt="Profile Picture"
-          style="
-            display: inline-block;
-            max-width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            border: 2px solid #007bff;
-          "
-        />
+        <img id="profile-picture" src="" class="img-thumbnail" alt="Profile Picture" style="display: inline-block; max-width: 100%; height: 200px; border-radius: 10px; border: 2px solid #007bff;" />
       </div>
-      <button
-        type="submit"
-        class="btn btn-secondary mt"
-        onclick="const preview = document.querySelector('#profile-picture'); preview.src = '';"
-      >
-        Cancel Image
-      </button>
-      <input
-        type="file"
-        class="form-control-file mt-2"
-        id="profilePicture"
-        name="profilePicture"
-        onchange="
-            const preview = document.querySelector('#profile-picture');
-            const file = document.querySelector('#profilePicture').files[0];
-            const reader = new FileReader();
-  
-            reader.onloadend = function() {
-              preview.src = reader.result;
-            }
-  
-            if (file) {
-              reader.readAsDataURL(file);
-            } else {
-              preview.src = '';
-            }
-          "
-      />
+      <button type="submit" class="btn btn-secondary mt" onclick="const preview = document.querySelector('#profile-picture'); preview.src = '';">Cancel Image</button>
+      <input type="file" class="form-control-file mt-2" id="profilePicture" name="profilePicture" onchange="const preview = document.querySelector('#profile-picture'); const file = document.querySelector('#profilePicture').files; const reader = new FileReader(); reader.onloadend = function() { preview.src = reader.result; } if (file) { reader.readAsDataURL(file); } else { preview.src = ''; }" />
     </div>
   </div>
 </div>
@@ -216,6 +124,11 @@
       password,
       retypePassword,
     };
+
+    const profilePicture = document.getElementById("profilePicture").files[0];
+    if (profilePicture) {
+      employeeData.profilePicture = profilePicture;
+    }
 
     try {
       const response = await fetch("http://localhost:3000/api/auth/register", {

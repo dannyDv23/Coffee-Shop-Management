@@ -1,5 +1,7 @@
 const Employee = require("../models/employee");
 const Auth = require("../models/auth");
+const runWorker = require('../utils/worker');
+const path = require('path');
 
 const createEmployee = async (employeeBody) => {
   const employee = await Employee.create({
@@ -8,7 +10,7 @@ const createEmployee = async (employeeBody) => {
     position: employeeBody.position,
     salary: employeeBody.salary,
     phoneNumber: employeeBody.phoneNumber,
-    avatar: employeeBody.avatar,
+    avatar: employeeBody.profilePicture,
 
     // Add other necessary fields
   });
@@ -68,6 +70,15 @@ const updateEmployee = async (employeeId, employeeBody) => {
 const deleteEmployee = async (employeeId) => {
   return await Employee.findByIdAndDelete(employeeId);
 };
+
+async function processUserProfileImage(imagePath, imageKey) {
+  try {
+    const result = await runWorker({ imagePath, imageKey });
+    return result;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
 module.exports = {
   createEmployee,
   getEmployeeByUsername,
@@ -76,4 +87,5 @@ module.exports = {
   getEmployeeByPhoneNumber,
   updateEmployee,
   deleteEmployee,
+  processUserProfileImage,
 };

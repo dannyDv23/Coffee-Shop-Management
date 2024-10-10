@@ -10,6 +10,7 @@ const createEmployeeSchema = {
     position: Joi.string().required(),
     salary: Joi.number().required(),
     address: Joi.string().trim(),
+    avatar: Joi.object().optional(),
     phoneNumber: Joi.string()
       .pattern(/^0[3-9]\d{8}$/)
       .required()

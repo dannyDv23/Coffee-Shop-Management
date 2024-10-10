@@ -2,7 +2,19 @@ const catchAsync = require("../utils/catchAsync");
 const httpStatus = require("http-status");
 const { tokenService, authService, employeeService } = require("../services");
 const ApiError = require("../utils/ApiError");
-const { max } = require("../validations/env.validation");
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
 
 const register = catchAsync(async (req, res) => {
   const {
@@ -15,6 +27,15 @@ const register = catchAsync(async (req, res) => {
     phoneNumber,
     address,
   } = req.body;
+
+  const imagePath = req.file?.path;
+
+  const imageKey = `profile-images/${req.file.filename}`;
+
+  const result = await employeeService.processUserProfileImage(
+    imagePath,
+    imageKey
+  );
   const existingEmployee = await employeeService.getEmployeeByUsername(
     username
   );
@@ -38,6 +59,7 @@ const register = catchAsync(async (req, res) => {
     salary,
     phoneNumber,
     address,
+    avatar: imageKey,
   });
   const tokens = await tokenService.generateAuthTokens(employee._id);
   res.status(httpStatus.CREATED).send({ employee, tokens, authRecord });
