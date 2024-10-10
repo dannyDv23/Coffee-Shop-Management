@@ -40,108 +40,104 @@
   </head>
   <body>
         <% 
-          const menuItems = [
-            //TODO: quan ly nhan vien
-            {
-              icon: "fas fa-users",
-              managementName: "Employee",
-              subItems: [
-                { name: "View employee list", link: "/manage-employee" },
-                { name: "Add employee", link: "/manage-employee/add" },
-                { name: "Edit employee", link: "/manage-employee" },
-                { name: "Delete employee", link: "/manage-employee/delete" },
-                { name: "Find employee", link: "components/notifications.html" },
-              ],
-            },
-            //TODO: quan ly ban hang
-            {
-              icon: "fas fa-chart-line",
-              managementName: "Sales",
-              subItems: [
-                { name: "View table", link: "./avatar" },
-                { name: "Move table", link: "components/buttons.html" },
-                { name: "Split table", link: "components/gridsystem.html" },
-                { name: "Merge tables", link: "components/panels.html" },
-                { name: "Cancel table", link: "components/notifications.html" },
-                { name: "Book table", link: "components/sweetalert.html" },
-                { name: "Select menu", link: "components/font-awesome-icons.html" },
-                { name: "Payment", link: "components/simple-line-icons.html" },
-                { name: "Print settings", link: "components/typography.html" },
-              ],
-            },
-            //TODO: quan ly trang thiet bi
-            {
-              icon: "fas fa-toolbox",
-              managementName: "Equipment",
-              subItems: [
-                { name: "View equipment list", link: "./avatar" },
-                { name: "Add equipment", link: "components/buttons.html" },
-                { name: "Edit equipment", link: "components/gridsystem.html" },
-                { name: "Delete equipment", link: "components/panels.html" },
-              ],
-            },
-            //TODO: quan ly kho hang
-            {
-              icon: "fas fa-box",
-              managementName: "Inventory",
-              subItems: [
-                { name: "View inventory list", link: "/inventory" },
-                { name: "Import material", link: "/inventory/import" },
-                { name: "Export products", link: "/inventory/export" },
-                { name: "Find products", link: "/inventory/find" },
-              ],
-            },
-            //TODO: quan ly thuc don
-            {
-              icon: "fas fa-utensils",
-              managementName: "Menu",
-              subItems: [
-                { name: "View menu list", link: "./avatar" },
-                { name: "Add menu", link: "components/buttons.html" },
-                { name: "Edit menu", link: "components/gridsystem.html" },
-                { name: "Delete menu", link: "components/panels.html" },
-                { name: "Search", link: "components/notifications.html" },
-              ],
-            },
-            //TODO: quan ly marketting
-            {
-              icon: "fas fa-bullhorn",
-              managementName: "Marketing",
-              subItems: [
-                { name: "View list of promotions", link: "./avatar" },
-                { name: "Add new promotion", link: "components/buttons.html" },
-                { name: "Edit promotion", link: "components/panels.html" },
-                { name: "Remove promotion", link: "components/gridsystem.html" },
-              ],
-            },
-            //TODO: quan ly ngan sach
-            {
-              icon: "fas fa-wallet",
-              managementName: "Budget ",
-              subItems: [
-                { name: "View income and expenses", link: "./avatar" },
-                { name: "Add income and expenses", link: "components/buttons.html" },
-              ],
-            },
-            //TODO: quan ly du lieu
-            {
-              icon: "fas fa-database",
-              managementName: "Data",
-              subItems: [
-                { name: "Data backup", link: "./avatar" },
-                { name: "Data recovery", link: "components/buttons.html" },
-              ],
-            },
-            //TODO: Thong ke, bao cao
-            {
-              icon: "fas fa-chart-bar",
-              managementName: "Statistics and Reports",
-              subItems: [
-                { name: "View and Export", link: "/report" },
-              ],
-            },
+        const menuItems = [
+        //TODO: quan ly nhan vien
+        {
+          icon: "fas fa-users",
+          managementName: "Employee",
+          subItems: [
+            { name: "View employee list", link: "/manage-employee" },
+            { name: "Add employee", link: "/manage-employee/add" },
+            { name: "Edit employee", link: "/manage-employee" },
+            { name: "Delete employee", link: "/manage-employee/delete" },
+            { name: "Find employee", link: "components/notifications.html" },
+          ],
+        },
+        //TODO: quan ly ban hang
+        {
+          icon: "fas fa-chart-line",
+          managementName: "Sales",
+          subItems: [
+            { name: "View table", link: "/table/view" },
+            { name: "Move table", link: "/table/move" },
+            { name: "Split table", link: "/table/split" },
+            { name: "Merge tables", link: "/table/merge" },
+            { name: "Cancel table", link: "/table/cancel" },
+            { name: "Choose menu", link: "/table/chooseMenu" },
+            { name: "Booking table", link: "/table/booking" },
+            { name: "Payment", link: "/table/payment" },
+            { name: "Print settings", link: "/table/print" },
+          ],
+        },
+        //TODO: quan ly trang thiet bi
+        {
+          icon: "fas fa-toolbox",
+          managementName: "Equipment",
+          subItems: [
+            { name: "View All Equipment", link: "/equipment/view-all" },
+            { name: "Create new Equipment", link: "/equipment/create" },
+          ],
+        },
+        //TODO: quan ly kho hang
+        {
+          icon: "fas fa-box",
+          managementName: "Inventory",
+          subItems: [
+            { name: "View inventory list", link: "/inventory" },
+            { name: "Import material", link: "/inventory/import" },
+            { name: "Export products", link: "/inventory/export" },
+            { name: "Find products", link: "/inventory/find" },
+          ],
+        },
+        //TODO: quan ly thuc don
+        {
+          icon: "fas fa-utensils",
+          managementName: "Menu",
+          subItems: [
+            { name: "View menu list", link: "./avatar" },
+            { name: "Add menu", link: "components/buttons.html" },
+            { name: "Edit menu", link: "components/gridsystem.html" },
+            { name: "Delete menu", link: "components/panels.html" },
+            { name: "Search", link: "components/notifications.html" },
+          ],
+        },
+        //TODO: quan ly marketting
+        {
+          icon: "fas fa-bullhorn",
+          managementName: "Marketing",
+          subItems: [
+            { name: "View All Sale", link: "/sale/view-all" },
+            { name: "Create new Sale", link: "/sale/create" }
+          ],
+        },
+        //TODO: quan ly ngan sach
+        {
+          icon: "fas fa-wallet",
+          managementName: "Budget ",
+          subItems: [
+            { name: "View income and expenses", link: "./avatar" },
+            { name: "Add income and expenses", link: "components/buttons.html" },
+          ],
+        },
+        //TODO: quan ly du lieu
+        {
+          icon: "fas fa-database",
+          managementName: "Data",
+          subItems: [
+            { name: "Data backup", link: "./avatar" },
+            { name: "Data recovery", link: "components/buttons.html" },
+          ],
+        },
+        //TODO: Thong ke, bao cao
+        {
+          icon: "fas fa-chart-bar",
+          managementName: "Statistics and Reports",
+          subItems: [
+            { name: "View and Export", link: "/report" },
+          ],
+        },
 
-          ];
+      ];
         %>
 
     <div class="wrapper">
@@ -200,48 +196,6 @@
                       </a>
                     </li>
                     
-                  </ul>
-                </div>
-              </li>
-              <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#forms">
-                  <i class="fas fa-pen-square"></i>
-                  <p>Equipment</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="forms">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="/equipment/view-all">
-                        <span class="sub-item">View All Equipment</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/equipment/create">
-                        <span class="sub-item">Create new Equipment</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#forms">
-                  <i class="fas fa-pen-square"></i>
-                  <p>Sale</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="forms">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="/sale/view-all">
-                        <span class="sub-item">View All Sale</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/sale/create">
-                        <span class="sub-item">Create new Sale</span>
-                      </a>
-                    </li>
                   </ul>
                 </div>
               </li>
@@ -863,6 +817,7 @@
     <script src="/js/core/jquery-3.7.1.min.js"></script>
     <script src="/js/core/popper.min.js"></script>
     <script src="/js/core/bootstrap.min.js"></script>
+    <script src="/js/plugin/sweetalert/sweetalert.min.js"></script>
     <!-- jQuery Scrollbar -->
     <script src="/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
     <!-- jQuery Sparkline -->
@@ -871,6 +826,7 @@
     <script src="/js/kaiadmin.min.js"></script>
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="/js/setting-demo.js"></script>
+    <script src="/js/customerModal.js"></script>
     <script>
       $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
         type: "line",
