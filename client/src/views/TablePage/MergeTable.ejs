@@ -1,7 +1,157 @@
-<button type="button" class="btn btn-info merge-table-button" data-table="<%= data.number %>"
-    data-status="<%= data.status %>" >
-    <h4>
-        <%= data.number %>
-    </h4>
-    <div class="table-status fw-bold <%= data.textStyle %>">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+
+            <!-- Pass `listTableSelected` and `listTable` as JSON strings into the data attributes -->
+            <div class="row row-demo-grid" data-list-selected-table='<%= JSON.stringify(listTableSelected) %>'
+                data-list-available-table='<%= JSON.stringify(listTable) %>'>
+                <% listTable.forEach(data=> { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info merge-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.querySelectorAll('.merge-table-button').forEach(button => {
+        button.addEventListener('click', function () {
+            let tableName = button.getAttribute('data-table');
+            let tableStatus = button.getAttribute('data-status');
+
+            // Get all tables available and filter out the selected one
+            let availableTables = JSON.parse(document.querySelector('.row-demo-grid').getAttribute('data-list-available-table'));
+            let listSelectedTables = JSON.parse(document.querySelector('.row-demo-grid').getAttribute('data-list-selected-table'));
+            let filteredTables = availableTables.filter(table => table.tableNumber !== parseInt(tableName));
+
+            // Create checkboxes for the available tables (excluding the selected one)
+            let tableOptionsHTML = filteredTables.map(table => `
+                <label><input type="checkbox" value="${table.tableNumber}"> Table ${table.tableNumber}</label><br>
+            `).join('');
+
+            // Create the HTML for selecting tables and target table
+            let tableHTML = `
+            <div style="display: flex; justify-content: space-between;">
+                <div style="width: 45%;">
+                    <strong>Select tables to merge:</strong>
+                    <div id="tablesToMerge" style="width: 100%; padding: 8px; border: 1px solid #ddd; height: 150px; overflow-y: auto;">
+                        ${tableOptionsHTML}
+                    </div>
+                </div>
+
+                <div style="width: 45%;">
+                    <strong>Select the target table:</strong>
+                    <select id="targetTable" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                        <option value="">Select a table</option>
+                        ${listSelectedTables.map(table => `<option value="${table.tableNumber}">Table ${table.tableNumber}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+
+             <div style="margin-top: 10px;">
+                    <label for="customerName">Customer Name:</label>
+                    <input type="text" id="customerName" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                </div>
+            `;
+
+            const content = document.createElement('div');
+            content.innerHTML = tableHTML;
+
+            swal({
+                title: tableName,
+                text: `Status: ${tableStatus}`,
+                icon: tableStatus === "Available" ? "success" : (tableStatus === "Empty" ? "warning" : "error"),
+                content: content,
+                buttons: {
+                    confirm: {
+                        text: "Close",
+                        className: "btn btn-success"
+                    },
+                    move: {
+                        text: "Merge Tables",
+                        value: "merge",
+                        className: "btn btn-warning"
+                    }
+                },
+            }).then((value) => {
+                if (value === "merge") {
+                    const selectedTables = Array.from(document.querySelectorAll('#tablesToMerge input[type="checkbox"]:checked')).map(checkbox => parseInt(checkbox.value));
+                    // Push the current table (the one that was clicked) into the selectedTables array
+                    selectedTables.push(parseInt(tableName));
+                    const targetTable = parseInt(document.getElementById('targetTable').value);
+
+                    if (selectedTables.length && targetTable) {
+                        // Collect customer information
+                        const customerName = document.getElementById('customerName').value;
+                        const phoneNumber = document.getElementById('phoneNumber').value;
+
+                        if ( !customerName || !phoneNumber) {
+                            swal("Please fill in all fields before proceeding.");
+                            return; // Stop execution if any field is empty
+                        }
+
+                        const now = new Date();
+                        const currentDate = now.toISOString();
+                        const currentTime = now.toTimeString().slice(0, 5);
+
+                        const payload = {
+                            fromTables: selectedTables,
+                            toTable: targetTable,
+                            newBookingDetails: {
+                                customerName,
+                                phoneNumber,
+                                date: currentDate,
+                                time: currentTime,
+                                status: "Now"
+                            }
+                        };
+
+                        console.log("Payload:", payload);
+
+                        // Post the payload to the server
+                        fetch('http://localhost:3000/api/table/merge', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(payload),
+                        }).then(response => response.json())
+                            .then(data => {
+                                swal(`Tables merged successfully! Merged tables: ${selectedTables.join(', ')} to 
+                                 ${targetTable}.`).then(() => {
+                                    window.location.reload();
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    } else {
+                        swal("Please select tables to merge and a target table!");
+                    }
+                }
+            });
+        });
+    });
+</script>

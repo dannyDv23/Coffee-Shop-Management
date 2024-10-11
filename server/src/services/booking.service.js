@@ -1,8 +1,8 @@
 const Table = require("../models/table");
 
-const getBookingNowByTableNumber = async (tableNumber) => {
+const getBookingNowByTableNumber = async (tableNumbe) => {
     try {
-      const parsedTableNumber = Number(tableNumber);
+      const parsedTableNumber = Number(tableNumbe);
       const result = await Table.aggregate([
         {
           $match: {
@@ -19,11 +19,6 @@ const getBookingNowByTableNumber = async (tableNumber) => {
         },
         {
           $unwind: '$bookings'
-        },
-        {
-          $match: {
-            'bookings.status': 'Now'
-          }
         },
         {
           $group: {
@@ -50,5 +45,5 @@ const getBookingNowByTableNumber = async (tableNumber) => {
   };
   
 module.exports = {
-    getBookingNowByTableNumber
+  getBookingNowByTableNumber
 };

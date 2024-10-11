@@ -1,7 +1,155 @@
-<button type="button" class="btn btn-info view-table-button" data-table="<%= data.tableNumber %>"
-    data-status="<%= data.status %>" %>'>
-    <h4>
-       Table <%= data.tableNumber %>
-    </h4>
-    <div class="table-status fw-bold">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab%>
+            </h4>
+
+            <div class="row row-demo-grid">
+                <% datas.forEach(data=> { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info view-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>" %>'>
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.querySelectorAll('.view-table-button').forEach(button => {
+        button.addEventListener('click', async function () {
+            var tableNumber = button.getAttribute('data-table');
+            var tableStatus = button.getAttribute('data-status');
+
+            if (tableStatus !== 'Empty') {
+                try {
+                    // Fetch data from the API
+                    const response = await fetch(`http://localhost:3000/api/table/${tableNumber}`);
+                    const data = await response.json(); // Assuming API returns a JSON response
+                    const tableData = data.infoTable?.[0];
+                    console.log(tableData);
+
+                    if (!response.ok) {
+                        throw new Error(`Error fetching table data: ${tableData.message}`);
+                    }
+
+                    // Extract bookings and orders from the tableData
+                    const bookings = tableData.bookings || [];
+                    const orders = tableData.orders || []; // Ensure orders is an array
+
+                    // Create bookings list string with booking status
+                    const bookingList = bookings.map(booking => {
+                        return `${booking.customerName} (Phone: ${booking.phoneNumber}, Date: ${new Date(booking.date).toLocaleString()}, Time: ${booking.time}, Status: ${booking.status}, Reason: ${booking.reason})`;
+                    }).join(', ');
+
+                    // Create HTML content for the modal
+                    // Create HTML content for the modal
+                    let tableHTML = `
+    <div style="margin-bottom: 10px; max-height: 100px; overflow-y: auto;">
+        <strong>Booking schedule:</strong>
+        <textarea readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; max-height: 100px; overflow-y: auto;">${bookingList}</textarea>
+    </div>
+    <div style="max-height: 200px; overflow-y: auto;">
+        <strong>Product List:</strong>
+        <div style="display: flex; margin-bottom: 8px;">
+            <input type="text" value="Product Name" readonly style="flex: 1; padding: 8px; border: 1px solid #ddd; margin-right: 5px;" />
+            <input type="text" value="Quantity" readonly style="width: 100px; padding: 8px; border: 1px solid #ddd;" />
+        </div>
+        ${orders.length > 0 ?
+                            orders.map(order => {
+                                // Check if the order has products
+                                if (order.products && order.products.length > 0) {
+                                    const productHTML = order.products.map(product => {
+                                        // Check if product has a name and quantity
+                                        const productName = product.name || 'Unknown Product';
+                                        const productQuantity = product.quantity || 0;
+
+                                        return (productName || productQuantity) ? `
+                    <div style="display: flex; margin-bottom: 8px;">
+                        <input type="text" value="${productName}" readonly style="flex: 1; padding: 8px; border: 1px solid #ddd; margin-right: 5px;" />
+                        <input type="number" value="${productQuantity}" readonly style="width: 100px; padding: 8px; border: 1px solid #ddd;" />
+                    </div>
+                ` : ''; // Return empty string if no valid product data
+                                    }).join('');
+
+                                    return productHTML; // Return the HTML for products
+                                }
+                                return ''; // Return empty string if no products
+                            }).join('')
+                            : '<div>No products ordered.</div>'}
+    </div>
+`;
+
+                    // Create Information Customer section only if booking status is Confirmed
+                    if (bookings.some(booking => booking.status === "Confirmed")) {
+                        const confirmedBookings = bookings.filter(booking => booking.status === "Confirmed");
+                        tableHTML += `
+                            <div style="margin-top: 10px; max-height: 100px; overflow-y: auto;">
+                                <strong>Information Customer:</strong>
+                                ${confirmedBookings.map(booking => `
+                                    <input id="productSummary" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; margin-bottom: 5px;" value="${booking.customerName} (Phone: ${booking.phoneNumber})" />
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+
+                    // Create a div for the content
+                    const content = document.createElement('div');
+                    content.innerHTML = tableHTML;
+
+                    // Display the modal with SweetAlert
+                    swal({
+                        title: `Table ${tableNumber}`,
+                        text: `Status: ${tableStatus}`,
+                        icon: tableStatus === "Available" ? "info" : (tableStatus === "Booked" ? "warning" : "error"),
+                        content: content,
+                        buttons: {
+                            confirm: {
+                                text: "Close",
+                                className: "btn btn-success"
+                            }
+                        },
+                    }).then((value) => {
+                        switch (value) {
+                            case "move":
+                                swal("Table moved successfully!");
+                                break;
+                            case "cancel":
+                                swal("Reservation canceled successfully!");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    swal({
+                        title: "Error",
+                        text: `Failed to fetch data for table ${tableNumber}`,
+                        icon: "error"
+                    });
+                }
+            } else {
+                swal({
+                    title: `Table ${tableNumber}`,
+                    text: `Empty`,
+                    icon: "info"
+                });
+            }
+
+        });
+    });
+</script>

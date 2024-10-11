@@ -19,6 +19,8 @@ const materialRouter = require("./routes/material.route");
 const reportRoutes = require("./routes/report.route");
 const equipmentRouter = require("./routes/equipment.route");
 const salesRouter = require("./routes/sales.route");
+const orderRouter = require("./routes/order.route");
+const bookingRouter = require("./routes/booking.route");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -57,6 +59,8 @@ rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
 rootRouter.use("/material", materialRouter);
 rootRouter.use("/report", reportRoutes);// Report routes 
 rootRouter.use("/table", tableRouter);
+rootRouter.use("/order", orderRouter);
+rootRouter.use("/booking", bookingRouter);
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));

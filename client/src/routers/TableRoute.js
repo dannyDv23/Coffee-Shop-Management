@@ -47,9 +47,8 @@ router.get('/view', async (req, res) => {
     const response = await axios.get('http://localhost:3000/api/table/all');
     const listTable = response.data.listTable;
     res.render('../MainLayout', {
-      bodyPage: path.join('views', 'TablePage/TablePage'),
+      bodyPage: path.join('views', 'TablePage','ViewTable'),
       datas: listTable,
-      detailPage: path.join('views', '../../TablePage/ViewTable'),
       titleTab: 'View Table'
     });
 
@@ -63,7 +62,7 @@ router.get('/view', async (req, res) => {
 
 });
 
-router.get('/move', async(req, res) => {
+router.get('/move', async (req, res) => {
   try {
     const response = await axios.get('http://localhost:3000/api/table/status/Available');
     const listAvailableTable = response.data.listTable;
@@ -82,20 +81,28 @@ router.get('/move', async(req, res) => {
   }
 });
 
-router.get('/split', (req, res) => {
+router.get('/split', async (req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const responseTableBook = await axios.get('http://localhost:3000/api/table/list-can-booking');
+  const listTable = responseAvailableTable.data.listTable;
+  const listTableSelected = responseTableBook.data.listTableCanBook;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/SplitTable'),
+    bodyPage: path.join('views', 'TablePage','SplitTable'),
+    listTable: listTable,
+    listTableSelected: listTableSelected,
     titleTab: 'Split Table'
   });
 });
 
-router.get('/merge', (req, res) => {
+router.get('/merge', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const responseTableBook = await axios.get('http://localhost:3000/api/table/list-can-booking');
+  const listTable = responseAvailableTable.data.listTable;
+  const listTableSelected = responseTableBook.data.listTableCanBook;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/MergeTable'),
+    bodyPage: path.join('views', 'TablePage','MergeTable'),
+    listTable: listTable,
+    listTableSelected: listTableSelected,
     titleTab: 'Merge Table'
   });
 });

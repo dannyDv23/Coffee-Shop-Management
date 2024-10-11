@@ -199,7 +199,7 @@ const tableIds = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
 // Data arrays with tableIds
 const tableData = [
   { _id: tableIds[0], tableNumber: 1, status: 'Available' },
-  { _id: tableIds[1], tableNumber: 2, status: 'Empty' },
+  { _id: tableIds[1], tableNumber: 2, status: 'Booked' },
   { _id: tableIds[2], tableNumber: 3, status: 'Empty' },
   { _id: tableIds[3], tableNumber: 4, status: 'Empty' }
 ];
@@ -360,7 +360,7 @@ const createInitialData = async () => {
           saleId: null,
           price: 10.00,
           time: new Date(),
-          status: 'Completed'
+          status: 'Now'
         },
         {
           product: [{ productId: products[1]._id, numberProduct: 1 }],
@@ -368,7 +368,7 @@ const createInitialData = async () => {
           saleId: sales[0]._id,
           price: 3.00,
           time: new Date(),
-          status: 'Pending'
+          status: 'Completed'
         }
       ];
       await Order.insertMany(orders);

@@ -4,7 +4,7 @@ const Booking = require("../models/booking");
 const Order = require("../models/order")
 
 const getTableCanBook = async () => {
-  return await Table.find({ status: { $ne: 'Available'} });
+  return await Table.find({ status: { $ne: 'Available' } });
 };
 
 const getTableByStatus = async (tableStatus) => {
@@ -19,6 +19,111 @@ const getAllTable = async () => {
   return await Table.find();
 };
 
+// const getInfomationTableById = async (tableNumber) => {
+//   try {
+//     const parsedTableNumber = Number(tableNumber);
+//     const result = await Table.aggregate([
+//       {
+//         $match: {
+//           tableNumber: parsedTableNumber,
+//           status: { $in: ['Available', 'Booked'] }
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: 'bookings',
+//           localField: '_id',
+//           foreignField: 'tableId',
+//           as: 'bookings'
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: 'orders',
+//           let: { tableId: '$_id' },
+//           pipeline: [
+//             {
+//               $match: {
+//                 $expr: {
+//                   $and: [
+//                     { $eq: ['$tableId', '$$tableId'] },
+//                     { $eq: ['$status', 'Now'] } // Only include orders with status 'Now'
+//                   ]
+//                 }
+//               }
+//             },
+//             {
+//               $unwind: {
+//                 path: '$product',
+//                 preserveNullAndEmptyArrays: true // Include tables with no orders
+//               }
+//             },
+//             {
+//               $lookup: {
+//                 from: 'products',
+//                 localField: 'product.productId',
+//                 foreignField: '_id',
+//                 as: 'productDetails'
+//               }
+//             },
+//             {
+//               $unwind: {
+//                 path: '$productDetails',
+//                 preserveNullAndEmptyArrays: true // Allow empty product details for tables without orders
+//               }
+//             },
+//             {
+//               $group: {
+//                 _id: '$tableId',
+//                 products: {
+//                   $push: {
+//                     name: '$productDetails.name',
+//                     quantity: '$product.numberProduct'
+//                   }
+//                 }
+//               }
+//             }
+//           ],
+//           as: 'orders'
+//         }
+//       },
+//       {
+//         // Ensure orders always have a default structure even if empty
+//         $addFields: {
+//           orders: {
+//             $cond: {
+//               if: { $eq: ['$orders', []] }, // If no orders found
+//               then: [{ products: [{}] }],      // Assign a default structure
+//               else: '$orders'                 // Otherwise return the orders
+//             }
+//           }
+//         }
+//       },
+//       {
+//         $project: {
+//           tableNumber: 1,
+//           status: 1,
+//           bookings: 1,
+//           orders: {
+//             $map: {
+//               input: '$orders',
+//               as: 'order',
+//               in: {
+//                 products: '$$order.products'
+//               }
+//             }
+//           }
+//         }
+//       }
+//     ]);
+
+//     return result;
+//   } catch (error) {
+//     console.error('Error fetching table details:', error);
+//     throw error;
+//   }
+// };
+
 const getInfomationTableById = async (tableNumber) => {
   try {
     const parsedTableNumber = Number(tableNumber);
@@ -26,7 +131,7 @@ const getInfomationTableById = async (tableNumber) => {
       {
         $match: {
           tableNumber: parsedTableNumber,
-          status: 'Available'
+          status: { $in: ['Available', 'Booked'] }
         }
       },
       {
@@ -38,49 +143,77 @@ const getInfomationTableById = async (tableNumber) => {
         }
       },
       {
+        // Filter bookings to include only those with status 'Now' or 'Appointment'
+        $addFields: {
+          bookings: {
+            $filter: {
+              input: '$bookings',
+              as: 'booking',
+              cond: { 
+                $in: ['$$booking.status', ['Now', 'Appointment']] // Only keep bookings with status 'Now' or 'Appointment'
+              }
+            }
+          }
+        }
+      },
+      {
         $lookup: {
           from: 'orders',
-          localField: '_id',
-          foreignField: 'tableId',
+          let: { tableId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$tableId', '$$tableId'] },
+                    { $eq: ['$status', 'Now'] } // Only include orders with status 'Now'
+                  ]
+                }
+              }
+            },
+            {
+              $unwind: {
+                path: '$product',
+                preserveNullAndEmptyArrays: true // Include tables with no orders
+              }
+            },
+            {
+              $lookup: {
+                from: 'products',
+                localField: 'product.productId',
+                foreignField: '_id',
+                as: 'productDetails'
+              }
+            },
+            {
+              $unwind: {
+                path: '$productDetails',
+                preserveNullAndEmptyArrays: true // Allow empty product details for tables without orders
+              }
+            },
+            {
+              $group: {
+                _id: '$tableId',
+                products: {
+                  $push: {
+                    name: '$productDetails.name',
+                    quantity: '$product.numberProduct'
+                  }
+                }
+              }
+            }
+          ],
           as: 'orders'
         }
       },
       {
-        $unwind: {
-          path: '$orders',
-          preserveNullAndEmptyArrays: true // Keep the document even if there are no orders
-        }
-      },
-      {
-        $unwind: {
-          path: '$orders.product', // Unwind to get individual products
-          preserveNullAndEmptyArrays: true // Keep the document even if there are no products
-        }
-      },
-      {
-        $lookup: {
-          from: 'products', // Your products collection
-          localField: 'orders.product.productId', // Assuming each product has an ID
-          foreignField: '_id',
-          as: 'productDetails'
-        }
-      },
-      {
-        $unwind: {
-          path: '$productDetails',
-          preserveNullAndEmptyArrays: true // Keep the document even if there are no product details
-        }
-      },
-      {
-        $group: {
-          _id: '$_id',
-          tableNumber: { $first: '$tableNumber' },
-          status: { $first: '$status' },
-          bookings: { $first: '$bookings' },
-          products: {
-            $push: {
-              name: '$productDetails.name', // Get the product name from productDetails
-              quantity: '$orders.product.numberProduct' // Ensure this matches the field in your orders
+        // Ensure orders always have a default structure even if empty
+        $addFields: {
+          orders: {
+            $cond: {
+              if: { $eq: ['$orders', []] }, // If no orders found
+              then: [{ products: [{}] }],    // Assign a default structure
+              else: '$orders'                // Otherwise return the orders
             }
           }
         }
@@ -90,7 +223,15 @@ const getInfomationTableById = async (tableNumber) => {
           tableNumber: 1,
           status: 1,
           bookings: 1,
-          orders: [{ product: '$products' }] // Group products under a single orders object
+          orders: {
+            $map: {
+              input: '$orders',
+              as: 'order',
+              in: {
+                products: '$$order.products'
+              }
+            }
+          }
         }
       }
     ]);
@@ -102,35 +243,47 @@ const getInfomationTableById = async (tableNumber) => {
   }
 };
 
-const moveTableData = async (dataTableFrom, idTableTo, fromTableNumber , toTableNumber) => {
-    // Transfer bookings to the destination table
-    await Booking.updateMany(
-      { tableId: dataTableFrom }, // Bookings linked to source table
-      { $set: { tableId: idTableTo } } // Update tableId to destination table
-    );
+const moveTableData = async (dataTableFrom, idTableTo, fromTableNumber, toTableNumber) => {
+  // Transfer bookings to the destination table
+  await Booking.updateMany(
+    { tableId: dataTableFrom, status: 'Now' }, // Bookings linked to source table
+    { $set: { tableId: idTableTo } } // Update tableId to destination table
+  );
 
-    // Transfer orders to the destination table (assumed structure similar to bookings)
-    await Order.updateMany(
-      { tableId: dataTableFrom }, // Orders linked to source table
-      { $set: { tableId: idTableTo } } // Update tableId to destination table
-    );
+  // Transfer orders to the destination table (assumed structure similar to bookings)
+  await Order.updateMany(
+    { tableId: dataTableFrom }, // Orders linked to source table
+    { $set: { tableId: idTableTo } } // Update tableId to destination table
+  );
 
-    // Step 3: Set source table status to 'Available' and remove bookings/orders
+  // Step 3: Check if the table has any 'Appointment' bookings
+  const appointmentBookings = await Booking.find({
+    tableId: dataTableFrom,
+    status: 'Appointment'
+  });
+
+  if (appointmentBookings.length > 0) {
+    // If there are appointment bookings, set the status to 'Booked'
+    await Table.updateOne(
+      { tableNumber: fromTableNumber },
+      { $set: { status: 'Booked' } } // Change status to Booked
+    );
+  } else {
+    // If no appointment bookings, set status to 'Empty' and remove bookings/orders
     await Table.updateOne(
       { tableNumber: fromTableNumber },
       {
-        $set: { status: 'Empty' }, // Change status to Available
+        $set: { status: 'Empty' }, // Change status to Empty
         $unset: { bookings: "", orders: "" } // Remove bookings and orders
       }
     );
+  }
 
-    await Table.updateOne(
-      { tableNumber: toTableNumber },
-      {
-        $set: { status: 'Available' }, // Change status to Available
-      }
-    );
-
+  // Update the destination table status to 'Available'
+  await Table.updateOne(
+    { tableNumber: toTableNumber },
+    { $set: { status: 'Available' } } // Change status to Available
+  );
 };
 
 const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newInfomationBook) => {
@@ -160,7 +313,7 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
     const newOrder = new Order({
       tableId: idTableTo,
       time: newInfomationBook.time,
-      status: 'Pending',
+      status: 'Now',
       product: [],
       price: 0
     });
@@ -168,7 +321,7 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
     // Add the split products to the new order and calculate the price
     let totalPrice = 0;
     for (const product of arrayProduct.splitProduct) {
-      const foundProduct = await Product.findOne({ name: product._id });
+      const foundProduct = await Product.findOne({ name: product.name });
       if (foundProduct) {
         totalPrice += foundProduct.price * product.quantity; // Calculate total price
         newOrder.product.push({
@@ -218,7 +371,7 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
       { tableNumber: toTableNumber },
       { $set: { status: 'Available' } }
     );
-    
+
     return { booking: savedBooking, order: savedOrder }; // Return created booking and order
 
   } catch (error) {
@@ -229,65 +382,113 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
 
 const mergeTables = async (fromTables, toTableNumber, newBookingDetails) => {
   try {
-      // Step 1: Fetch all products from the `fromTables`
-      let mergedProducts = [];
-      let totalPrice = 0;
+    // Step 1: Fetch all products from the `fromTables` that have orders with status 'Now'
+    let mergedProducts = [];
+    let totalPrice = 0;
 
-      for (const tableNumber of fromTables) {
-          // Find the table by `tableNumber` to get its `_id`
-          const tableFrom = await Table.findOne({ tableNumber: tableNumber });
-          const orders = await Order.find({ tableId: tableFrom._id });  // Use the table `_id` here
-          orders.forEach(order => {
-              order.product.forEach(product => {
-                  mergedProducts.push(product);
-                  //totalPrice += product.price * product.quantity;
-              });
-          });
+    for (const tableNumber of fromTables) {
+      // Find the table by `tableNumber` to get its `_id`
+      let tableFrom = await Table.findOne({ tableNumber: tableNumber });
+
+      // Check if the table was found
+      if (!tableFrom) {
+        console.error(`Table with number ${tableNumber} not found.`);
+        continue; // Skip to the next iteration
       }
 
-      // Step 2: Create a new order for the `toTable` with the merged products
-      const tableTo = await Table.findOne({ tableNumber: toTableNumber });
-      const idTableTo = tableTo._id;  // Get the correct `_id` for the `toTable`
-      
-      const newOrder = new Order({
-          tableId: idTableTo,  // Use the `_id` of `toTable`
-          product: mergedProducts,
-          price: totalPrice,
-          status: 'Pending',
-          time: newBookingDetails.time
+      let tableFromId = tableFrom._id;
+      // Step 1.4: Merge products only from orders with status 'Now'
+      let orders = await Order.find({ tableId: tableFromId, status: 'Now' }); // Only 'Now' orders
+
+      // Check if orders exist
+      if (orders.length === 0) {
+        console.log(`No active orders found for table ${tableNumber}.`);
+        continue; // Skip to the next iteration
+      }
+
+      orders.forEach(order => {
+        order.product.forEach(product => {
+          const existingProduct = mergedProducts.find(p => p.productId.toString() === product.productId.toString());
+
+          if (existingProduct) {
+            existingProduct.numberProduct += product.numberProduct; // Sum up quantities
+          } else {
+            mergedProducts.push({
+              productId: product.productId,
+              numberProduct: product.numberProduct
+            });
+          }
+
+        });
       });
 
-      const savedOrder = await newOrder.save();
+      // Step 1.1: Update table status based on booking status
+      let bookingFrom = await Booking.findOne({ tableId: tableFromId, status: 'Appointment' });
+      let newStatus = bookingFrom ? 'Booked' : 'Empty';
 
-      // Step 3: Create a new booking for the `toTable`
-      const booking = new Booking({
-          customerName: newBookingDetails.customerName,
-          phoneNumber: newBookingDetails.phoneNumber,
-          date: new Date(newBookingDetails.date),
-          time: newBookingDetails.time,
-          status: newBookingDetails.status,
-          tableId: [idTableTo]  // Use the `_id` of the `toTable`
-      });
+      await Table.updateOne({ _id: tableFromId }, { $set: { status: newStatus } });
 
-      const savedBooking = await booking.save();
-
-      // Step 4: Update the status of the `toTable` to 'Occupied'
-      await Table.updateOne(
-          { _id: idTableTo },  // Use `_id` to find and update the table
-          { $set: { status: 'Available' } }
+      // Step 1.2: Update the orders with status 'Now' to 'Cancelled' and set reason
+      await Order.updateMany(
+        { tableId: tableFromId, status: 'Now' },
+        { $set: { status: 'Cancelled', reason: 'merge table' } }
       );
 
-      // Return the new merged order and booking details
-      return { booking: savedBooking, order: savedOrder };
+      // Step 1.3: Update bookings with status 'Now' to 'Cancelled' and set reason
+      await Booking.updateMany(
+        { tableId: tableFromId, status: 'Now' },
+        { $set: { status: 'Cancelled', reason: 'merge table' } }
+      );
 
+    }
+
+    // Step 2: Create a new order for the `toTable` with the merged products
+    const tableTo = await Table.findOne({ tableNumber: toTableNumber });
+
+    // Check if the destination table exists
+    if (!tableTo) {
+      console.error(`Destination table with number ${toTableNumber} not found.`);
+      return; // Exit if table not found
+    }
+
+    const idTableTo = tableTo._id;  // Get the correct `_id` for the `toTable`
+
+    const newOrder = new Order({
+      tableId: idTableTo,  // Use the `_id` of `toTable`
+      product: mergedProducts,
+      price: totalPrice,
+      status: 'Now',
+      time: newBookingDetails.time
+    });
+
+    const savedOrder = await newOrder.save();
+
+    // Step 3: Create a new booking for the `toTable`
+    const booking = new Booking({
+      customerName: newBookingDetails.customerName,
+      phoneNumber: newBookingDetails.phoneNumber,
+      date: new Date(newBookingDetails.date),
+      time: newBookingDetails.time,
+      status: newBookingDetails.status,
+      tableId: [idTableTo]  // Use the `_id` of the `toTable`
+    });
+
+    const savedBooking = await booking.save();
+
+    // Step 4: Update the status of the `toTable` to 'Occupied'
+    await Table.updateOne(
+      { _id: idTableTo },  // Use `_id` to find and update the table
+      { $set: { status: 'Available' } }
+    );
+
+    // Return the new merged order and booking details
+    return { booking: savedBooking, order: savedOrder };
 
   } catch (error) {
-      console.error("Error merging tables:", error);
-      throw error;
+    console.error("Error merging tables:", error);
+    throw error;
   }
 };
-
-
 
 
 module.exports = {
@@ -299,5 +500,4 @@ module.exports = {
   getTableByNumber,
   splitTableData,
   mergeTables
-  
 };
