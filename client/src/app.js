@@ -37,6 +37,8 @@ app.use("/", homeRoute);
 app.use("/login", loginRoute);
 app.use('/equipment', equipmentRoute);
 app.use('/sale', saleRoute);
+app.use('/equipment', equipmentRoute);
+app.use('/sale', saleRoute);
 app.use('/about', aboutRoute); 
 app.use('/manage-employee', manageEmployeeRoute);
 app.use('/table', tableRoute); 
