@@ -312,7 +312,7 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
     // Step 2: Create a new order for the destination table (toTableNumber) using splitProduct
     const newOrder = new Order({
       tableId: idTableTo,
-      time: newInfomationBook.time,
+      time: new Date(newInfomationBook.date),
       status: 'Now',
       product: [],
       price: 0
@@ -458,7 +458,7 @@ const mergeTables = async (fromTables, toTableNumber, newBookingDetails) => {
       product: mergedProducts,
       price: totalPrice,
       status: 'Now',
-      time: newBookingDetails.time
+      time: new Date(newBookingDetails.date)
     });
 
     const savedOrder = await newOrder.save();

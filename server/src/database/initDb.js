@@ -359,7 +359,7 @@ const createInitialData = async () => {
           tableId: tableIds[0], // Using the manually assigned tableIds
           saleId: null,
           price: 10.00,
-          time: new Date(),
+          time: new Date().toISOString(),
           status: 'Now'
         },
         {
@@ -367,7 +367,7 @@ const createInitialData = async () => {
           tableId: tableIds[1], // Using the manually assigned tableIds
           saleId: sales[0]._id,
           price: 3.00,
-          time: new Date(),
+          time: new Date().toISOString(),
           status: 'Completed'
         }
       ];
