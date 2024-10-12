@@ -28,7 +28,7 @@ const viewTableProductById = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ product });
 });
 
-const moveTable = catchAsync(async (req, res) => {
+const moveTableController = catchAsync(async (req, res) => {
     try {
         const { fromTableNumber, toTableNumber } = req.body;
         const sourceTableData = await tableService.getInfomationTableById(Number(fromTableNumber));
@@ -50,7 +50,7 @@ const moveTable = catchAsync(async (req, res) => {
     }
 });
 
- const splitTable = catchAsync(async (req, res) => {
+ const splitTableController = catchAsync(async (req, res) => {
     try {
         const { fromTableNumber, toTableNumber, product, newInfomationBook} = req.body;
 
@@ -68,7 +68,7 @@ const moveTable = catchAsync(async (req, res) => {
     }
 });
 
-const mergeTable = catchAsync(async (req, res) => {
+const mergeTableController = catchAsync(async (req, res) => {
     try {
         // Destructure `fromTables`, `toTable`, and `newBookingDetails` from the request body
         const { fromTables, toTable, newBookingDetails } = req.body;
@@ -90,6 +90,16 @@ const mergeTable = catchAsync(async (req, res) => {
     }
 });
 
+const cancelTableController = async (req, res) => {
+    try {
+        const { tableNumber } = req.params; 
+        await tableService.cancelTable(tableNumber);
+        res.status(200).json({ message: 'Table, bookings, and orders updated successfully' });
+    } catch (error) {
+        console.error('Error canceling table:', error);
+        res.status(500).json({ message: 'Error updating statuses', error: error.message });
+    }
+};
 
 module.exports = {
     viewInfomationByTableNumber,
@@ -97,7 +107,8 @@ module.exports = {
     viewTableCanBook,
     viewTableProductById,
     viewTableByStatus,
-    moveTable,
-    splitTable,
-    mergeTable
+    moveTableController,
+    splitTableController,
+    mergeTableController,
+    cancelTableController
 };

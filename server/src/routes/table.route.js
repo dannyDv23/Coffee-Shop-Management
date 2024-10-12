@@ -25,17 +25,22 @@ router.get(
 
 router.post(
     "/move",
-    tableController.moveTable
+    tableController.moveTableController
 );
 
 router.post(
     "/split",
-    tableController.splitTable
+    tableController.splitTableController
 );
 
 router.post(
     "/merge",
-    tableController.mergeTable
+    tableController.mergeTableController
+);
+
+router.put(
+    "/cancel/:tableNumber",
+    tableController.cancelTableController
 );
 
 module.exports = router;

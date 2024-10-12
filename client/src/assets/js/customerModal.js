@@ -486,40 +486,40 @@ var SweetAlert2Demo = (function () {
         // });
 
         //TODO: cancel table
-        document.querySelectorAll('.cancel-table-button').forEach(button => {
-            button.addEventListener('click', function () {
-                swal({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    type: "warning",
-                    buttons: {
-                        confirm: {
-                            text: "Yes, delete it!",
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            visible: true,
-                            className: "btn btn-danger",
-                        },
-                    },
-                }).then((Delete) => {
-                    if (Delete) {
-                        swal({
-                            title: "Deleted!",
-                            text: "Your file has been deleted.",
-                            type: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        // document.querySelectorAll('.cancel-table-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         swal({
+        //             title: "Are you sure?",
+        //             text: "You won't be able to revert this!",
+        //             type: "warning",
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Yes, delete it!",
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     visible: true,
+        //                     className: "btn btn-danger",
+        //                 },
+        //             },
+        //         }).then((Delete) => {
+        //             if (Delete) {
+        //                 swal({
+        //                     title: "Deleted!",
+        //                     text: "Your file has been deleted.",
+        //                     type: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: book table
         document.querySelectorAll('.book-table-button').forEach(button => {

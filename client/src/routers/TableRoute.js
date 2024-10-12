@@ -107,11 +107,12 @@ router.get('/merge', async(req, res) => {
   });
 });
 
-router.get('/cancel', (req, res) => {
+router.get('/cancel', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const listTable = responseAvailableTable.data.listTable;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/CancelTable'),
+    bodyPage: path.join('views', 'TablePage','CancelTable'),
+    listTable: listTable,
     titleTab: 'Cancel Table'
   });
 });

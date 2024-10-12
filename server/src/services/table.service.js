@@ -19,111 +19,6 @@ const getAllTable = async () => {
   return await Table.find();
 };
 
-// const getInfomationTableById = async (tableNumber) => {
-//   try {
-//     const parsedTableNumber = Number(tableNumber);
-//     const result = await Table.aggregate([
-//       {
-//         $match: {
-//           tableNumber: parsedTableNumber,
-//           status: { $in: ['Available', 'Booked'] }
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: 'bookings',
-//           localField: '_id',
-//           foreignField: 'tableId',
-//           as: 'bookings'
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: 'orders',
-//           let: { tableId: '$_id' },
-//           pipeline: [
-//             {
-//               $match: {
-//                 $expr: {
-//                   $and: [
-//                     { $eq: ['$tableId', '$$tableId'] },
-//                     { $eq: ['$status', 'Now'] } // Only include orders with status 'Now'
-//                   ]
-//                 }
-//               }
-//             },
-//             {
-//               $unwind: {
-//                 path: '$product',
-//                 preserveNullAndEmptyArrays: true // Include tables with no orders
-//               }
-//             },
-//             {
-//               $lookup: {
-//                 from: 'products',
-//                 localField: 'product.productId',
-//                 foreignField: '_id',
-//                 as: 'productDetails'
-//               }
-//             },
-//             {
-//               $unwind: {
-//                 path: '$productDetails',
-//                 preserveNullAndEmptyArrays: true // Allow empty product details for tables without orders
-//               }
-//             },
-//             {
-//               $group: {
-//                 _id: '$tableId',
-//                 products: {
-//                   $push: {
-//                     name: '$productDetails.name',
-//                     quantity: '$product.numberProduct'
-//                   }
-//                 }
-//               }
-//             }
-//           ],
-//           as: 'orders'
-//         }
-//       },
-//       {
-//         // Ensure orders always have a default structure even if empty
-//         $addFields: {
-//           orders: {
-//             $cond: {
-//               if: { $eq: ['$orders', []] }, // If no orders found
-//               then: [{ products: [{}] }],      // Assign a default structure
-//               else: '$orders'                 // Otherwise return the orders
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $project: {
-//           tableNumber: 1,
-//           status: 1,
-//           bookings: 1,
-//           orders: {
-//             $map: {
-//               input: '$orders',
-//               as: 'order',
-//               in: {
-//                 products: '$$order.products'
-//               }
-//             }
-//           }
-//         }
-//       }
-//     ]);
-
-//     return result;
-//   } catch (error) {
-//     console.error('Error fetching table details:', error);
-//     throw error;
-//   }
-// };
-
 const getInfomationTableById = async (tableNumber) => {
   try {
     const parsedTableNumber = Number(tableNumber);
@@ -149,7 +44,7 @@ const getInfomationTableById = async (tableNumber) => {
             $filter: {
               input: '$bookings',
               as: 'booking',
-              cond: { 
+              cond: {
                 $in: ['$$booking.status', ['Now', 'Appointment']] // Only keep bookings with status 'Now' or 'Appointment'
               }
             }
@@ -490,6 +385,24 @@ const mergeTables = async (fromTables, toTableNumber, newBookingDetails) => {
   }
 };
 
+const cancelTable = async (TableNumber) => {
+  await Table.findOneAndUpdate(
+    { tableNumber: TableNumber }, // Find table by tableNumber
+    { status: 'Empty' }, // Set status to 'Empty'
+    { new: true } // Return the updated document
+  )
+
+  await Booking.updateMany(
+    { status: 'Now' },
+    { status: 'Completed' }
+  )
+
+  await Order.updateMany(
+    { status: 'Now' },
+    { status: 'Completed' }
+  )
+}
+
 
 module.exports = {
   getTableCanBook,
@@ -499,5 +412,6 @@ module.exports = {
   moveTableData,
   getTableByNumber,
   splitTableData,
-  mergeTables
+  mergeTables,
+  cancelTable
 };
