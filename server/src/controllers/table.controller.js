@@ -90,7 +90,7 @@ const mergeTableController = catchAsync(async (req, res) => {
     }
 });
 
-const cancelTableController = async (req, res) => {
+const cancelTableController = catchAsync (async (req, res) => {
     try {
         const { tableNumber } = req.params; 
         await tableService.cancelTable(tableNumber);
@@ -99,7 +99,17 @@ const cancelTableController = async (req, res) => {
         console.error('Error canceling table:', error);
         res.status(500).json({ message: 'Error updating statuses', error: error.message });
     }
-};
+});
+
+const orderProductTableController =  catchAsync (async (req, res) => {
+    try {
+        const { tableNumber, productList } = req.body;
+        const result = await tableService.orderProductTable(tableNumber, productList);
+        res.status(200).json({ message: 'Order processed successfully', order: result.order });
+    } catch (error) {
+        res.status(500).json({ message: 'Error processing order', error: error.message });
+    }
+});
 
 module.exports = {
     viewInfomationByTableNumber,
@@ -110,5 +120,6 @@ module.exports = {
     moveTableController,
     splitTableController,
     mergeTableController,
-    cancelTableController
+    cancelTableController,
+    orderProductTableController
 };

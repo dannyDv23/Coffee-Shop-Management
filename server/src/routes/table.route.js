@@ -43,4 +43,9 @@ router.put(
     tableController.cancelTableController
 );
 
+router.post(
+    '/order',
+    tableController.orderProductTableController
+);
+
 module.exports = router;

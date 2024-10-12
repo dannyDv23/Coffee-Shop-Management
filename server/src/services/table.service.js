@@ -403,6 +403,109 @@ const cancelTable = async (TableNumber) => {
   )
 }
 
+const orderProductTable = async (tableNumber, productList) => {
+  try {
+    // Step 1: Find the table by its number
+    const table = await Table.findOne({ tableNumber: tableNumber });
+    
+    if (!table) {
+      throw new Error(`Table number ${tableNumber} does not exist.`);
+    }
+
+    // Step 2: Check if there's already an order with status 'Now' for this table
+    let existingOrder = await Order.findOne({ tableId: table._id, status: 'Now' });
+
+    // Step 3: If an order exists, update it
+    if (existingOrder) {
+      let totalPrice = existingOrder.price;
+
+      // Loop through productList and update the order accordingly
+      for (let item of productList) {
+        const { productId, quantity } = item;
+        
+        // Find the product details in the Product collection
+        const product = await Product.findById(productId);
+        if (!product) {
+          throw new Error(`Product with ID ${productId} does not exist.`);
+        }
+
+        // Check if the product already exists in the order
+        const productInOrder = existingOrder.product.find(p => p.productId.toString() === productId);
+
+        if (productInOrder) {
+          // Product exists in the order, so increase the quantity
+          productInOrder.numberProduct += quantity;
+        } else {
+          // Product doesn't exist in the order, so add it
+          existingOrder.product.push({
+            productId: product._id,
+            numberProduct: quantity
+          });
+        }
+
+        // Update the total price
+        totalPrice += product.price * quantity;
+      }
+
+      // Update the total price and save the updated order
+      existingOrder.price = totalPrice;
+      await existingOrder.save();
+
+      return {
+        message: 'Order updated successfully',
+        order: existingOrder
+      };
+    } 
+
+    // Step 4: If no order exists, create a new order
+    else {
+      let totalPrice = 0;
+      const productOrders = [];
+
+      for (let item of productList) {
+        const { productId, quantity } = item;
+
+        // Fetch product details
+        const product = await Product.findById(productId);
+        if (!product) {
+          throw new Error(`Product with ID ${productId} does not exist.`);
+        }
+
+        // Calculate the total price
+        const productPrice = product.price * quantity;
+        totalPrice += productPrice;
+
+        // Prepare product details for the new order
+        productOrders.push({
+          productId: product._id,
+          numberProduct: quantity
+        });
+      }
+
+      // Create a new order
+      const newOrder = new Order({
+        product: productOrders,
+        tableId: table._id,
+        price: totalPrice,
+        time: new Date(),
+        status: 'Now', // Set status to "Now" for the new order
+      });
+
+      // Save the new order
+      await newOrder.save();
+      return {
+        message: 'Order placed successfully',
+        order: newOrder
+      };
+    }
+
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
 
 module.exports = {
   getTableCanBook,
@@ -413,5 +516,6 @@ module.exports = {
   getTableByNumber,
   splitTableData,
   mergeTables,
-  cancelTable
+  cancelTable,
+  orderProductTable
 };

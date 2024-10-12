@@ -117,11 +117,15 @@ router.get('/cancel', async(req, res) => {
   });
 });
 
-router.get('/chooseMenu', (req, res) => {
+router.get('/chooseMenu', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const responseProduct = await axios.get('http://localhost:3000/api/product');
+  const listTable = responseAvailableTable.data.listTable;
+  const listproduct = responseProduct.data.listProduct;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/ChooseMenu'),
+    bodyPage: path.join('views', 'TablePage','ChooseMenu'),
+    listTable: listTable,
+    listproduct: listproduct,
     titleTab: 'Choose Menu'
   });
 });
