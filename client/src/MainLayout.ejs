@@ -40,102 +40,102 @@
   </head>
   <body>
         <% 
-        const menuItems = [
-        //TODO: quan ly nhan vien
-        {
-          icon: "fas fa-users",
-          managementName: "Employee",
-          subItems: [
-            { name: "View employee list", link: "/manage-employee" },
-            { name: "Add employee", link: "/manage-employee/add" },
-            { name: "Edit employee", link: "/manage-employee" },
-            { name: "Delete employee", link: "/manage-employee/delete" },
-            { name: "Find employee", link: "components/notifications.html" },
-          ],
-        },
-        //TODO: quan ly ban hang
-        {
-          icon: "fas fa-chart-line",
-          managementName: "Sales",
-          subItems: [
-            { name: "View table", link: "/table/view" },
-            { name: "Move table", link: "/table/move" },
-            { name: "Split table", link: "/table/split" },
-            { name: "Merge tables", link: "/table/merge" },
-            { name: "Cancel table", link: "/table/cancel" },
-            { name: "Choose menu", link: "/table/chooseMenu" },
-            { name: "Booking table", link: "/table/booking" },
-            { name: "Payment", link: "/table/payment" },
-            { name: "Print settings", link: "/table/print" },
-          ],
-        },
-        //TODO: quan ly trang thiet bi
-        {
-          icon: "fas fa-toolbox",
-          managementName: "Equipment",
-          subItems: [
-            { name: "View All Equipment", link: "/equipment/view-all" },
-            { name: "Create new Equipment", link: "/equipment/create" },
-          ],
-        },
-        //TODO: quan ly kho hang
-        {
-          icon: "fas fa-box",
-          managementName: "Inventory",
-          subItems: [
-            { name: "View inventory list", link: "/inventory" },
-            { name: "Import material", link: "/inventory/import" },
-            { name: "Export products", link: "/inventory/export" },
-            { name: "Find products", link: "/inventory/find" },
-          ],
-        },
-        //TODO: quan ly thuc don
-        {
-          icon: "fas fa-utensils",
-          managementName: "Menu",
-          subItems: [
-            { name: "View menu list", link: "./avatar" },
-            { name: "Add menu", link: "components/buttons.html" },
-            { name: "Edit menu", link: "components/gridsystem.html" },
-            { name: "Delete menu", link: "components/panels.html" },
-            { name: "Search", link: "components/notifications.html" },
-          ],
-        },
-        //TODO: quan ly marketting
-        {
-          icon: "fas fa-bullhorn",
-          managementName: "Marketing",
-          subItems: [
-            { name: "View All Sale", link: "/sale/view-all" },
-            { name: "Create new Sale", link: "/sale/create" }
-          ],
-        },
-        //TODO: quan ly ngan sach
-        {
-          icon: "fas fa-wallet",
-          managementName: "Budget ",
-          subItems: [
-            { name: "View income and expenses", link: "./avatar" },
-            { name: "Add income and expenses", link: "components/buttons.html" },
-          ],
-        },
-        //TODO: quan ly du lieu
-        {
-          icon: "fas fa-database",
-          managementName: "Data",
-          subItems: [
-            { name: "Data backup", link: "./avatar" },
-            { name: "Data recovery", link: "components/buttons.html" },
-          ],
-        },
-        //TODO: Thong ke, bao cao
-        {
-          icon: "fas fa-chart-bar",
-          managementName: "Statistics and Reports",
-          subItems: [
-            { name: "View and Export", link: "/report" },
-          ],
-        },
+          const menuItems = [
+            //TODO: quan ly nhan vien
+            {
+              icon: "fas fa-users",
+              managementName: "Employee",
+              subItems: [
+                { name: "View employee list", link: "/manage-employee" },
+                { name: "Add employee", link: "/manage-employee/add" },
+                { name: "Edit employee", link: "/manage-employee" },
+                { name: "Delete employee", link: "/manage-employee/delete" },
+                { name: "Find employee", link: "components/notifications.html" },
+              ],
+            },
+            //TODO: quan ly ban hang
+            {
+              icon: "fas fa-chart-line",
+              managementName: "Sales",
+              subItems: [
+                { name: "View table", link: "/table/view" },
+                { name: "Move table", link: "/table/move" },
+                { name: "Split table", link: "/table/split" },
+                { name: "Merge tables", link: "/table/merge" },
+                { name: "Cancel table", link: "/table/cancel" },
+                { name: "Choose menu", link: "/table/chooseMenu" },
+                { name: "Booking table", link: "/table/booking" },
+                { name: "Payment", link: "/table/payment" },
+                { name: "Print settings", link: "/table/print" },
+              ],
+            },
+            //TODO: quan ly trang thiet bi
+            {
+              icon: "fas fa-toolbox",
+              managementName: "Equipment",
+              subItems: [
+                { name: "View All Equipment", link: "/equipment/view-all" },
+                { name: "Create new Equipment", link: "/equipment/create" },
+              ],
+            },
+            //TODO: quan ly kho hang
+            {
+              icon: "fas fa-box",
+              managementName: "Inventory",
+              subItems: [
+                { name: "View inventory list", link: "/inventory" },
+                { name: "Import material", link: "/inventory/import" },
+                { name: "Export products", link: "/inventory/export" },
+                { name: "Find products", link: "/inventory/find" },
+              ],
+            },
+            //TODO: quan ly thuc don
+            {
+              icon: "fas fa-utensils",
+              managementName: "Menu",
+              subItems: [
+                { name: "View menu list", link: "./avatar" },
+                { name: "Add menu", link: "components/buttons.html" },
+                { name: "Edit menu", link: "components/gridsystem.html" },
+                { name: "Delete menu", link: "components/panels.html" },
+                { name: "Search", link: "components/notifications.html" },
+              ],
+            },
+            //TODO: quan ly marketting
+            {
+              icon: "fas fa-bullhorn",
+              managementName: "Marketing",
+              subItems: [
+                { name: "View All Sale", link: "/sale/view-all" },
+                { name: "Create new Sale", link: "/sale/create" }
+              ],
+            },
+            //TODO: quan ly ngan sach
+            {
+              icon: "fas fa-wallet",
+              managementName: "Budget ",
+              subItems: [
+                { name: "View income and expenses", link: "./avatar" },
+                { name: "Add income and expenses", link: "components/buttons.html" },
+              ],
+            },
+            //TODO: quan ly du lieu
+            {
+              icon: "fas fa-database",
+              managementName: "Data",
+              subItems: [
+                { name: "Data backup", link: "./avatar" },
+                { name: "Data recovery", link: "components/buttons.html" },
+              ],
+            },
+            //TODO: Thong ke, bao cao
+            {
+              icon: "fas fa-chart-bar",
+              managementName: "Statistics and Reports",
+              subItems: [
+                { name: "View and Export", link: "/report" },
+              ],
+            },
 
       ];
         %>
@@ -890,7 +890,5 @@
         window.location.href = "/login";
       }
     </script>
-
-    
   </body>
 </html>

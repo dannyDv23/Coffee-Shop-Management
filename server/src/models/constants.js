@@ -2,9 +2,9 @@
 
 const ROLES = ['Admin', 'Employee'];
 const EMPLOYEE_STATUSES = ['Active', 'Inactive'];
-const TABLE_STATUSES = ['Available', 'Empty'];
-const BOOKING_STATUSES = ['Pending', 'Confirmed', 'Cancelled'];
-const ORDER_STATUSES = ['Pending', 'Completed', 'Cancelled'];
+const TABLE_STATUSES = ['Available', 'Empty', 'Booked'];
+const BOOKING_STATUSES = ['Appointment', 'Now', 'Cancelled'];
+const ORDER_STATUSES = ['Now', 'Completed', 'Cancelled'];
 const PRODUCT_STATUSES = ['Available', 'Unavailable'];
 const EQUIPMENT_STATUSES = ['Active', 'Pending'];
 const HISTORY_MONEY_STATUSES = ['Spend', 'Collect'];
