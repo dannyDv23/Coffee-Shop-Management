@@ -133,6 +133,24 @@ const createBookingController = catchAsync (async (req, res) => {
     }
 });
 
+const completeOrderController = catchAsync (async (req, res) => {
+    const { tableNumber } = req.params;
+    const { moneyReceived, moneyRefund, changeTableStatus } = req.body;
+
+    try {
+        const result = await tableService.completeOrder(tableNumber, {
+            moneyReceived,
+            moneyRefund,
+            changeTableStatus
+        });
+        return res.json(result);
+    } catch (error) {
+        console.error('Error completing order:', error);
+        return res.status(500).json({ message: error.message });
+    }
+});
+
+
 module.exports = {
     viewInfomationByTableNumber,
     viewAllTable,
@@ -144,5 +162,6 @@ module.exports = {
     mergeTableController,
     cancelTableController,
     orderProductTableController,
-    createBookingController
+    createBookingController,
+    completeOrderController
 };

@@ -556,6 +556,46 @@ const createBooking = async (bookingData) => {
   return newBooking;
 };
 
+const completeOrder = async (tableNumber, { moneyReceived, moneyRefund, changeTableStatus }) => {
+  // Find the table by its number to get the tableId
+  const table = await Table.findOne({ tableNumber: tableNumber });
+  if (!table) {
+      throw new Error('Table not found.');
+  }
+
+  const tableId = table._id;
+
+  // Find the order with status 'Now' for the given tableId
+  const order = await Order.findOne({ tableId, status: 'Now' });
+  if (!order) {
+      throw new Error('Order not found or already completed.');
+  }
+
+  // Update the order with payment details
+  await Order.findByIdAndUpdate(order._id, {
+      $set: {
+          moneyReceived,
+          moneyRefund,
+          status: 'Completed'
+      }
+  });
+
+  // If changeTableStatus is true, update the table and booking statuses
+  if (changeTableStatus) {
+      // Update the table status to 'Empty'
+      await Table.findByIdAndUpdate(tableId, {
+          $set: { status: 'Empty' }
+      });
+
+      // Update the associated booking status to 'Completed'
+      await Booking.findOneAndUpdate(
+          { tableId, status: 'Now' },
+          { $set: { status: 'Completed'} }
+      );
+  }
+
+  return { message: 'Order and table status updated successfully.' };
+};
 
 module.exports = {
   getTableCanBook,
@@ -568,5 +608,6 @@ module.exports = {
   mergeTables,
   cancelTable,
   orderProductTable,
-  createBooking
+  createBooking,
+  completeOrder
 };

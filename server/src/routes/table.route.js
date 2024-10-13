@@ -53,4 +53,9 @@ router.post(
     tableController.createBookingController
 );
 
+router.post(
+    '/:tableNumber/complete', 
+    tableController.completeOrderController
+);
+
 module.exports = router;
