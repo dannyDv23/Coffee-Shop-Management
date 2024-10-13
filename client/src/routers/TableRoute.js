@@ -152,10 +152,8 @@ router.get('/payment', async(req, res) => {
 
 router.get('/print', (req, res) => {
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/PrintSetting'),
-    titleTab: 'table payment'
+    bodyPage: path.join('views', 'TablePage','PrintSetting'),
+    titleTab: 'Print Setting'
   });
 });
 
