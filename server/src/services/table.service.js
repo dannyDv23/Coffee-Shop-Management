@@ -19,111 +19,6 @@ const getAllTable = async () => {
   return await Table.find();
 };
 
-// const getInfomationTableById = async (tableNumber) => {
-//   try {
-//     const parsedTableNumber = Number(tableNumber);
-//     const result = await Table.aggregate([
-//       {
-//         $match: {
-//           tableNumber: parsedTableNumber,
-//           status: { $in: ['Available', 'Booked'] }
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: 'bookings',
-//           localField: '_id',
-//           foreignField: 'tableId',
-//           as: 'bookings'
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: 'orders',
-//           let: { tableId: '$_id' },
-//           pipeline: [
-//             {
-//               $match: {
-//                 $expr: {
-//                   $and: [
-//                     { $eq: ['$tableId', '$$tableId'] },
-//                     { $eq: ['$status', 'Now'] } // Only include orders with status 'Now'
-//                   ]
-//                 }
-//               }
-//             },
-//             {
-//               $unwind: {
-//                 path: '$product',
-//                 preserveNullAndEmptyArrays: true // Include tables with no orders
-//               }
-//             },
-//             {
-//               $lookup: {
-//                 from: 'products',
-//                 localField: 'product.productId',
-//                 foreignField: '_id',
-//                 as: 'productDetails'
-//               }
-//             },
-//             {
-//               $unwind: {
-//                 path: '$productDetails',
-//                 preserveNullAndEmptyArrays: true // Allow empty product details for tables without orders
-//               }
-//             },
-//             {
-//               $group: {
-//                 _id: '$tableId',
-//                 products: {
-//                   $push: {
-//                     name: '$productDetails.name',
-//                     quantity: '$product.numberProduct'
-//                   }
-//                 }
-//               }
-//             }
-//           ],
-//           as: 'orders'
-//         }
-//       },
-//       {
-//         // Ensure orders always have a default structure even if empty
-//         $addFields: {
-//           orders: {
-//             $cond: {
-//               if: { $eq: ['$orders', []] }, // If no orders found
-//               then: [{ products: [{}] }],      // Assign a default structure
-//               else: '$orders'                 // Otherwise return the orders
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $project: {
-//           tableNumber: 1,
-//           status: 1,
-//           bookings: 1,
-//           orders: {
-//             $map: {
-//               input: '$orders',
-//               as: 'order',
-//               in: {
-//                 products: '$$order.products'
-//               }
-//             }
-//           }
-//         }
-//       }
-//     ]);
-
-//     return result;
-//   } catch (error) {
-//     console.error('Error fetching table details:', error);
-//     throw error;
-//   }
-// };
-
 const getInfomationTableById = async (tableNumber) => {
   try {
     const parsedTableNumber = Number(tableNumber);
@@ -149,7 +44,7 @@ const getInfomationTableById = async (tableNumber) => {
             $filter: {
               input: '$bookings',
               as: 'booking',
-              cond: { 
+              cond: {
                 $in: ['$$booking.status', ['Now', 'Appointment']] // Only keep bookings with status 'Now' or 'Appointment'
               }
             }
@@ -490,6 +385,217 @@ const mergeTables = async (fromTables, toTableNumber, newBookingDetails) => {
   }
 };
 
+const cancelTable = async (tableNumber) => {
+  // Step 1: Find the table by its number
+  const table = await Table.findOne({ tableNumber });
+
+  // Step 2: Check if the table has an Appointment booking
+  const appointmentBooking = await Booking.findOne({
+    tableId: table._id,
+    status: 'Appointment',
+  });
+
+  // Step 3: Update table status based on the booking type
+  if (appointmentBooking) {
+    await Table.findOneAndUpdate(
+      { tableNumber }, 
+      { status: 'Booked' }, // Keep it booked if there's an appointment
+      { new: true }
+    );
+  } else {
+    await Table.findOneAndUpdate(
+      { tableNumber }, 
+      { status: 'Empty' }, // Set status to Empty if no appointment
+      { new: true }
+    );
+  }
+
+  // Step 4: Update only 'Now' bookings and orders to 'Completed'
+  await Booking.updateMany(
+    { tableId: table._id, status: 'Now' }, // Target only bookings with 'Now' status
+    { status: 'Completed' } // Update them to 'Completed'
+  );
+
+  await Order.updateMany(
+    { tableId: table._id, status: 'Now' }, // Target only orders with 'Now' status
+    { status: 'Completed' } // Update them to 'Completed'
+  );
+};
+
+const orderProductTable = async (tableNumber, productList) => {
+  try {
+    // Step 1: Find the table by its number
+    const table = await Table.findOne({ tableNumber: tableNumber });
+
+    if (!table) {
+      throw new Error(`Table number ${tableNumber} does not exist.`);
+    }
+
+    // Step 2: Check if there's already an order with status 'Now' for this table
+    let existingOrder = await Order.findOne({ tableId: table._id, status: 'Now' });
+
+    // Step 3: If an order exists, update it
+    if (existingOrder) {
+      let totalPrice = existingOrder.price;
+
+      // Loop through productList and update the order accordingly
+      for (let item of productList) {
+        const { productId, quantity } = item;
+
+        // Find the product details in the Product collection
+        const product = await Product.findById(productId);
+        if (!product) {
+          throw new Error(`Product with ID ${productId} does not exist.`);
+        }
+
+        // Check if the product already exists in the order
+        const productInOrder = existingOrder.product.find(p => p.productId.toString() === productId);
+
+        if (productInOrder) {
+          // Product exists in the order, so increase the quantity
+          productInOrder.numberProduct += quantity;
+        } else {
+          // Product doesn't exist in the order, so add it
+          existingOrder.product.push({
+            productId: product._id,
+            numberProduct: quantity
+          });
+        }
+
+        // Update the total price
+        totalPrice += product.price * quantity;
+      }
+
+      // Update the total price and save the updated order
+      existingOrder.price = totalPrice;
+      await existingOrder.save();
+
+      return {
+        message: 'Order updated successfully',
+        order: existingOrder
+      };
+    }
+
+    // Step 4: If no order exists, create a new order
+    else {
+      let totalPrice = 0;
+      const productOrders = [];
+
+      for (let item of productList) {
+        const { productId, quantity } = item;
+
+        // Fetch product details
+        const product = await Product.findById(productId);
+        if (!product) {
+          throw new Error(`Product with ID ${productId} does not exist.`);
+        }
+
+        // Calculate the total price
+        const productPrice = product.price * quantity;
+        totalPrice += productPrice;
+
+        // Prepare product details for the new order
+        productOrders.push({
+          productId: product._id,
+          numberProduct: quantity
+        });
+      }
+
+      // Create a new order
+      const newOrder = new Order({
+        product: productOrders,
+        tableId: table._id,
+        price: totalPrice,
+        time: new Date(),
+        status: 'Now', // Set status to "Now" for the new order
+      });
+
+      // Save the new order
+      await newOrder.save();
+      return {
+        message: 'Order placed successfully',
+        order: newOrder
+      };
+    }
+
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
+
+const createBooking = async (bookingData) => {
+  const { customerName, phoneNumber, date, time, tableNumber, statusBooking, statusTable } = bookingData;
+
+  // Step 1: Find the table by its number
+  const table = await Table.findOne({ tableNumber: tableNumber });
+  if (!table) {
+    throw new Error('Table not found');
+  }
+
+  // Step 2: Update the table's status to 'Booked'
+  await Table.updateOne(
+    { tableNumber: tableNumber },
+    { $set: { status: statusTable } }
+  );
+
+  // Step 3: Create a new booking with the found table ID
+  const newBooking = new Booking({
+    customerName,
+    phoneNumber,
+    date,
+    time,
+    reason: '',
+    status: statusBooking,
+    tableId: table._id
+  });
+
+  // Step 4: Save the booking to the database
+  await newBooking.save(); // <-- This is the missing part
+  return newBooking;
+};
+
+const completeOrder = async (tableNumber, { moneyReceived, moneyRefund, changeTableStatus }) => {
+  // Find the table by its number to get the tableId
+  const table = await Table.findOne({ tableNumber: tableNumber });
+  if (!table) {
+      throw new Error('Table not found.');
+  }
+
+  const tableId = table._id;
+
+  // Find the order with status 'Now' for the given tableId
+  const order = await Order.findOne({ tableId, status: 'Now' });
+  if (!order) {
+      throw new Error('Order not found or already completed.');
+  }
+
+  // Update the order with payment details
+  await Order.findByIdAndUpdate(order._id, {
+      $set: {
+          moneyReceived,
+          moneyRefund,
+          status: 'Completed'
+      }
+  });
+
+  // If changeTableStatus is true, update the table and booking statuses
+  if (changeTableStatus) {
+      // Update the table status to 'Empty'
+      await Table.findByIdAndUpdate(tableId, {
+          $set: { status: 'Empty' }
+      });
+
+      // Update the associated booking status to 'Completed'
+      await Booking.findOneAndUpdate(
+          { tableId, status: 'Now' },
+          { $set: { status: 'Completed'} }
+      );
+  }
+
+  return { message: 'Order and table status updated successfully.' };
+};
 
 module.exports = {
   getTableCanBook,
@@ -499,5 +605,9 @@ module.exports = {
   moveTableData,
   getTableByNumber,
   splitTableData,
-  mergeTables
+  mergeTables,
+  cancelTable,
+  orderProductTable,
+  createBooking,
+  completeOrder
 };

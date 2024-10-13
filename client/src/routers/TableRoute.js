@@ -107,48 +107,53 @@ router.get('/merge', async(req, res) => {
   });
 });
 
-router.get('/cancel', (req, res) => {
+router.get('/cancel', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const listTable = responseAvailableTable.data.listTable;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/CancelTable'),
+    bodyPage: path.join('views', 'TablePage','CancelTable'),
+    listTable: listTable,
     titleTab: 'Cancel Table'
   });
 });
 
-router.get('/chooseMenu', (req, res) => {
+router.get('/chooseMenu', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const responseProduct = await axios.get('http://localhost:3000/api/product');
+  const listTable = responseAvailableTable.data.listTable;
+  const listproduct = responseProduct.data.listProduct;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/ChooseMenu'),
+    bodyPage: path.join('views', 'TablePage','ChooseMenu'),
+    listTable: listTable,
+    listproduct: listproduct,
     titleTab: 'Choose Menu'
   });
 });
 
-router.get('/booking', (req, res) => {
+router.get('/booking', async(req, res) => {
+  const responseEmptyTable = await axios.get('http://localhost:3000/api/table/list-can-booking');
+  const listTable = responseEmptyTable.data.listTableCanBook;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/BookingTable'),
+    bodyPage: path.join('views', 'TablePage','BookingTable'),
+    listTable: listTable,
     titleTab: 'Booking Table'
   });
 });
 
-router.get('/payment', (req, res) => {
+router.get('/payment', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const listTable = responseAvailableTable.data.listTable;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/PaymentTable'),
-    titleTab: 'Payment Table '
+    bodyPage: path.join('views', 'TablePage','PaymentTable'),
+    listTable: listTable,
+    titleTab: 'Payment Table'
   });
 });
 
 router.get('/print', (req, res) => {
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/PrintSetting'),
-    titleTab: 'table payment'
+    bodyPage: path.join('views', 'TablePage','PrintSetting'),
+    titleTab: 'Print Setting'
   });
 });
 

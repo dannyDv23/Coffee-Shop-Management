@@ -3,7 +3,7 @@
 const ROLES = ['Admin', 'Employee'];
 const EMPLOYEE_STATUSES = ['Active', 'Inactive'];
 const TABLE_STATUSES = ['Available', 'Empty', 'Booked'];
-const BOOKING_STATUSES = ['Appointment', 'Now', 'Cancelled'];
+const BOOKING_STATUSES = ['Appointment', 'Now', 'Cancelled','Completed'];
 const ORDER_STATUSES = ['Now', 'Completed', 'Cancelled'];
 const PRODUCT_STATUSES = ['Available', 'Unavailable'];
 const EQUIPMENT_STATUSES = ['Active', 'Pending'];
