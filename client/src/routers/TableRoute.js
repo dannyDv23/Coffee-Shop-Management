@@ -130,11 +130,12 @@ router.get('/chooseMenu', async(req, res) => {
   });
 });
 
-router.get('/booking', (req, res) => {
+router.get('/booking', async(req, res) => {
+  const responseEmptyTable = await axios.get('http://localhost:3000/api/table/list-can-booking');
+  const listTable = responseEmptyTable.data.listTableCanBook;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/BookingTable'),
+    bodyPage: path.join('views', 'TablePage','BookingTable'),
+    listTable: listTable,
     titleTab: 'Booking Table'
   });
 });

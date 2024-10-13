@@ -522,71 +522,71 @@ var SweetAlert2Demo = (function () {
         // });
 
         //TODO: book table
-        document.querySelectorAll('.book-table-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const tableName = button.getAttribute('data-table');
+        // document.querySelectorAll('.book-table-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         const tableName = button.getAttribute('data-table');
 
-                // Create the HTML for the form, styled similar to the image
-                const reservationForm = `
-                    <div style="margin-top: 10px;">
-                        <strong>Khách hàng:</strong>
-                        <input id="customerName" class="form-control" type="text" placeholder="Nhập tên khách hàng" value="Đặng Lê Hùng" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>SĐT:</strong>
-                        <input id="customerPhone" class="form-control" type="text" placeholder="Nhập số điện thoại" value="0965433222" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>Ngày:</strong>
-                        <input id="reservationDate" class="form-control" type="date" value="2014-12-24" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>Giờ:</strong>
-                        <input id="reservationTime" class="form-control" type="time" value="10:23" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                `;
+        //         // Create the HTML for the form, styled similar to the image
+        //         const reservationForm = `
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Khách hàng:</strong>
+        //                 <input id="customerName" class="form-control" type="text" placeholder="Nhập tên khách hàng" value="Đặng Lê Hùng" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>SĐT:</strong>
+        //                 <input id="customerPhone" class="form-control" type="text" placeholder="Nhập số điện thoại" value="0965433222" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Ngày:</strong>
+        //                 <input id="reservationDate" class="form-control" type="date" value="2014-12-24" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Giờ:</strong>
+        //                 <input id="reservationTime" class="form-control" type="time" value="10:23" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //         `;
 
-                const content = document.createElement('div');
-                content.innerHTML = reservationForm;
+        //         const content = document.createElement('div');
+        //         content.innerHTML = reservationForm;
 
-                swal({
-                    title: `Đặt bàn ${tableName}`, // Custom title for the table
-                    content: content,  // Inject the form content
-                    buttons: {
-                        confirm: {
-                            text: "Đặt bàn",  // Button text for confirming
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            text: "Hủy",  // Button text for canceling
-                            className: "btn btn-danger",
-                            visible: true,
-                        },
-                    },
-                }).then((confirmBooking) => {
-                    if (confirmBooking) {
-                        const name = document.getElementById('customerName').value;
-                        const phone = document.getElementById('customerPhone').value;
-                        const date = document.getElementById('reservationDate').value;
-                        const time = document.getElementById('reservationTime').value;
+        //         swal({
+        //             title: `Đặt bàn ${tableName}`, // Custom title for the table
+        //             content: content,  // Inject the form content
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Đặt bàn",  // Button text for confirming
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     text: "Hủy",  // Button text for canceling
+        //                     className: "btn btn-danger",
+        //                     visible: true,
+        //                 },
+        //             },
+        //         }).then((confirmBooking) => {
+        //             if (confirmBooking) {
+        //                 const name = document.getElementById('customerName').value;
+        //                 const phone = document.getElementById('customerPhone').value;
+        //                 const date = document.getElementById('reservationDate').value;
+        //                 const time = document.getElementById('reservationTime').value;
 
-                        // Show success message after booking confirmation
-                        swal({
-                            title: "Thành công!",
-                            text: `Bàn đã được đặt cho ${name}, SĐT: ${phone}, Ngày: ${date}, Giờ: ${time}`,
-                            icon: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        //                 // Show success message after booking confirmation
+        //                 swal({
+        //                     title: "Thành công!",
+        //                     text: `Bàn đã được đặt cho ${name}, SĐT: ${phone}, Ngày: ${date}, Giờ: ${time}`,
+        //                     icon: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: choose menu
         // document.querySelectorAll('.choose-menu-button').forEach(button => {

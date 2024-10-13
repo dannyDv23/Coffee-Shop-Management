@@ -48,4 +48,9 @@ router.post(
     tableController.orderProductTableController
 );
 
+router.post(
+    '/booking',
+    tableController.createBookingController
+);
+
 module.exports = router;

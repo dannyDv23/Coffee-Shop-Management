@@ -111,6 +111,28 @@ const orderProductTableController =  catchAsync (async (req, res) => {
     }
 });
 
+
+const createBookingController = catchAsync (async (req, res) => {
+    try {
+        // Get booking details from request body
+        const bookingData = req.body;
+
+        // Call the service to create a booking
+        const newBooking = await tableService.createBooking(bookingData);
+
+        // Send a successful response with the created booking
+        res.status(201).json({
+            message: 'Booking created successfully',
+            data: newBooking,
+        });
+    } catch (error) {
+        // Handle errors (e.g., table not found or database issues)
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+});
+
 module.exports = {
     viewInfomationByTableNumber,
     viewAllTable,
@@ -121,5 +143,6 @@ module.exports = {
     splitTableController,
     mergeTableController,
     cancelTableController,
-    orderProductTableController
+    orderProductTableController,
+    createBookingController
 };
