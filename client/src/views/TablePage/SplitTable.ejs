@@ -1,0 +1,254 @@
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+
+            <!-- Pass `listTableSelected` as a JSON string into the data attribute -->
+            <div class="row row-demo-grid" data-list-selected-table='<%= JSON.stringify(listTableSelected) %>'>
+                <% listTable.forEach(data=> { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info split-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.querySelectorAll('.split-table-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const tableName = button.getAttribute('data-table');
+            const tableStatus = button.getAttribute('data-status');
+
+            // Get the list of selected tables from the data attribute and parse it
+            const div = document.querySelector('.row-demo-grid');
+            const listTableSelected = JSON.parse(div.getAttribute('data-list-selected-table'));
+
+            // Fetch product data for the selected table
+            const productdata = async (tableNumber) => {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/order/${tableNumber}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    if (data.infoOrder && data.infoOrder.length > 0) {
+                        return data.infoOrder[0].product;
+                    } else {
+                        return [];
+                    }
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                    return [];
+                }
+            };
+
+            // Arrays to store products in left (original) and right (target) tables
+            let leftTableProducts = [];
+            let rightTableProducts = [];
+
+            // Fetch the product data
+            productdata(tableName).then(products => {
+                leftTableProducts = products.map(p => ({
+                    name: p.productId.name,
+                    quantity: p.numberProduct
+                }));
+
+                const renderTables = () => {
+                    let leftHTML = leftTableProducts.map(product => `
+                    <label style="display: flex;align-items: center;justify-content: flex-start;margin-left: 20px;">
+                        <input type="radio" name="product" class="product-radio" data-max="${product.quantity}" value="${product.name}" /> 
+                        ${product.name} (${product.quantity})
+                    </label>
+                `).join('');
+
+                    let rightHTML = rightTableProducts.map(product => `
+                    <div>${product.name} (${product.quantity})</div>
+                `).join('');
+
+                    document.getElementById('leftProductList').innerHTML = leftHTML;
+                    document.getElementById('rightProductList').innerHTML = rightHTML;
+                };
+
+                let tableOptionsHTML = listTableSelected.map(table => `
+                <option value="${table.tableNumber}">Table ${table.tableNumber}</option>
+            `).join('');
+
+                var tableHTML = `
+                <div style="margin-top: 10px;">
+                    <strong>Choose table to split to:</strong>
+                    <select id="targetTable" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                        <option value="">Select a table</option>
+                        ${tableOptionsHTML}
+                    </select>
+                </div>
+
+                <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+                    <div style="width: 40%">
+                        <strong>${tableName}</strong>
+                        <div id="leftProductList" style="height: 150px; overflow-y: scroll; border: 1px solid #ddd;"></div>
+                    </div>
+
+                    <div style="align-self: center;">
+                        <button id="moveRight" style="margin-bottom: 5px;">&gt;&gt;</button>
+                    </div>
+
+                    <div style="width: 40%">
+                        <strong id="targetTableLabel">Target Table</strong>
+                        <div id="rightProductList" style="height: 150px; overflow-y: scroll; border: 1px solid #ddd;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label for="splitQuantity">Quantity to split:</label>
+                    <input type="number" id="splitQuantity" min="1" style="width: 50px; border: 1px solid #ddd;">
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label for="customerName">Customer Name:</label>
+                    <input type="text" id="customerName" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                </div>
+            `;
+
+                const content = document.createElement('div');
+                content.innerHTML = tableHTML;
+                swal({
+                    title: `Table ${tableName}`,
+                    text: `Status: ${tableStatus}`,
+                    icon: tableStatus === "Available" ? "success" : (tableStatus === "Empty" ? "warning" : "error"),
+                    content: content,
+                    buttons: {
+                        confirm: {
+                            text: "Close",
+                            className: "btn btn-success"
+                        },
+                        move: {
+                            text: "Split",
+                            value: "split",
+                            className: "btn btn-warning"
+                        }
+                    },
+                }).then((value) => {
+                    if (value === "split") {
+                        const targetTableNumber = document.getElementById('targetTable').value;
+                        const customerName = document.getElementById('customerName').value;
+                        const phoneNumber = document.getElementById('phoneNumber').value;
+                        const now = new Date();
+                        const currentDate = now.toISOString().slice(0, 10); // Format: YYYY-MM-DD
+                        const currentTime = now.toTimeString().slice(0, 5);
+
+                        const splitProduct = rightTableProducts.map(product => ({
+                            name: product.name,
+                            quantity: product.quantity
+                        }));
+
+                        const keepProduct = leftTableProducts;
+                        if (!targetTableNumber || !customerName || !phoneNumber) {
+                            swal("Please fill in all fields before proceeding.");
+                            return; // Stop execution if any field is empty
+                        }
+                        // Validation check: If only 1 product in keepProduct and quantity is 1, do not proceed
+                        if (keepProduct.length === 0) {
+                            swal("Not allowed to split table with only 1 product and quantity of 1. You can move table");
+                            return; // Stop execution if the condition is met
+                        }
+
+                        const payload = {
+                            fromTableNumber: parseInt(tableName),
+                            toTableNumber: parseInt(targetTableNumber),
+                            product: {
+                                keepProduct,
+                                splitProduct
+                            },
+                            newInfomationBook: {
+                                customerName,
+                                phoneNumber,
+                                date: currentDate,
+                                time: currentTime,
+                                status: "Now",
+                                tableId: [listTableSelected.find(table => table.tableNumber === parseInt(targetTableNumber))._id]
+                            }
+                        };
+                        console.log("🚀 ~ productdata ~ payload:", payload)
+
+                        // Post the payload to the API
+                        fetch('http://localhost:3000/api/table/split', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(payload),
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                swal(`Table split successfully from ${tableName} to Table ${targetTableNumber}!`).then(() => {
+                                    // Reload the page after moving table successfully
+                                    window.location.reload(); // Reload the current page
+                                });
+                                console.log('Success:', data);
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
+                    }
+                });
+
+
+                renderTables();
+
+                document.getElementById('moveRight').addEventListener('click', () => {
+                    const selectedProduct = document.querySelector('.product-radio:checked');
+                    const selectedQuantity = document.getElementById('splitQuantity').value;
+
+                    if (selectedProduct && selectedQuantity) {
+                        const productName = selectedProduct.value;
+                        const maxQuantity = parseInt(selectedProduct.getAttribute('data-max'));
+                        const inputQuantity = parseInt(selectedQuantity);
+
+                        if (inputQuantity <= maxQuantity) {
+                            const remainingQuantity = maxQuantity - inputQuantity;
+
+                            leftTableProducts = leftTableProducts.map(p =>
+                                p.name === productName ? { name: p.name, quantity: remainingQuantity } : p
+                            ).filter(p => p.quantity > 0);
+
+                            const rightProduct = rightTableProducts.find(p => p.name === productName);
+                            if (rightProduct) {
+                                rightProduct.quantity += inputQuantity;
+                            } else {
+                                rightTableProducts.push({ name: productName, quantity: inputQuantity });
+                            }
+
+                            renderTables();
+                        } else {
+                            swal("Quantity exceeds available amount!");
+                        }
+                    } else {
+                        swal("Please select a product and enter a quantity!");
+                    }
+                });
+            });
+        });
+    });
+</script>

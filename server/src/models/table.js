@@ -9,4 +9,5 @@ const tableSchema = new mongoose.Schema({
     status: { type: String, enum: TABLE_STATUSES, required: true }
 });
 
-module.exports = mongoose.model('Table', tableSchema);
+const Table  = mongoose.model('Table', tableSchema);
+module.exports = Table;

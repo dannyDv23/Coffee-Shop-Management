@@ -12,12 +12,12 @@ const materialSchema = new mongoose.Schema({
     pricePerUnit: { type: Number, required: true }, 
     status: { type: String, enum: MATERIAL_STATUSES, required: true }, 
     importHistory: [{
-        dateImport: { type: String, required: false }, 
+        dateImport: { type: Date, required: false }, 
         quantity: { type: Number, required: false }, 
         price: { type: Number, required: false }     
     }],
     exportHistory: [{
-        dateExport: { type: String, required: false }, 
+        dateExport: { type: Date, required: false }, 
         quantity: { type: Number, required: false }, 
         price: { type: Number, required: false }     
     }],

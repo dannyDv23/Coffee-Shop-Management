@@ -11,7 +11,7 @@ require("dotenv").config(); // Load .env variables
 const homeRoute = require("./routers/HomeRoute");
 const loginRoute = require("./routers/LoginRoute");
 const aboutRoute =  require('./routers/AboutRoute');
-
+const tableRoute =  require('./routers/TableRoute');
 const equipmentRoute = require('./routers/EquipmentRoute');
 const saleRoute = require('./routers/SaleRoute');
 const manageEmployeeRoute = require('./routers/EmployeesRoute');
@@ -37,10 +37,15 @@ app.use("/", homeRoute);
 app.use("/login", loginRoute);
 app.use('/equipment', equipmentRoute);
 app.use('/sale', saleRoute);
+app.use('/equipment', equipmentRoute);
+app.use('/sale', saleRoute);
 app.use('/about', aboutRoute); 
 app.use('/manage-employee', manageEmployeeRoute);
+app.use('/table', tableRoute); 
 app.use('/inventory', inventoryRoute );
 app.use('/report', reportRoute); 
+
+
 // Create an HTTP server
 const server = http.createServer(app);
 
