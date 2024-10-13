@@ -1,7 +1,195 @@
-<button type="button" class="btn btn-info payment-table-button" data-table="<%= data.number %>"
-    data-status="<%= data.status %>" >
-    <h4>
-        <%= data.number %>
-    </h4>
-    <div class="table-status fw-bold <%= data.textStyle %>">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+
+            <div class="row row-demo-grid">
+                <% listTable.forEach(data=> { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info payment-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.querySelectorAll('.payment-table-button').forEach(button => {
+        button.addEventListener('click', function () {
+            let tableNumber = button.getAttribute('data-table');
+
+            // Fetch the order data for this table
+            fetch(`http://localhost:3000/api/order/${tableNumber}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Ensure you parse the JSON response
+                })
+                .then(data => {
+                    // Assuming the API response structure is like your provided example
+                    console.log(data)
+                    let order = data.infoOrder[0];
+                    let products = order.product;
+                    let totalPrice = order.price || 0;
+
+                    // Generate the table rows dynamically based on product data
+                    let productRows = '';
+                    products.forEach(item => {
+                        let { name, price } = item.productId;
+                        let quantity = item.numberProduct;
+                        let itemTotalPrice = price * quantity;
+                        productRows += `
+                            <tr>
+                                <td>${name}</td>
+                                <td>${price.toFixed(2)} $</td> <!-- Price per product -->
+                                <td>${quantity}</td>
+                                <td>${itemTotalPrice.toFixed(2)} $</td>
+                            </tr>`;
+                    });
+
+                    // Create the HTML for the payment form
+                    const paymentForm = `
+                        <div style="margin-top: 10px;">
+                            <strong>Bàn ${tableNumber}</strong>
+                            <table border="1" cellpadding="10" style="width: 100%; text-align: left; margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th>Tên món</th>
+                                        <th>Giá/Sản phẩm</th> <!-- Price per product column -->
+                                        <th>SL</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${productRows}
+                                </tbody>
+                            </table>
+                            <div style="margin-top: 10px; text-align: right;">
+                                <strong>Tổng:</strong> ${totalPrice.toFixed(2)} $
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label><strong>Khách đưa:</strong></label>
+                                <input id="cashGiven" class="form-control" type="number" value="${totalPrice}" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label><strong>Thối lại:</strong></label>
+                                <input id="change" class="form-control" type="number" value="0" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <input type="checkbox" id="changeTableStatus"> Đổi trạng thái bàn sang trống sau khi thanh toán
+                            </div>
+                        </div>
+                    `;
+
+                    // Insert the form content into the SweetAlert modal
+                    const content = document.createElement('div');
+                    content.innerHTML = paymentForm;
+
+                    // Show the modal with the payment form
+                    swal({
+                        title: `Thanh toán bàn ${tableNumber}`,
+                        content: content, // Inject the form content
+                        buttons: {
+                            confirm: {
+                                text: "Thanh toán",
+                                className: "btn btn-success",
+                            },
+                            cancel: {
+                                text: "Hủy",
+                                className: "btn btn-danger",
+                                visible: true,
+                            },
+                        },
+                    }).then((confirmPayment) => {
+                        if (confirmPayment) {
+                            const cashGiven = parseFloat(document.getElementById('cashGiven').value);
+                            const change = cashGiven - totalPrice;
+                            const changeTableStatus = document.getElementById('changeTableStatus').checked;
+
+                            // Update the change field dynamically
+                            document.getElementById('change').value = change.toFixed(2);
+
+                            // If payment is confirmed, show success message
+                            swal({
+                                title: "Thành công!",
+                                text: `Thanh toán hoàn tất. Khách đưa: ${cashGiven} $, Thối lại: ${change.toFixed(2)} $`,
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                // If checkbox is checked, update order status
+                                fetch(`http://localhost:3000/api/table/${tableNumber}/complete`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        moneyReceived: cashGiven,   // From the input
+                                        moneyRefund: change.toFixed(2),  // Calculated
+                                        changeTableStatus: changeTableStatus // From checkbox
+                                    })
+                                }).then(response => {
+                                    if (!response.ok) {
+                                        // Handle error response from order fetch
+                                        throw new Error('Table not ordered any drinks or ordered and paid for them.');
+                                    }
+                                    return response.json();
+                                }).then(result => {
+                                    location.reload();
+                                })
+                                    .catch(error => {
+                                        // Show error message if the API call fails
+                                        swal({
+                                            title: "Lỗi!",
+                                            text: error.message, // Custom error message
+                                            icon: "error",
+                                            buttons: {
+                                                confirm: {
+                                                    className: "btn btn-danger",
+                                                },
+                                            },
+                                        });
+                                    });
+                            });
+                        } else {
+                            swal.close();
+                        }
+                    });
+                })
+                .catch(error => {
+                    // Show error message if fetching order data fails
+                    swal({
+                        title: "error",
+                        text: 'Table not ordered any drinks or ordered and paid for them.',
+                        // text: error.message, // Custom error message for order fetch
+                        icon: "error",
+                        buttons: {
+                            confirm: {
+                                className: "btn btn-danger",
+                            },
+                        },
+                    });
+                });
+        }, { passive: true });
+    });
+</script>

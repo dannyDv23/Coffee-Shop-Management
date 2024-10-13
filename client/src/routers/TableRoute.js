@@ -140,12 +140,13 @@ router.get('/booking', async(req, res) => {
   });
 });
 
-router.get('/payment', (req, res) => {
+router.get('/payment', async(req, res) => {
+  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
+  const listTable = responseAvailableTable.data.listTable;
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage/TablePage'),
-    datas: infomationTable,
-    detailPage: path.join('views', '../../TablePage/PaymentTable'),
-    titleTab: 'Payment Table '
+    bodyPage: path.join('views', 'TablePage','PaymentTable'),
+    listTable: listTable,
+    titleTab: 'Payment Table'
   });
 });
 
