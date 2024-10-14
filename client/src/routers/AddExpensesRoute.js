@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require("path");
 
 router.get("/", (req, res) => {
-  res.render("../MainLayout", { bodyPage: path.join("views", "ReportPage") });
+  res.render("../MainLayout", { bodyPage: path.join("views", "AddExpensesPage") });
 });
 
 module.exports = router;
