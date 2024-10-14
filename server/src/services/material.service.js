@@ -11,9 +11,22 @@ const createMaterial = async (materialData) => {
     }
 };
 
-const findMaterialByName = async (name) => {
-    return await Material.findOne({ name: name });
+const findIdMaterialByName = async (materialName) => {
+    const foundMaterial = await Material.findOne({ name: materialName });
+    if (foundMaterial) {
+        return {
+            materialId: foundMaterial._id, // Ensure this is set
+        };
+    } else {
+        throw new Error(`Material ${materialName} not found`);
+    }
 };
+
+
+const findMaterialByName = async (materialName) => {
+  return await Material.findOne({ name: materialName });
+};
+
 
 const updateNewQuantity = async (id, updateData) => {
     return await Material.findByIdAndUpdate(id, updateData, { new: true }); // new: true returns the updated document

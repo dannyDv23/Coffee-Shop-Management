@@ -5,6 +5,8 @@ const http = require("http");
 const reload = require("reload");
 // const cookieParser = require('cookie-parser');
 // const multer = require('multer');
+// const cookieParser = require('cookie-parser');
+// const multer = require('multer');
 require("dotenv").config(); // Load .env variables
 
 // Import routers
@@ -17,9 +19,12 @@ const saleRoute = require('./routers/SaleRoute');
 const manageEmployeeRoute = require('./routers/EmployeesRoute');
 const inventoryRoute = require('./routers/InventoryRoute');
 const reportRoute =  require('./routers/ReportRoute');
+const menuRoute = require('./routers/MenuRoute');
 
 // Create the Express app
 const app = express();
+// app.use(express.urlencoded({ extended: true }));
+// app.use(cookieParser());
 // app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 const port = process.env.PORT || 3000;
@@ -37,10 +42,9 @@ app.use("/", homeRoute);
 app.use("/login", loginRoute);
 app.use('/equipment', equipmentRoute);
 app.use('/sale', saleRoute);
-app.use('/equipment', equipmentRoute);
-app.use('/sale', saleRoute);
 app.use('/about', aboutRoute); 
 app.use('/manage-employee', manageEmployeeRoute);
+app.use('/menu', menuRoute );
 app.use('/table', tableRoute); 
 app.use('/inventory', inventoryRoute );
 app.use('/report', reportRoute); 

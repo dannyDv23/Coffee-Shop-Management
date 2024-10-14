@@ -19,6 +19,13 @@
                     <span class="input-group-text">$</span>
                     <input type="number" id="price2" class="form-control" aria-label="Amount (to the nearest dollar)" min="0" required />
                     <span class="input-group-text">.000</span>
+                    <script>
+                      document.getElementById('price2').addEventListener('input', function () {
+                        if (this.value < 0) {
+                          this.value = 0;
+                        }
+                      });
+                    </script>
                   </div>
                 </div>
                 <div class="form-group">
@@ -36,6 +43,13 @@
                 <div class="form-group">
                   <label for="quantity2">Quantity</label>
                   <input type="number" class="form-control" id="quantity2" placeholder="Enter Quantity" min="0" required />
+                  <script>
+                    document.getElementById('quantity2').addEventListener('input', function () {
+                      if (this.value < 0) {
+                        this.value = 0;
+                      }
+                    });
+                  </script>
                 </div>
                 <div class="form-group">
                   <label for="defaultSelect">Unit</label>
@@ -62,54 +76,64 @@
 
 <script>
   document.getElementById('importMaterialForm').addEventListener('submit', async function (event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    // Gather form data
-    const name = document.getElementById('material2').value;
-    const price = parseFloat(document.getElementById('price2').value);
-    const date = document.getElementById('Date').value;
-    const quantity = parseInt(document.getElementById('quantity2').value, 10);
-    const unit = document.getElementById('defaultSelect').value;
+  // Gather form data
+  const name = document.getElementById('material2').value;
+  const price = parseFloat(document.getElementById('price2').value);
+  const date = document.getElementById('Date').value;
+  const quantity = parseInt(document.getElementById('quantity2').value, 10);
+  const unit = document.getElementById('defaultSelect').value;
 
-    // Create the material data structure
-    const materialData = {
-      name: name,
-      unit: unit,
-      totalQuantity: quantity,
-      pricePerUnit: price,
-      importHistory: [
-        {
-          dateImport: date,
-          quantity: quantity,
-          price: price * quantity
-        }
-      ],
-      exportHistory: []
-    };
+  // Validate the inputs
+  if (!name || isNaN(price) || isNaN(quantity) || !unit || !date) {
+    alert('Please fill all the fields correctly.');
+    return;
+  }
 
-    // Send the data to the API
-    try {
-      const response = await fetch('http://localhost:3000/api/material', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(materialData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Error while importing material.');
+  // Create the material data structure
+  const materialData = {
+    name: name,
+    unit: unit,
+    totalQuantity: quantity,
+    pricePerUnit: price,
+    importHistory: [
+      {
+        dateImport: date,
+        quantity: quantity,
+        price: price * quantity  // Backend could recalculate this
       }
+    ],
+    exportHistory: []
+  };
 
-      const responseData = await response.json();
-      console.log('Material imported successfully:', responseData);
+  console.log('Sending data:', materialData);
 
-      // Optionally, redirect or show a success message
-      alert('Material imported successfully!');
-      location.reload();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to import material.');
+  // Send the data to the API
+  try {
+    const response = await fetch('http://localhost:3000/api/material', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(materialData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error while importing material.');
     }
-  });
+
+    const responseData = await response.json();
+    console.log('Material imported successfully:', responseData);
+
+    // Optionally, redirect or show a success message
+    alert('Material imported successfully!');
+    location.reload();
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to import material. Please try again.');
+  }
+});
+
 </script>
