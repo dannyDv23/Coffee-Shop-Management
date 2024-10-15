@@ -17,6 +17,9 @@ const saleRoute = require('./routers/SaleRoute');
 const manageEmployeeRoute = require('./routers/EmployeesRoute');
 const inventoryRoute = require('./routers/InventoryRoute');
 const reportRoute =  require('./routers/ReportRoute');
+const budgetRoute =  require('./routers/BudgetRoute');
+const expenseRoute = require('./routers/AddExpensesRoute');
+const BackupRoute = require('./routers/BackupRoute');
 
 // Create the Express app
 const app = express();
@@ -43,7 +46,11 @@ app.use('/about', aboutRoute);
 app.use('/manage-employee', manageEmployeeRoute);
 app.use('/table', tableRoute); 
 app.use('/inventory', inventoryRoute );
+app.use('/budget', budgetRoute);
 app.use('/report', reportRoute); 
+app.use('/expenses', expenseRoute);  // Add Expenses Route
+app.use('/backup', BackupRoute); // Backup Route
+
 
 
 // Create an HTTP server
