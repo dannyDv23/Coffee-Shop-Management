@@ -46,6 +46,10 @@ app.use(cookieParser());
 app.use(passport.initialize());
 passport.use(jwtStrategy);
 
+// parse json request body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // root Route
 const rootRouter = express.Router();
 app.use(`/${config.rootRoute}`, rootRouter);
@@ -55,9 +59,9 @@ rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
 rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
-rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
+rootRouter.use("/employee", manageEmployeeRouter); //auth(["Admin"])
 rootRouter.use("/material", materialRouter);
-rootRouter.use("/report", reportRoutes);// Report routes 
+rootRouter.use("/report", reportRoutes); // Report routes
 rootRouter.use("/table", tableRouter);
 rootRouter.use("/order", orderRouter);
 rootRouter.use("/booking", bookingRouter);

@@ -1,26 +1,67 @@
-const { parentPort, workerData } = require('worker_threads');
-const AWS = require('../config/awsConfig');
-const sharp = require('sharp');
-const fs = require('fs');
-const config = require('../config/config');
+const {parentPort, workerData} = require("worker_threads");
+const sharp = require("sharp");
+const fs = require("fs");
+const config = require("../config/config");
+const s3 = require("../config/aws");
+const {PutObjectCommand, GetObjectCommand, DeleteObjectCommand} = require("@aws-sdk/client-s3");
+const {getSignedUrl} = require("@aws-sdk/s3-request-presigner");
 
-async function processImage(imagePath, imageKey) {
+async function processImage(imageKey, currentImageKey, imagePath) {
     try {
-        const s3 = new AWS.S3();
+        // Delete the current image if it exists
+        if (currentImageKey) {
+            const deleteParams = {
+                Bucket: config.aws.bucketName,
+                Key: currentImageKey,
+            };
+            const deleteCommand = new DeleteObjectCommand(deleteParams);
+            await s3.send(deleteCommand);
+            console.log(`Image deleted successfully: ${currentImageKey}`);
+        }
+
         const resizedImage = await sharp(imagePath).resize(800, 600).toBuffer();
 
         const putParams = {
             Bucket: config.aws.bucketName,
             Key: imageKey,
             Body: resizedImage,
-            ContentType: 'image/jpeg',
+            ContentType: "image/jpeg",
         };
-        await s3.putObject(putParams).promise();
-        fs.unlinkSync(imagePath); // Delete the local file after upload
-        parentPort.postMessage(`Image processed and saved as ${putParams.Key}`);
+
+        const putCommand = new PutObjectCommand(putParams);
+        await s3.send(putCommand);
+
+        // Generate a signed URL for the uploaded image
+        const getParams = {
+            Bucket: config.aws.bucketName,
+            Key: imageKey,
+        };
+        const getCommand = new GetObjectCommand(getParams);
+        const imageUrl = await getSignedUrl(s3, getCommand);
+
+        // Delete the local file after successful upload
+        setTimeout(() => {
+            fs.access(imagePath, fs.constants.F_OK, (accessErr) => {
+                if (accessErr) {
+                    console.error(`File not found: ${imagePath}`);
+                } else {
+                    fs.unlinkSync(imagePath,
+                        {force: true},
+                        (err) => {
+                            if (err) {
+                                console.error(`Error deleting file: ${err.message}`);
+                            } else {
+                                console.log(`File deleted successfully: ${imagePath}`);
+                            }
+                        });
+                }
+            });
+        }, 2000);
+
+        parentPort.postMessage(imageUrl);
     } catch (error) {
-        parentPort.postMessage(`Error processing image: ${error.message}`);
+        parentPort.postMessage({message: `Error processing image: ${error.message}`});
     }
 }
 
-processImage(workerData.imagePath, workerData.imageKey);
+processImage(workerData.imagePath, workerData.imageKey, workerData.currentImageKey);
