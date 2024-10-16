@@ -5,6 +5,7 @@ const http = require("http");
 const reload = require("reload");
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
+
 require("dotenv").config(); // Load .env variables
 
 // Import routers
@@ -17,6 +18,7 @@ const saleRoute = require('./routers/SaleRoute');
 const manageEmployeeRoute = require('./routers/EmployeesRoute');
 const inventoryRoute = require('./routers/InventoryRoute');
 const reportRoute =  require('./routers/ReportRoute');
+const menuRoute = require('./routers/MenuRoute');
 const budgetRoute =  require('./routers/BudgetRoute');
 const expenseRoute = require('./routers/AddExpensesRoute');
 const BackupRoute = require('./routers/BackupRoute');
@@ -26,6 +28,7 @@ const profileRoute = require('./routers/ProfileRoute');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 const port = process.env.PORT || 3000;
 
 // Set the view engine to EJS
@@ -41,10 +44,9 @@ app.use("/", homeRoute);
 app.use("/login", loginRoute);
 app.use('/equipment', equipmentRoute);
 app.use('/sale', saleRoute);
-app.use('/equipment', equipmentRoute);
-app.use('/sale', saleRoute);
 app.use('/about', aboutRoute); 
 app.use('/manage-employee', manageEmployeeRoute);
+app.use('/menu', menuRoute );
 app.use('/table', tableRoute); 
 app.use('/inventory', inventoryRoute );
 app.use('/budget', budgetRoute);

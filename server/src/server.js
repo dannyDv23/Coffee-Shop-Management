@@ -15,6 +15,7 @@ const { auth } = require("./middlewares/auth");
 const authRouter = require("./routes/auth.route");
 const tableRouter = require("./routes/table.route");
 const manageEmployeeRouter = require("./routes/employee.route");
+const menuRouter = require("./routes/menu.route");
 const materialRouter = require("./routes/material.route");
 const reportRoutes = require("./routes/report.route"); //report
 const equipmentRouter = require("./routes/equipment.route");
@@ -61,6 +62,7 @@ rootRouter.use("/auth", authRouter);
 rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
 rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
+rootRouter.use("/menu", menuRouter);
 rootRouter.use("/material", materialRouter);
 rootRouter.use("/report", reportRoutes); // Report routes
 rootRouter.use("/table", tableRouter);
