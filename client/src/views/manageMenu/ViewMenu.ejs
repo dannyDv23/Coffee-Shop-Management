@@ -1,22 +1,16 @@
-<style>
-    .table-cell-fixed {
-        height: 100px; 
-        max-height: 100px;
-        overflow-y: hidden; 
-    }
-    
-    .table-cell-content {
-        height: 100%; 
-        overflow-y: auto; 
-        display: block; 
-        padding-right: 10px;
-    }
-    </style>
-    
-    <div class="page-inner">
+<div class="container my-4">
+    <!-- Search box -->
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name..."
+                    onkeyup="filterTable()">
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table id="add-row" class="display table table-striped table-hover">
-                <thead>
+            <table id="add-row" class="table table-striped table-hover">
+                <thead class="thead-dark">
                     <tr>
                         <th>#</th>
                         <th>Name</th>
@@ -25,81 +19,101 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% menus.forEach((menu, index) => { %>
+                    <% menus.forEach((menu, index)=> { %>
                         <tr>
-                            <td class="table-cell-fixed"><%= index + 1 %></td>
-                            <td class="table-cell-fixed"><%= menu.name %></td>
-                            <td class="table-cell-fixed"><%= menu.price %></td>
+                            <td class="table-cell-fixed">
+                                <%= index + 1 %>
+                            </td>
+                            <td class="table-cell-fixed material-name">
+                                <%= menu.name %>
+                            </td>
+                            <td class="table-cell-fixed">
+                                <%= menu.price %>
+                            </td>
                             <td>
                                 <div class="form-button-action">
-                                    <button type="button" class="btn btn-link btn-primary btn-lg" onclick="redirectToEdit('<%= menu._id %>')">
+                                    <button type="button" class="btn btn-link btn-primary btn-lg"
+                                        onclick="redirectToEdit('<%= menu._id %>')">
                                         <i class="fa fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-link btn-danger" onclick="confirmDeleteMenu('<%= menu._id %>', '<%= menu.name %>');">
+                                    <button type="button" class="btn btn-link btn-danger"
+                                        onclick="confirmDeleteMenu('<%= menu._id %>', '<%= menu.name %>');">
                                         <i class="fa fa-times"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                    <% }) %>
+                        <% }) %>
                 </tbody>
             </table>
         </div>
     </div>
+</div>
+
+    <script>
+        // Search function to filter table by name
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('add-row');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {  // Skip header row
+                const nameCell = rows[i].getElementsByClassName('material-name')[0];
+                if (nameCell) {
+                    const nameText = nameCell.textContent || nameCell.innerText;
+                    rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
+                }
+            }
+        }
+    </script>
+
     <script>
         function redirectToEdit(id) {
             window.location.href = `/menu/edit?id=${id}`;
         }
     </script>
-    
+
     <script>
         async function confirmDeleteMenu(menuId, menuName) {
-        // Show confirmation modal
-        swal({
-            title: "Are you sure?",
-            text: `Do you really want to delete ${menuName}?`,
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        }).then(async (willDelete) => {  // Use the parameter to check if the user confirmed
-            if (willDelete) {  // Proceed only if the user clicked "OK"
-                try {
-                    const updatedMaterial = {
-                        status: 'Delete'  // Updating the status to 'Delete'
-                    };
-    
-                    const response = await fetch(
-                        `http://localhost:3000/api/menu/${menuId}`,
-                        {
-                            method: 'PUT',  // Use PUT method to update the material status
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(updatedMaterial),  // Send the updated status in the request body
+            swal({
+                title: "Are you sure?",
+                text: `Do you really want to delete ${menuName}?`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then(async (willDelete) => {
+                if (willDelete) {
+                    try {
+                        const updatedMaterial = { status: 'Delete' };
+
+                        const response = await fetch(
+                            `http://localhost:3000/api/menu/${menuId}`,
+                            {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(updatedMaterial),
+                            }
+                        );
+
+                        if (response.ok) {
+                            swal("Menu status updated to Delete successfully!", {
+                                icon: "success",
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            const errorData = await response.json();
+                            swal("Failed to delete menu", errorData.message, "error");
                         }
-                    );
-    
-                    if (response.ok) {
-                        swal("Menu status updated to Delete successfully!", {
-                            icon: "success",
-                        }).then(() => {
-                            window.location.reload();  // Reload the page after successful update
-                        });
-                    } else {
-                        const errorData = await response.json();
-                        swal("Failed to delete menu", errorData.message, "error");
+                    } catch (error) {
+                        swal("Error", "An error occurred while deleting the menu.", "error");
                     }
-                } catch (error) {
-                    swal("Error", "An error occurred while deleting the menu.", "error");
-                    console.error("Error deleting material:", error);
+                } else {
+                    swal("Action canceled", "The menu was not deleted.", "info");
                 }
-            } else {
-                // Optionally show a message when the action is canceled
-                swal("Action canceled", "The menu was not deleted.", "info");
-            }
-        });
-    }
-    
+            });
+        }
     </script>
-    
+
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

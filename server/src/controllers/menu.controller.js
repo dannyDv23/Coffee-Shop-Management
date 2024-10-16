@@ -8,7 +8,7 @@ const createNewProduct = catchAsync(async (req, res) => {
     const productBody = {
         name: req.body?.name,
         price: req.body?.price,
-        status: 'Active',
+        status: 'Available',
         material: req.body?.material
       };
 
