@@ -31,12 +31,12 @@
 </div>
 
 <script>
-  window.onload = function () {
+  <!-- window.onload = function () {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       window.location.href = "/login";
     }
-  };
+  }; -->
 
   fetch("http://localhost:3000/api/employees", {
     method: "GET",

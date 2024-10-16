@@ -3,10 +3,9 @@ const express = require("express");
 const path = require("path");
 const http = require("http");
 const reload = require("reload");
-// const cookieParser = require('cookie-parser');
-// const multer = require('multer');
-// const cookieParser = require('cookie-parser');
-// const multer = require('multer');
+const cookieParser = require('cookie-parser');
+const multer = require('multer');
+
 require("dotenv").config(); // Load .env variables
 
 // Import routers
@@ -23,13 +22,13 @@ const menuRoute = require('./routers/MenuRoute');
 const budgetRoute =  require('./routers/BudgetRoute');
 const expenseRoute = require('./routers/AddExpensesRoute');
 const BackupRoute = require('./routers/BackupRoute');
+const profileRoute = require('./routers/ProfileRoute');
 
 // Create the Express app
 const app = express();
-// app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 const port = process.env.PORT || 3000;
 
 // Set the view engine to EJS
@@ -54,6 +53,7 @@ app.use('/budget', budgetRoute);
 app.use('/report', reportRoute); 
 app.use('/expenses', expenseRoute);  // Add Expenses Route
 app.use('/backup', BackupRoute); // Backup Route
+app.use('/profile', profileRoute);
 
 
 
