@@ -27,7 +27,7 @@ const auth =
       .then(() => {
         const userRole = req.user.role;
 
-        if (roles.length && !roles.includes(userRole)) {
+        if (!roles.includes(userRole)) {
           return next(
             new ApiError(
               httpStatus.FORBIDDEN,

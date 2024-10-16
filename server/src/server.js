@@ -12,12 +12,12 @@ const cookieParser = require("cookie-parser");
 const { auth } = require("./middlewares/auth");
 
 // define routes
-const authRouter = require("./routes/auth.roure");
+const authRouter = require("./routes/auth.route");
 const tableRouter = require("./routes/table.route");
 const manageEmployeeRouter = require("./routes/employee.route");
 const materialRouter = require("./routes/material.route");
 const reportRoutes = require("./routes/report.route"); //report
-const equipmentRouter = require("./routes/equipment.route"); 
+const equipmentRouter = require("./routes/equipment.route");
 const salesRouter = require("./routes/sales.route");
 const BudgetRouter = require("./routes/budget.route"); //budget
 const ExpenseRouter = require("./routes/addExpenses.route"); //expense
@@ -25,6 +25,7 @@ const BackupRouter = require("./routes/backupData.route"); //backup
 const orderRouter = require("./routes/order.route");
 const bookingRouter = require("./routes/booking.route");
 const productRouter = require("./routes/product.route");
+const profileRouter = require("./routes/whoami.route");
 
 app.use(morgan.successHandler);
 app.use(morgan.errorHandler);
@@ -61,14 +62,15 @@ rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
 rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
 rootRouter.use("/material", materialRouter);
-rootRouter.use("/report", reportRoutes);// Report routes 
+rootRouter.use("/report", reportRoutes); // Report routes
 rootRouter.use("/table", tableRouter);
-rootRouter.use("/budget", BudgetRouter);// Budget routes 
-rootRouter.use("/expenses", ExpenseRouter);// Expense routes
+rootRouter.use("/budget", BudgetRouter); // Budget routes
+rootRouter.use("/expenses", ExpenseRouter); // Expense routes
 rootRouter.use("/backup", BackupRouter); //Backup routes
 rootRouter.use("/order", orderRouter);
 rootRouter.use("/booking", bookingRouter);
 rootRouter.use("/product", productRouter);
+rootRouter.use("/profile", profileRouter);
 
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, "Not found"));

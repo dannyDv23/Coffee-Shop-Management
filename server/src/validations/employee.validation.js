@@ -8,7 +8,9 @@ const createEmployeeSchema = {
     password: Joi.custom(password).required(),
     retypePassword: Joi.custom(password).required(),
     position: Joi.string().required(),
-    salary: Joi.number().required(),
+    salary: Joi.number().min(0).required().messages({
+      "number.min": "Salary must be greater than or equal to 0.",
+    }),
     address: Joi.string().trim(),
     phoneNumber: Joi.string()
       .pattern(/^0[3-9]\d{8}$/)
@@ -42,6 +44,7 @@ const deleteEmployeeSchema = {
     id: Joi.string().custom(objectId).required(),
   }),
 };
+
 module.exports = {
   createEmployeeSchema,
   updateEmployeeSchema,
