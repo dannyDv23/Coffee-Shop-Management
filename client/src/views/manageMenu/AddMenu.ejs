@@ -1,0 +1,335 @@
+<div class="page-inner">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Add New Product</div>
+                </div>
+                <div class="card-body">
+                    <form id="addMenuForm">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6">
+                                <div class="form-group">
+                                    <label for="name-product">Name product</label>
+                                    <input type="text" class="form-control" id="name-product"
+                                        placeholder="Enter Name Material" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                                <div class="form-group">
+                                    <label for="price-product">Price</label>
+                                    <input type="number" class="form-control" id="price-product"
+                                        placeholder="Enter Quantity" min="0" required />
+                                    <script>
+                                        document.getElementById('price-product').addEventListener('input', function () {
+                                            if (this.value < 0) {
+                                                this.value = 0;
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div>
+                                    <div class="card-header">
+                                        <div class="d-flex align-items-center">
+                                            <h4 class="card-title">Add Material</h4>
+                                            <button type="button" class="btn btn-primary btn-round ms-auto"
+                                                data-bs-toggle="modal" data-bs-target="#addRowModal">
+                                                <i class="fa fa-plus"></i>
+                                                Add Row
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="addRowModal" tabindex="-1" role="dialog"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title">
+                                                            <span class="fw-mediumbold"> New</span>
+                                                            <span class="fw-light"> Row </span>
+                                                        </h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="small">
+                                                            Create a new row using this form, make sure you fill them
+                                                            all
+                                                        </p>
+                                                        <form id="materialSelectionForm">
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <div class="form-group form-group-default">
+                                                                        <label for="materialSelect">Select
+                                                                            Material</label>
+                                                                        <select id="materialSelect" class="form-control"
+                                                                            onchange="updateMaterialUnit()">
+                                                                            <option value="">Select a material</option>
+                                                                            <% materials.forEach(material=> { %>
+                                                                                <option value="<%= material._id %>"
+                                                                                    data-name="<%= material.name %>"
+                                                                                    data-quantity="<%= material.totalQuantity %>"
+                                                                                    data-unit="<%= material.unit %>">
+                                                                                    <%= material.name %> (Available: <%=
+                                                                                            material.totalQuantity %>
+                                                                                            <%= material.unit %>)
+                                                                                </option>
+                                                                                <% }) %>
+                                                                        </select>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6 pe-0 d-none">
+                                                                    <div class="form-group form-group-default">
+                                                                        <label>name</label>
+                                                                        <input id="addMaterialName" type="text"
+                                                                            class="form-control"
+                                                                            placeholder="Enter name" />
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6 pe-0">
+                                                                    <div class="form-group form-group-default">
+                                                                        <label>Quantity</label>
+                                                                        <input id="addMaterialQuantity" type="number"
+                                                                            class="form-control"
+                                                                            placeholder="Enter quantity" min="1" />
+                                                                            <script>
+                                                                                document.getElementById('addMaterialQuantity').addEventListener('input', function () {
+                                                                                    if (this.value < 0) {
+                                                                                        this.value = 0;
+                                                                                    }
+                                                                                });
+                                                                            </script>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group form-group-default">
+                                                                        <label>Unit</label>
+                                                                        <input id="addMaterialUnit" type="text"
+                                                                            class="form-control" placeholder="Unit"
+                                                                            readonly />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" id="addRowButton" class="btn btn-primary">
+                                                            Add
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger"
+                                                            data-bs-dismiss="modal">
+                                                            Close
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table id="add-row" class="display table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name material</th>
+                                                        <th>Quantity</th>
+                                                        <th>Unit</th>
+                                                        <th style="width: 10%">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="materialTableBody">
+                                                    <!-- Dynamically added rows will appear here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <button type="button" id="submitFormButton" class="btn btn-success">Submit</button>
+                            <button type="button" class="btn btn-danger">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Array to hold materials
+    let materials = [];
+
+    document.getElementById('addRowButton').addEventListener('click', function () {
+        // Get selected material
+        const selectedMaterial = document.getElementById('materialSelect');
+        const materialId = selectedMaterial.value;
+        const materialName = document.getElementById('addMaterialName').value;
+        const materialQuantity = document.getElementById('addMaterialQuantity').value;
+        const materialUnit = document.getElementById('addMaterialUnit').value;
+        const availableQuantity = selectedMaterial.options[selectedMaterial.selectedIndex].getAttribute('data-quantity');
+
+        // Ensure all fields are filled
+        if (!materialId || !materialQuantity || !materialUnit) {
+            alert('Please fill all fields before adding.');
+            return;
+        }
+
+        // Check if quantity exceeds available quantity
+        if (parseInt(materialQuantity) > parseInt(availableQuantity)) {
+            alert(`Quantity exceeds available stock. Available: ${availableQuantity}`);
+            return;
+        }
+
+        // Check if the material name already exists in the materials array
+        const materialExists = materials.some(material => material.name === materialName);
+        if (materialExists) {
+            alert('Material with this name already exists. Please choose a different name.');
+            return; // Exit if material already exists
+        }
+
+        // Create a new material object
+        const newMaterial = {
+            id: materialId,
+            name: materialName,
+            quantity: materialQuantity,
+            unit: materialUnit
+        };
+
+        // Push the new material to the array
+        materials.push(newMaterial);
+
+        // Load the materials into the table
+        loadMaterials();
+
+        // Clear the input fields
+        document.getElementById('addMaterialQuantity').value = '';
+        document.getElementById('addMaterialUnit').value = '';
+        selectedMaterial.selectedIndex = 0; // Reset the dropdown
+
+        // Close the modal
+        $('#addRowModal').modal('hide');
+    });
+
+    // Function to load materials into the table
+    function loadMaterials() {
+        const tableBody = document.getElementById('materialTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        materials.forEach((material, index) => {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${material.name}</td>
+                <td>${material.quantity}</td>
+                <td>${material.unit}</td>
+                <td>
+                    <div class="form-button-action">
+                        <button type="button" class="btn btn-link btn-primary btn-lg" onclick="editRow(${index})">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-link btn-danger" onclick="removeRow(${index})">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        });
+    }
+
+    // Function to remove a row
+    function removeRow(index) {
+        materials.splice(index, 1); // Remove material from the array
+        loadMaterials(); // Reload the materials in the table
+    }
+
+    // Function to edit a row
+    function editRow(index) {
+        const material = materials[index];
+        // Set the input fields with the material's current values
+        document.getElementById('materialSelect').value = material.id;
+        document.getElementById('addMaterialQuantity').value = material.quantity;
+        document.getElementById('addMaterialUnit').value = material.unit;
+
+        // Remove the item from the array before editing
+        materials.splice(index, 1); // Optional: Remove it if you want to avoid duplicates when re-adding
+
+        // Close the modal and reopen it for editing
+        $('#addRowModal').modal('hide');
+        $('#addRowModal').modal('show');
+    }
+
+    // Function to update the unit input based on selected material
+    function updateMaterialUnit() {
+        const selectedMaterial = document.getElementById('materialSelect');
+        const unitInput = document.getElementById('addMaterialUnit');
+        const nameInput = document.getElementById('addMaterialName');
+        const selectedOption = selectedMaterial.options[selectedMaterial.selectedIndex];
+
+        if (selectedOption.value) {
+            unitInput.value = selectedOption.dataset.unit; // Assuming unit is stored in data-unit attribute
+            nameInput.value = selectedOption.dataset.name;
+        } else {
+            unitInput.value = ''; // Clear unit if no material is selected
+            nameInput.value = '';
+        }
+    }
+</script>
+
+<script>
+    document.getElementById('submitFormButton').addEventListener('click', function (event) {
+        // Prevent default behavior
+        event.preventDefault();
+
+        // Collect form data
+        const productName = document.getElementById('name-product').value;
+        const productPrice = document.getElementById('price-product').value;
+        const materials = [];
+
+        // Collect materials from the table
+        const materialRows = document.querySelectorAll('#materialTableBody tr');
+        materialRows.forEach(row => {
+            const materialName = row.querySelector('td:nth-child(1)').textContent;
+            const quantity = row.querySelector('td:nth-child(2)').textContent;
+            const unit = row.querySelector('td:nth-child(3)').textContent;
+
+            materials.push({ materialName, quantity, unit });
+        });
+
+        // Create data object
+        const data = {
+            name: productName,
+            price: productPrice,
+            materials: materials
+        };
+
+        console.log(data)
+
+        // Send data via AJAX POST request
+        fetch('http://localhost:3000/api/menu', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Handle success
+            console.log('Success:', result);
+            location.reload();
+            alert('Data submitted successfully');
+        })
+        .catch(error => {
+            // Handle error
+            console.error('Error:', error);
+            alert('There was an error submitting the data');
+        });
+    });
+</script>
