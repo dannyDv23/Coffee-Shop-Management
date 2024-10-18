@@ -16,8 +16,42 @@
     }
 
     .date-picker {
-      margin-bottom: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-section {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các thành phần */
+  align-items: center;
+}
+
+.export-section {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các button */
+}
+    .highlight-profit {
+      font-weight: bold;
     }
+
+    .highlight-profit .amount-red {
+      color: red;
+    }
+
+    .highlight-profit .amount-green {
+      color: green;
+    }
+    .title {
+      text-align: center; /* Căn giữa tiêu đề */
+      font-weight: bold;  /* In đậm */
+      font-size: 2.5rem;    /* Tăng kích thước font */
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #362c5f;
+    }
+  
   </style>
 </head>
 
@@ -25,18 +59,22 @@
   <div class="page-inner">
     <div class="row">
       <div class="col-md-12">
-        <div class="card">
+        <div >
           <div class="card-header">
-            <div class="card-title">Report</div>
+            <div class="title">Report</div>
             <hr>
             <div class="date-picker">
-              <label for="startDate">Start Date:</label>
-              <input type="date" id="startDate" name="startDate">
-              <label for="endDate">End Date:</label>
-              <input type="date" id="endDate" name="endDate">
-              <button onclick="fetchData()">Apply</button>
-              <button onclick="exportExcel()">Export Excel</button>
-              <button onclick="exportPDF()">Export PDF</button>
+              <div class="input-section">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate">
+                <button onclick="fetchData()">Apply</button>
+              </div>
+              <div class="export-section">
+                <button onclick="exportExcel()">Export Excel</button>
+                <button onclick="exportPDF()">Export PDF</button>
+              </div>
             </div>
             <!-- Bảng thống kê -->
             <div class="col-md-12">
@@ -90,6 +128,7 @@
       </div>
     </div>
   </div>
+
 
   <script>
     // Gán giá trị ngày hiện tại để ngăn người dùng chọn ngày trong tương lai
@@ -196,17 +235,19 @@
     }
 
     const chartColors = {
-      'Income': 'rgba(255, 99, 132, 0.2)',     // Màu hồng
-      'Material Purchase': 'rgba(54, 162, 235, 0.2)', // Màu xanh dương
-      'Equipment Purchase': 'rgba(255, 206, 86, 0.2)',  // Màu vàng
-      'Employee Salary': 'rgba(75, 192, 192, 0.2)' // Màu xanh lá
+      'Income': 'rgba(255, 99, 132, 0.3)',     // Màu hồng
+      'Material Purchase': 'rgba(54, 162, 235, 0.3)', // Màu xanh dương
+      'Equipment Purchase': 'rgba(255, 206, 86, 0.3)',  // Màu vàng
+      'Employee Salary': 'rgba(75, 192, 192, 0.3)', // Màu xanh lá
+      'Other Cost': 'rgba(106, 90, 205, 0.3)'
     };
 
     const chartBorderColors = {
       'Income': 'rgba(255, 99, 132, 1)',
       'Material Purchase': 'rgba(54, 162, 235, 1)',
       'Equipment Purchase': 'rgba(255, 206, 86, 1)',
-      'Employee Salary': 'rgba(75, 192, 192, 1)'
+      'Employee Salary': 'rgba(75, 192, 192, 1)',
+      'Other Cost': 'rgba(106, 90, 205, 1)'
     };
 
     // Hàm vẽ Bar Chart
@@ -273,7 +314,10 @@
 
       categoryCell.textContent = row.category;
       amountCell.textContent = row.amount.toLocaleString('en-US'); // Định dạng số với dấu phẩy
-
+      if (row.highlight) {
+      tableRow.classList.add('highlight-profit');
+      amountCell.classList.add(row.color === 'red' ? 'amount-red' : 'amount-green');
+    }
       tableRow.appendChild(categoryCell);
       tableRow.appendChild(amountCell);
       tableBody.appendChild(tableRow);

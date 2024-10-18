@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Backup</title>
+</head>
+<body>
+    <h1>Backup Data</h1>
+    <button onclick="backupData()">Sao Lưu</button>
+
+    <script>
+        function backupData() {
+            const url = 'http://127.0.0.1:3000/api/backup/backup-data';
+            window.open(url, '_blank')
+        }
+    </script>
+</body>
+</html>

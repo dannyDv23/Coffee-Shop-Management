@@ -25,17 +25,37 @@ router.get(
 
 router.post(
     "/move",
-    tableController.moveTable
+    tableController.moveTableController
 );
 
 router.post(
     "/split",
-    tableController.splitTable
+    tableController.splitTableController
 );
 
 router.post(
     "/merge",
-    tableController.mergeTable
+    tableController.mergeTableController
+);
+
+router.put(
+    "/cancel/:tableNumber",
+    tableController.cancelTableController
+);
+
+router.post(
+    '/order',
+    tableController.orderProductTableController
+);
+
+router.post(
+    '/booking',
+    tableController.createBookingController
+);
+
+router.post(
+    '/:tableNumber/complete', 
+    tableController.completeOrderController
 );
 
 module.exports = router;

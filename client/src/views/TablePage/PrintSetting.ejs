@@ -1,7 +1,52 @@
-<button type="button" class="btn btn-info print-setting-button" data-table="<%= data.number %>"
-    data-status="<%= data.status %>" >
-    <h4>
-        <%= data.number %>
-    </h4>
-    <div class="table-status fw-bold <%= data.textStyle %>">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <%= titleTab %>
+        </div>
+        <div class="card-body">
+            <form id="print-settings-form">
+                <div class="form-group">
+                    <label for="paper-size">Khổ giấy:</label>
+                    <select class="form-control" id="paper-size" name="paperSize">
+                        <option value="A5" selected>A5</option>
+                        <option value="A4">A4</option>
+                        <option value="A3">A3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="printer">Máy in:</label>
+                    <select class="form-control" id="printer" name="printer">
+                        <option value="Canon XL22" selected>Canon XL22</option>
+                        <option value="HP 1234">HP 1234</option>
+                        <option value="Epson RX55">Epson RX55</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="print-limit">Giới hạn in:</label>
+                    <input type="number" class="form-control" id="print-limit" name="printLimit" value="3" min="1">
+                </div>
+                <div class="form-group text-center">
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Lưu</button>
+                    <button type="reset" class="btn btn-secondary">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function saveSettings() {
+        const paperSize = document.getElementById('paper-size').value;
+        const printer = document.getElementById('printer').value;
+        const printLimit = document.getElementById('print-limit').value;
+
+        // Log or send the form data
+        console.log({
+            paperSize: paperSize,
+            printer: printer,
+            printLimit: printLimit
+        });
+        
+        alert('Cài đặt đã được lưu!');
+    }
+</script>

@@ -28,7 +28,7 @@ const viewTableProductById = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send({ product });
 });
 
-const moveTable = catchAsync(async (req, res) => {
+const moveTableController = catchAsync(async (req, res) => {
     try {
         const { fromTableNumber, toTableNumber } = req.body;
         const sourceTableData = await tableService.getInfomationTableById(Number(fromTableNumber));
@@ -50,7 +50,7 @@ const moveTable = catchAsync(async (req, res) => {
     }
 });
 
- const splitTable = catchAsync(async (req, res) => {
+ const splitTableController = catchAsync(async (req, res) => {
     try {
         const { fromTableNumber, toTableNumber, product, newInfomationBook} = req.body;
 
@@ -68,7 +68,7 @@ const moveTable = catchAsync(async (req, res) => {
     }
 });
 
-const mergeTable = catchAsync(async (req, res) => {
+const mergeTableController = catchAsync(async (req, res) => {
     try {
         // Destructure `fromTables`, `toTable`, and `newBookingDetails` from the request body
         const { fromTables, toTable, newBookingDetails } = req.body;
@@ -90,6 +90,66 @@ const mergeTable = catchAsync(async (req, res) => {
     }
 });
 
+const cancelTableController = catchAsync (async (req, res) => {
+    try {
+        const { tableNumber } = req.params; 
+        await tableService.cancelTable(tableNumber);
+        res.status(200).json({ message: 'Table, bookings, and orders updated successfully' });
+    } catch (error) {
+        console.error('Error canceling table:', error);
+        res.status(500).json({ message: 'Error updating statuses', error: error.message });
+    }
+});
+
+const orderProductTableController =  catchAsync (async (req, res) => {
+    try {
+        const { tableNumber, productList } = req.body;
+        const result = await tableService.orderProductTable(tableNumber, productList);
+        res.status(200).json({ message: 'Order processed successfully', order: result.order });
+    } catch (error) {
+        res.status(500).json({ message: 'Error processing order', error: error.message });
+    }
+});
+
+
+const createBookingController = catchAsync (async (req, res) => {
+    try {
+        // Get booking details from request body
+        const bookingData = req.body;
+
+        // Call the service to create a booking
+        const newBooking = await tableService.createBooking(bookingData);
+
+        // Send a successful response with the created booking
+        res.status(201).json({
+            message: 'Booking created successfully',
+            data: newBooking,
+        });
+    } catch (error) {
+        // Handle errors (e.g., table not found or database issues)
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+});
+
+const completeOrderController = catchAsync (async (req, res) => {
+    const { tableNumber } = req.params;
+    const { moneyReceived, moneyRefund, changeTableStatus } = req.body;
+
+    try {
+        const result = await tableService.completeOrder(tableNumber, {
+            moneyReceived,
+            moneyRefund,
+            changeTableStatus
+        });
+        return res.json(result);
+    } catch (error) {
+        console.error('Error completing order:', error);
+        return res.status(500).json({ message: error.message });
+    }
+});
+
 
 module.exports = {
     viewInfomationByTableNumber,
@@ -97,7 +157,11 @@ module.exports = {
     viewTableCanBook,
     viewTableProductById,
     viewTableByStatus,
-    moveTable,
-    splitTable,
-    mergeTable
+    moveTableController,
+    splitTableController,
+    mergeTableController,
+    cancelTableController,
+    orderProductTableController,
+    createBookingController,
+    completeOrderController
 };

@@ -55,6 +55,7 @@ const deleteEmployeeSchema = {
         id: Joi.string().custom(objectId).required(),
     }),
 };
+
 module.exports = {
     createEmployeeSchema,
     updateEmployeeSchema,

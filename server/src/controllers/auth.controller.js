@@ -53,15 +53,17 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-    const {username, password} = req.body;
-    const employee = await authService.login(username, password);
-    const tokens = await tokenService.generateAuthTokens(employee.id);
-    res.cookie("accessToken", tokens.access.token, {
-        httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 1000,
-    });
-    res.status(httpStatus.OK).send({employee, tokens});
+  const { username, password } = req.body;
+  const employee = await authService.login(username, password);
+  const tokens = await tokenService.generateAuthTokens(employee.id);
+  res.cookie("accessToken", tokens.access.token, {
+    httpOnly: true,
+    secure: false, // Set to true in production
+    maxAge: 60 * 60 * 1000,
+    sameSite: "Lax",
+    domain: "localhost", // Domain should match the frontend domain
+  });
+  res.status(httpStatus.OK).send({ employee, tokens });
 });
 
 const refreshToken = catchAsync(async (req, res) => {

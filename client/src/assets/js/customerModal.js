@@ -486,236 +486,236 @@ var SweetAlert2Demo = (function () {
         // });
 
         //TODO: cancel table
-        document.querySelectorAll('.cancel-table-button').forEach(button => {
-            button.addEventListener('click', function () {
-                swal({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    type: "warning",
-                    buttons: {
-                        confirm: {
-                            text: "Yes, delete it!",
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            visible: true,
-                            className: "btn btn-danger",
-                        },
-                    },
-                }).then((Delete) => {
-                    if (Delete) {
-                        swal({
-                            title: "Deleted!",
-                            text: "Your file has been deleted.",
-                            type: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        // document.querySelectorAll('.cancel-table-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         swal({
+        //             title: "Are you sure?",
+        //             text: "You won't be able to revert this!",
+        //             type: "warning",
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Yes, delete it!",
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     visible: true,
+        //                     className: "btn btn-danger",
+        //                 },
+        //             },
+        //         }).then((Delete) => {
+        //             if (Delete) {
+        //                 swal({
+        //                     title: "Deleted!",
+        //                     text: "Your file has been deleted.",
+        //                     type: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: book table
-        document.querySelectorAll('.book-table-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const tableName = button.getAttribute('data-table');
+        // document.querySelectorAll('.book-table-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         const tableName = button.getAttribute('data-table');
 
-                // Create the HTML for the form, styled similar to the image
-                const reservationForm = `
-                    <div style="margin-top: 10px;">
-                        <strong>Khách hàng:</strong>
-                        <input id="customerName" class="form-control" type="text" placeholder="Nhập tên khách hàng" value="Đặng Lê Hùng" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>SĐT:</strong>
-                        <input id="customerPhone" class="form-control" type="text" placeholder="Nhập số điện thoại" value="0965433222" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>Ngày:</strong>
-                        <input id="reservationDate" class="form-control" type="date" value="2014-12-24" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>Giờ:</strong>
-                        <input id="reservationTime" class="form-control" type="time" value="10:23" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                    </div>
-                `;
+        //         // Create the HTML for the form, styled similar to the image
+        //         const reservationForm = `
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Khách hàng:</strong>
+        //                 <input id="customerName" class="form-control" type="text" placeholder="Nhập tên khách hàng" value="Đặng Lê Hùng" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>SĐT:</strong>
+        //                 <input id="customerPhone" class="form-control" type="text" placeholder="Nhập số điện thoại" value="0965433222" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Ngày:</strong>
+        //                 <input id="reservationDate" class="form-control" type="date" value="2014-12-24" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Giờ:</strong>
+        //                 <input id="reservationTime" class="form-control" type="time" value="10:23" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //             </div>
+        //         `;
 
-                const content = document.createElement('div');
-                content.innerHTML = reservationForm;
+        //         const content = document.createElement('div');
+        //         content.innerHTML = reservationForm;
 
-                swal({
-                    title: `Đặt bàn ${tableName}`, // Custom title for the table
-                    content: content,  // Inject the form content
-                    buttons: {
-                        confirm: {
-                            text: "Đặt bàn",  // Button text for confirming
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            text: "Hủy",  // Button text for canceling
-                            className: "btn btn-danger",
-                            visible: true,
-                        },
-                    },
-                }).then((confirmBooking) => {
-                    if (confirmBooking) {
-                        const name = document.getElementById('customerName').value;
-                        const phone = document.getElementById('customerPhone').value;
-                        const date = document.getElementById('reservationDate').value;
-                        const time = document.getElementById('reservationTime').value;
+        //         swal({
+        //             title: `Đặt bàn ${tableName}`, // Custom title for the table
+        //             content: content,  // Inject the form content
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Đặt bàn",  // Button text for confirming
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     text: "Hủy",  // Button text for canceling
+        //                     className: "btn btn-danger",
+        //                     visible: true,
+        //                 },
+        //             },
+        //         }).then((confirmBooking) => {
+        //             if (confirmBooking) {
+        //                 const name = document.getElementById('customerName').value;
+        //                 const phone = document.getElementById('customerPhone').value;
+        //                 const date = document.getElementById('reservationDate').value;
+        //                 const time = document.getElementById('reservationTime').value;
 
-                        // Show success message after booking confirmation
-                        swal({
-                            title: "Thành công!",
-                            text: `Bàn đã được đặt cho ${name}, SĐT: ${phone}, Ngày: ${date}, Giờ: ${time}`,
-                            icon: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        //                 // Show success message after booking confirmation
+        //                 swal({
+        //                     title: "Thành công!",
+        //                     text: `Bàn đã được đặt cho ${name}, SĐT: ${phone}, Ngày: ${date}, Giờ: ${time}`,
+        //                     icon: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: choose menu
-        document.querySelectorAll('.choose-menu-button').forEach(button => {
-            button.addEventListener('click', function () {
-                swal({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    type: "warning",
-                    buttons: {
-                        confirm: {
-                            text: "Yes, delete it!",
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            visible: true,
-                            className: "btn btn-danger",
-                        },
-                    },
-                }).then((Delete) => {
-                    if (Delete) {
-                        swal({
-                            title: "Deleted!",
-                            text: "Your file has been deleted.",
-                            type: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        // document.querySelectorAll('.choose-menu-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         swal({
+        //             title: "Are you sure?",
+        //             text: "You won't be able to revert this!",
+        //             type: "warning",
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Yes, delete it!",
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     visible: true,
+        //                     className: "btn btn-danger",
+        //                 },
+        //             },
+        //         }).then((Delete) => {
+        //             if (Delete) {
+        //                 swal({
+        //                     title: "Deleted!",
+        //                     text: "Your file has been deleted.",
+        //                     type: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: payment table
-        document.querySelectorAll('.payment-table-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const tableName = button.getAttribute('data-table');
+        // document.querySelectorAll('.payment-table-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         const tableName = button.getAttribute('data-table');
 
-                // Create the HTML for the payment form, styled similar to the image
-                const paymentForm = `
-                    <div style="margin-top: 10px;">
-                        <strong>Bàn ${tableName}</strong>
-                        <table border="1" cellpadding="10" style="width: 100%; text-align: left; margin-top: 10px;">
-                            <thead>
-                                <tr>
-                                    <th>Tên món</th>
-                                    <th>SL</th>
-                                    <th>Thành tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Sinh tố</td>
-                                    <td>3</td>
-                                    <td>45.000 đ</td>
-                                </tr>
-                                <tr>
-                                    <td>Pepsi</td>
-                                    <td>3</td>
-                                    <td>21.000 đ</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div style="margin-top: 10px; text-align: right;">
-                            <strong>Tổng:</strong> 66.000 đ
-                        </div>
-                        <div style="margin-top: 10px;">
-                            <label><strong>Khách đưa:</strong></label>
-                            <input id="cashGiven" class="form-control" type="number" value="100000" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                        </div>
-                        <div style="margin-top: 10px;">
-                            <label><strong>Thối lại:</strong></label>
-                            <input id="change" class="form-control" type="number" value="34000" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                        </div>
-                        <div style="margin-top: 10px;">
-                            <input type="checkbox" id="changeTableStatus"> Đổi trạng thái bàn sang trống sau khi thanh toán
-                        </div>
-                    </div>
-                `;
+        //         // Create the HTML for the payment form, styled similar to the image
+        //         const paymentForm = `
+        //             <div style="margin-top: 10px;">
+        //                 <strong>Bàn ${tableName}</strong>
+        //                 <table border="1" cellpadding="10" style="width: 100%; text-align: left; margin-top: 10px;">
+        //                     <thead>
+        //                         <tr>
+        //                             <th>Tên món</th>
+        //                             <th>SL</th>
+        //                             <th>Thành tiền</th>
+        //                         </tr>
+        //                     </thead>
+        //                     <tbody>
+        //                         <tr>
+        //                             <td>Sinh tố</td>
+        //                             <td>3</td>
+        //                             <td>45.000 đ</td>
+        //                         </tr>
+        //                         <tr>
+        //                             <td>Pepsi</td>
+        //                             <td>3</td>
+        //                             <td>21.000 đ</td>
+        //                         </tr>
+        //                     </tbody>
+        //                 </table>
+        //                 <div style="margin-top: 10px; text-align: right;">
+        //                     <strong>Tổng:</strong> 66.000 đ
+        //                 </div>
+        //                 <div style="margin-top: 10px;">
+        //                     <label><strong>Khách đưa:</strong></label>
+        //                     <input id="cashGiven" class="form-control" type="number" value="100000" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //                 </div>
+        //                 <div style="margin-top: 10px;">
+        //                     <label><strong>Thối lại:</strong></label>
+        //                     <input id="change" class="form-control" type="number" value="34000" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //                 </div>
+        //                 <div style="margin-top: 10px;">
+        //                     <input type="checkbox" id="changeTableStatus"> Đổi trạng thái bàn sang trống sau khi thanh toán
+        //                 </div>
+        //             </div>
+        //         `;
 
-                const content = document.createElement('div');
-                content.innerHTML = paymentForm;
+        //         const content = document.createElement('div');
+        //         content.innerHTML = paymentForm;
 
-                swal({
-                    title: `Thanh toán bàn ${tableName}`,
-                    content: content, // Inject the form content
-                    buttons: {
-                        confirm: {
-                            text: "Thanh toán",
-                            className: "btn btn-success",
-                        },
-                        cancel: {
-                            text: "Hủy",
-                            className: "btn btn-danger",
-                            visible: true,
-                        },
-                    },
-                }).then((confirmPayment) => {
-                    if (confirmPayment) {
-                        const cashGiven = document.getElementById('cashGiven').value;
-                        const change = document.getElementById('change').value;; // This can be dynamically calculated if needed
-                        const changeTableStatus = document.getElementById('changeTableStatus').checked;
+        //         swal({
+        //             title: `Thanh toán bàn ${tableName}`,
+        //             content: content, // Inject the form content
+        //             buttons: {
+        //                 confirm: {
+        //                     text: "Thanh toán",
+        //                     className: "btn btn-success",
+        //                 },
+        //                 cancel: {
+        //                     text: "Hủy",
+        //                     className: "btn btn-danger",
+        //                     visible: true,
+        //                 },
+        //             },
+        //         }).then((confirmPayment) => {
+        //             if (confirmPayment) {
+        //                 const cashGiven = document.getElementById('cashGiven').value;
+        //                 const change = document.getElementById('change').value;; // This can be dynamically calculated if needed
+        //                 const changeTableStatus = document.getElementById('changeTableStatus').checked;
 
-                        // Show success message after confirming payment
-                        swal({
-                            title: "Thành công!",
-                            text: `Thanh toán hoàn tất. Khách đưa: ${cashGiven} đ, Thối lại: ${change} đ`,
-                            icon: "success",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-success",
-                                },
-                            },
-                        }).then(() => {
-                            if (changeTableStatus) {
-                                // Logic to change table status goes here
-                                console.log("Table status changed to 'trống'");
-                            }
-                        });
-                    } else {
-                        swal.close();
-                    }
-                });
-            });
-        });
+        //                 // Show success message after confirming payment
+        //                 swal({
+        //                     title: "Thành công!",
+        //                     text: `Thanh toán hoàn tất. Khách đưa: ${cashGiven} đ, Thối lại: ${change} đ`,
+        //                     icon: "success",
+        //                     buttons: {
+        //                         confirm: {
+        //                             className: "btn btn-success",
+        //                         },
+        //                     },
+        //                 }).then(() => {
+        //                     if (changeTableStatus) {
+        //                         // Logic to change table status goes here
+        //                         console.log("Table status changed to 'trống'");
+        //                     }
+        //                 });
+        //             } else {
+        //                 swal.close();
+        //             }
+        //         });
+        //     });
+        // });
 
         //TODO: Print setting
         document.querySelectorAll('.print-setting-button').forEach(button => {

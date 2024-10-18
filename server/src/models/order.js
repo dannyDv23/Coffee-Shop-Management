@@ -13,6 +13,8 @@ const orderSchema = new mongoose.Schema({
     saleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Sales', required: false },
     price: { type: Number, required: true }, // Total price, with or without sale
     time: { type: Date, required: true }, // Order time
+    moneyReceived: { type: Number, required: false },
+    moneyRefund: { type: Number, required: false },
     status: { type: String, enum: ORDER_STATUSES, required: true } // Order status
 });
 

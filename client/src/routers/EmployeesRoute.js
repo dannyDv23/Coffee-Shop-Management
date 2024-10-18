@@ -10,7 +10,7 @@ async function getEmployees(req) {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
+      withCredentials: true
     });
     return data;
   } catch (error) {

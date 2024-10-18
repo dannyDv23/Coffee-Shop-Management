@@ -6,11 +6,11 @@ const ApiError = require("../utils/ApiError");
 // Create a new Material
 const createMaterial = catchAsync(async (req, res) => {
     const { name, unit, totalQuantity, pricePerUnit } = req.body;
-
     // Check if the material already exists by name
     const existingMaterial = await materialService.findMaterialByName(name);
 
     const dateImport = new Date();
+    console.log(totalQuantity)
     const importEntry = {
         dateImport: dateImport,
         quantity: totalQuantity,
@@ -19,7 +19,8 @@ const createMaterial = catchAsync(async (req, res) => {
 
     if (existingMaterial) {
         // Update the total quantity
-        const newTotalQuantity = existingMaterial.totalQuantity + totalQuantity;
+        const newTotalQuantity = Number(existingMaterial.totalQuantity) + Number(totalQuantity);
+        console.log(newTotalQuantity)
 
         // Update the material with the new total quantity and add the import history
         const updatedMaterial = await materialService.updateNewQuantity(existingMaterial._id, {

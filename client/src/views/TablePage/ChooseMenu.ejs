@@ -1,7 +1,179 @@
-<button type="button" class="btn btn-info choose-menu-button" data-table="<%= data.number %>"
-    data-status="<%= data.status %>" >
-    <h4>
-        <%= data.number %>
-    </h4>
-    <div class="table-status fw-bold <%= data.textStyle %>">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+            <div class="row row-demo-grid"  data-list-product='<%= JSON.stringify(listproduct) %>'>
+                <% listTable.forEach(data => { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info choose-menu-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    document.querySelectorAll('.choose-menu-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const tableNumber = button.getAttribute('data-table');
+            const div = document.querySelector('.row-demo-grid');
+            const productList = JSON.parse(div.getAttribute('data-list-product'));
+            // Parse the product data from the button's data-list-product attribute
+
+            // Create the table dynamically using the parsed product data
+            let productTable = `
+                <table border="1" style="width:100%; text-align:center;">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Loop through the productList to generate rows
+            productList.forEach(product => {
+                productTable += `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>$${product.price}</td>
+                        <td>
+                            <input type="number" name="quantity_${product._id}" value="0" min="0" style="width:50px;" class="product-quantity" data-product-id="${product._id}" oninput="validateQuantity(this)">
+                        </td>
+                    </tr>
+                `;
+            });
+
+            productTable += `
+                    </tbody>
+                </table>
+            `;
+
+            // Use swal to display the generated table
+            swal({
+                title: `Select Products for Table ${tableNumber}`,
+                content: {
+                    element: "div",
+                    attributes: {
+                        innerHTML: productTable,
+                    },
+                },
+                buttons: {
+                    confirm: {
+                        text: "Submit Order",
+                        className: "btn btn-success",
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        visible: true,
+                        className: "btn btn-danger",
+                    },
+                },
+            }).then((willSubmit) => {
+                if (willSubmit) {
+                    // Gather input data from the table
+                    const orderData = {
+                        tableNumber: tableNumber,
+                        productList: []
+                    };
+
+                    document.querySelectorAll('.product-quantity').forEach(input => {
+                        const quantity = input.value;
+                        const productId = input.getAttribute('data-product-id');
+
+                        if (quantity > 0) {
+                            orderData.productList.push({
+                                productId: productId,
+                                quantity: Number(quantity) // Ensure quantity is a number
+                            });
+                        }
+                    });
+                    console.log("🚀 ~ orderData:", orderData)
+
+                    if (orderData.productList.length > 0) {
+                        // Send the data to the backend using fetch
+                        fetch('http://localhost:3000/api/table/order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(orderData)
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            swal({
+                                title: "Order Submitted!",
+                                text: "Your order has been successfully placed.",
+                                icon: "success",
+                            });
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            swal({
+                                title: "Error",
+                                text: "There was an issue submitting your order. Please try again.",
+                                icon: "error",
+                            });
+                        });
+                    } else {
+                        swal({
+                            title: "No items selected",
+                            text: "Please select at least one item.",
+                            icon: "warning",
+                        });
+                    }
+                } else {
+                    swal.close();
+                }
+            });
+        });
+    });
+
+    // Validation function to only allow positive integers and 0, remove leading zeros
+    function validateQuantity(input) {
+        let value = input.value;
+
+        // Remove leading zeros unless the value is zero itself
+        value = value.replace(/^0+/, '');
+        
+        // If the input is cleared or becomes empty after removing zeros, reset it to 0
+        if (value === '') {
+            value = '0';
+        }
+
+        // Ensure the input value is a valid non-negative integer (0 or greater)
+        if (value < 0 || !Number.isInteger(Number(value))) {
+            input.value = '';  // Clear invalid value
+            swal({
+                title: "Invalid Quantity",
+                text: "Please enter a non-negative integer.",
+                icon: "warning",
+            });
+        } else {
+            input.value = value;  // Set the value without leading zeros
+        }
+    }
+</script>
