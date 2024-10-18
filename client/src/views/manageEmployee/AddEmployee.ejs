@@ -211,7 +211,7 @@
                     }
                 });
             } else if (response.status === 401 || response.status === 403) {
-                window.alert("Unauthorized");
+                window.alert("You are not authorized to view this page");
             } else {
                 const errorData = await response.json();
                 document.getElementById("error").textContent =

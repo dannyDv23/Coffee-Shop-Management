@@ -83,13 +83,11 @@ async function processUserProfileImage(currentImageKey = null, imagePath, imageK
     }
 }
 
-async function getCurrentImageKey(employeeId) {
-    const employee = await Employee.findById(employeeId);
-    if (!employee || !employee.avatar || !employee.avatar.imageKey) {
-        return null;
-    }
-    return employee.avatar.imageKey;
-}
+const getCurrentImageKey = async (employeeId) =>
+    (await Employee.findById(employeeId))?.avatar?.imageKey ?? null;
+
+const getImageUrl = async (employeeId) =>
+    (await Employee.findById(employeeId))?.avatar?.url ?? null;
 
 module.exports = {
     createEmployee,
@@ -101,4 +99,5 @@ module.exports = {
     deleteEmployee,
     processUserProfileImage,
     getCurrentImageKey,
+    getImageUrl,
 };
