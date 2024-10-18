@@ -14,13 +14,15 @@ const register = catchAsync(async (req, res) => {
         phoneNumber,
         address,
     } = req.body;
-    
-    const imagePath = req.file?.path;
-    const imageKey = `profile-images/${req.file.filename}`;
 
-    let imageUrl = null;
-    if (imagePath && imageKey) {
-        imageUrl = await employeeService.processUserProfileImage(imagePath, imageKey, null);
+    if (req.file) {
+        const imagePath = req.file?.path;
+        const imageKey = `profile-images/${req.file.filename}`;
+
+        let imageUrl = null;
+        if (imagePath && imageKey) {
+            imageUrl = await employeeService.processUserProfileImage(imagePath, imageKey, null);
+        }
     }
 
     const existingEmployee = await employeeService.getEmployeeByUsername(
@@ -46,24 +48,24 @@ const register = catchAsync(async (req, res) => {
         salary,
         phoneNumber,
         address,
-        avatar: {url: imageUrl, imageKey},
+        avatar: req.file ? {url: imageUrl, imageKey} : null,
     });
     const tokens = await tokenService.generateAuthTokens(employee._id);
     res.status(httpStatus.CREATED).send({employee, tokens, authRecord});
 });
 
 const login = catchAsync(async (req, res) => {
-  const { username, password } = req.body;
-  const employee = await authService.login(username, password);
-  const tokens = await tokenService.generateAuthTokens(employee.id);
-  res.cookie("accessToken", tokens.access.token, {
-    httpOnly: true,
-    secure: false, // Set to true in production
-    maxAge: 60 * 60 * 1000,
-    sameSite: "Lax",
-    domain: "localhost", // Domain should match the frontend domain
-  });
-  res.status(httpStatus.OK).send({ employee, tokens });
+    const {username, password} = req.body;
+    const employee = await authService.login(username, password);
+    const tokens = await tokenService.generateAuthTokens(employee.id);
+    res.cookie("accessToken", tokens.access.token, {
+        httpOnly: true,
+        secure: false, // Set to true in production
+        maxAge: 60 * 60 * 1000,
+        sameSite: "Lax",
+        domain: "localhost", // Domain should match the frontend domain
+    });
+    res.status(httpStatus.OK).send({employee, tokens});
 });
 
 const refreshToken = catchAsync(async (req, res) => {

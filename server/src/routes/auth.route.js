@@ -27,6 +27,7 @@ router.post(
     "/register",
     // auth["Admin"],
     // upload.single("profilePicture"),
+    auth(["Admin"]),
     upload.single("profilePicture"),
     validate(employeeValidation.createEmployeeSchema),
     authController.register

@@ -13,10 +13,12 @@ const updateEmployee = catchAsync(async (req, res) => {
     const employeeId = req.params.id;
     const currentImageKey = await employeeService.getCurrentImageKey(employeeId);
 
-    const imagePath = req.file?.path;
-    const imageKey = `profile-images/${req.file.filename}`;
-    let imageUrl = null;
-    if (imagePath && imageKey && currentImageKey) {
+    let imageUrl = await employeeService.getImageUrl(employeeId);
+    let imageKey = await employeeService.getCurrentImageKey(employeeId);
+
+    if (req.file) {
+        const imagePath = req.file?.path;
+        imageKey = `profile-images/${req.file.filename}`;
         imageUrl = await employeeService.processUserProfileImage(imagePath, imageKey, currentImageKey);
     }
 

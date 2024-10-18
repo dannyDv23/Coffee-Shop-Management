@@ -1,63 +1,63 @@
 <div class="page-inner container-fluid px-5">
-  <div class="container">
-    <h2>Employee Profile</h2>
-    <div class="row">
-      <div class="col-md-10 mt-5">
+    <div class="container">
+        <h2>Employee Profile</h2>
         <div class="row">
-          <p class="col-md-6">
-            <strong>Full Name:</strong> <%= employee.name %>
-          </p>
-          <p class="col-md-6">
-            <strong>Position:</strong> <%= employee.position %>
-          </p>
-        </div>
+            <div class="col-md-10 mt-5">
+                <div class="row">
+                    <p class="col-md-6">
+                        <strong>Full Name:</strong> <%= employee.name %>
+                    </p>
+                    <p class="col-md-6">
+                        <strong>Position:</strong> <%= employee.position %>
+                    </p>
+                </div>
 
-        <div class="row">
-          <p><strong>Address:</strong> <%= employee.address %></p>
-        </div>
+                <div class="row">
+                    <p><strong>Address:</strong> <%= employee.address %></p>
+                </div>
 
-        <div class="row">
-          <p class="col-md-6">
-            <strong>Phone:</strong> <%= employee.phoneNumber %>
-          </p>
-          <p class="col-md-6">
-            <strong>Salary:</strong> <%= employee.salary %>
-          </p>
+                <div class="row">
+                    <p class="col-md-6">
+                        <strong>Phone:</strong> <%= employee.phoneNumber %>
+                    </p>
+                    <p class="col-md-6">
+                        <strong>Salary:</strong> <%= employee.salary %>
+                    </p>
+                </div>
+                <hr/>
+                <div class="row">
+                    <p class="col-md-6">
+                        <strong>Username:</strong> <%= employee.username %>
+                    </p>
+                    <p class="col-md-6"><strong>Password:</strong> ********</p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <img
+                        src="<%= employee.avatar && employee.avatar.url ? employee.avatar.url : 'https://ui-avatars.com/api/?name=' + employee.name + '&size=150' %>"
+                        class="img-thumbnail w-100"
+                        height="150"
+                        alt="Profile Picture"
+                />
+            </div>
         </div>
-        <hr />
-        <div class="row">
-          <p class="col-md-6">
-            <strong>Username:</strong> <%= employee.username %>
-          </p>
-          <p class="col-md-6"><strong>Password:</strong> ********</p>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <img
-          src="https://ui-avatars.com/api/?name=<%= employee.name %>&size=150"
-          class="img-thumbnail w-100"
-          height="150"
-          alt="Profile Picture"
-        />
-      </div>
+        <button
+                class="btn btn-primary mx-auto d-block mt-3"
+                onclick="location.href='/profile/edit'"
+        >
+            Edit
+        </button>
+        <!-- Updated to use employee._id -->
     </div>
-    <button
-      class="btn btn-primary mx-auto d-block mt-3"
-      onclick="location.href='/profile/edit'"
-    >
-      Edit
-    </button>
-    <!-- Updated to use employee._id -->
-  </div>
 </div>
 
 <script>
-  window.onload = function () {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      window.location.href = "/login";
-    }
-  };
+    window.onload = function () {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            window.location.href = "/login";
+        }
+    };
 </script>
 
 <!-- SweetAlert -->
