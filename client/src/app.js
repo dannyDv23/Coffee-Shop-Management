@@ -4,7 +4,6 @@ const path = require("path");
 const http = require("http");
 const reload = require("reload");
 const cookieParser = require('cookie-parser');
-const multer = require('multer');
 
 require("dotenv").config(); // Load .env variables
 

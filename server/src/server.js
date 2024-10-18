@@ -52,6 +52,10 @@ app.use(cookieParser());
 app.use(passport.initialize());
 passport.use(jwtStrategy);
 
+// parse json request body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // root Route
 const rootRouter = express.Router();
 app.use(`/${config.rootRoute}`, rootRouter);

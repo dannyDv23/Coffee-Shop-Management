@@ -17,4 +17,10 @@ module.exports = {
   },
   rootRoute: envVars.ROOT_ROUTE,
   whiteList: envVars.WHITE_LIST,
+  aws: {
+    id: envVars.AWS_ACCESS_KEY_ID,
+    secret: envVars.AWS_SECRET_ACCESS_KEY,
+    region: envVars.AWS_REGION,
+    bucketName: envVars.AWS_BUCKET,
+  },
 };
