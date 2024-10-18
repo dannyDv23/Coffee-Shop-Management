@@ -105,118 +105,118 @@ var SweetAlert2Demo = (function () {
 
         // TODO: move table
 
-        document.querySelectorAll('.move-table-button').forEach(button => {
-            button.addEventListener('click', async function () {
-                var tableName = button.getAttribute('data-table');
-                var tableStatus = button.getAttribute('data-status');
+        // document.querySelectorAll('.move-table-button').forEach(button => {
+        //     button.addEventListener('click', async function () {
+        //         var tableName = button.getAttribute('data-table');
+        //         var tableStatus = button.getAttribute('data-status');
 
-                try {
-                    // Fetch data for empty tables
-                    const response = await fetch(`http://localhost:3000/api/table/list-can-booking`);
-                    const data = await response.json();
-                    const emptyTables = data.listTableCanBook || [];
-                    console.log(emptyTables);
+        //         try {
+        //             // Fetch data for empty tables
+        //             const response = await fetch(`http://localhost:3000/api/table/list-can-booking`);
+        //             const data = await response.json();
+        //             const emptyTables = data.listTableCanBook || [];
+        //             console.log(emptyTables);
 
-                    if (!response.ok) {
-                        throw new Error(`Error fetching table data: ${data.message}`);
-                    }
+        //             if (!response.ok) {
+        //                 throw new Error(`Error fetching table data: ${data.message}`);
+        //             }
 
-                    // Create options for empty tables
-                    let optionsHTML = emptyTables.map(table => `
-                        <option value="${table.tableNumber}">Table ${table.tableNumber}</option>
-                    `).join('');
+        //             // Create options for empty tables
+        //             let optionsHTML = emptyTables.map(table => `
+        //                 <option value="${table.tableNumber}">Table ${table.tableNumber}</option>
+        //             `).join('');
 
-                    if (optionsHTML === '') {
-                        optionsHTML = '<option value="">No empty tables available</option>';
-                    }
+        //             if (optionsHTML === '') {
+        //                 optionsHTML = '<option value="">No empty tables available</option>';
+        //             }
 
-                    // Create the move table modal
-                    var tableHTML = `
-                        <div style="margin-top: 10px;">
-                            <strong>Table Number:</strong>
-                            <select id="tableNumber" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-                                <option value="">Select an empty table</option>
-                                ${optionsHTML}
-                            </select>
-                        </div>
-                    `;
+        //             // Create the move table modal
+        //             var tableHTML = `
+        //                 <div style="margin-top: 10px;">
+        //                     <strong>Table Number:</strong>
+        //                     <select id="tableNumber" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        //                         <option value="">Select an empty table</option>
+        //                         ${optionsHTML}
+        //                     </select>
+        //                 </div>
+        //             `;
 
-                    const content = document.createElement('div');
-                    content.innerHTML = tableHTML;
+        //             const content = document.createElement('div');
+        //             content.innerHTML = tableHTML;
 
-                    swal({
-                        title: tableName,
-                        text: `Status: ${tableStatus}`,
-                        icon: tableStatus === "Available" ? "success" : (tableStatus === "Empty" ? "warning" : "error"),
-                        content: content,
-                        buttons: {
-                            confirm: {
-                                text: "Close",
-                                className: "btn btn-success"
-                            },
-                            move: {
-                                text: "Move Table",
-                                value: "move",
-                                className: "btn btn-warning"
-                            }
-                        },
-                    }).then(async (value) => {
-                        switch (value) {
-                            case "move":
-                                const selectedTable = document.getElementById('tableNumber').value;
-                                if (selectedTable) {
-                                    try {
-                                        // Call the API to move table data
-                                        const moveResponse = await fetch(`http://localhost:3000/api/table/move`, {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                            },
-                                            body: JSON.stringify({
-                                                fromTableNumber: tableName, // The current table
-                                                toTableNumber: selectedTable // The new empty table
-                                            }),
-                                        });
+        //             swal({
+        //                 title: tableName,
+        //                 text: `Status: ${tableStatus}`,
+        //                 icon: tableStatus === "Available" ? "success" : (tableStatus === "Empty" ? "warning" : "error"),
+        //                 content: content,
+        //                 buttons: {
+        //                     confirm: {
+        //                         text: "Close",
+        //                         className: "btn btn-success"
+        //                     },
+        //                     move: {
+        //                         text: "Move Table",
+        //                         value: "move",
+        //                         className: "btn btn-warning"
+        //                     }
+        //                 },
+        //             }).then(async (value) => {
+        //                 switch (value) {
+        //                     case "move":
+        //                         const selectedTable = document.getElementById('tableNumber').value;
+        //                         if (selectedTable) {
+        //                             try {
+        //                                 // Call the API to move table data
+        //                                 const moveResponse = await fetch(`http://localhost:3000/api/table/move`, {
+        //                                     method: 'POST',
+        //                                     headers: {
+        //                                         'Content-Type': 'application/json',
+        //                                     },
+        //                                     body: JSON.stringify({
+        //                                         fromTableNumber: tableName, // The current table
+        //                                         toTableNumber: selectedTable // The new empty table
+        //                                     }),
+        //                                 });
 
-                                        const moveData = await moveResponse.json();
+        //                                 const moveData = await moveResponse.json();
 
-                                        if (!moveResponse.ok) {
-                                            throw new Error(moveData.message || "Failed to move table.");
-                                        }
+        //                                 if (!moveResponse.ok) {
+        //                                     throw new Error(moveData.message || "Failed to move table.");
+        //                                 }
 
-                                        // Show success message
-                                        swal(`Table moved successfully to Table ${selectedTable}!`).then(() => {
-                                            // Reload the page after moving table successfully
-                                            window.location.reload(); // Reload the current page
-                                        });
-                                    } catch (error) {
-                                        swal({
-                                            title: "Error",
-                                            text: `Failed to move table: ${error.message}`,
-                                            icon: "error"
-                                        });
-                                    }
-                                } else {
-                                    swal("Please select an empty table to move!");
-                                }
-                                break;
-                            case "cancel":
-                                swal("Reservation canceled successfully!");
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error:', error);
-                    swal({
-                        title: "Error",
-                        text: `Failed to fetch data for empty tables`,
-                        icon: "error"
-                    });
-                }
-            });
-        });
+        //                                 // Show success message
+        //                                 swal(`Table moved successfully to Table ${selectedTable}!`).then(() => {
+        //                                     // Reload the page after moving table successfully
+        //                                     window.location.reload(); // Reload the current page
+        //                                 });
+        //                             } catch (error) {
+        //                                 swal({
+        //                                     title: "Error",
+        //                                     text: `Failed to move table: ${error.message}`,
+        //                                     icon: "error"
+        //                                 });
+        //                             }
+        //                         } else {
+        //                             swal("Please select an empty table to move!");
+        //                         }
+        //                         break;
+        //                     case "cancel":
+        //                         swal("Reservation canceled successfully!");
+        //                         break;
+        //                     default:
+        //                         break;
+        //                 }
+        //             });
+        //         } catch (error) {
+        //             console.error('Error:', error);
+        //             swal({
+        //                 title: "Error",
+        //                 text: `Failed to fetch data for empty tables`,
+        //                 icon: "error"
+        //             });
+        //         }
+        //     });
+        // });
 
 
         //TODO: split table

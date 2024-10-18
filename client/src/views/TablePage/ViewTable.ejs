@@ -27,8 +27,9 @@
     </div>
 </div>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.querySelectorAll('.view-table-button').forEach(button => {
         button.addEventListener('click', async function () {
             var tableNumber = button.getAttribute('data-table');
@@ -37,15 +38,9 @@
             if (tableStatus !== 'Empty') {
                 try {
                     // Fetch data from the API
-                    const response = await fetch(`http://localhost:3000/api/table/${tableNumber}`);
-                    const data = await response.json(); // Assuming API returns a JSON response
+                    const data = await apiFetch(`http://localhost:3000/api/table/${tableNumber}`);
                     const tableData = data.infoTable?.[0];
                     console.log(tableData);
-
-                    if (!response.ok) {
-                        throw new Error(`Error fetching table data: ${tableData.message}`);
-                    }
-
                     // Extract bookings and orders from the tableData
                     const bookings = tableData.bookings || [];
                     const orders = tableData.orders || []; // Ensure orders is an array

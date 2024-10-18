@@ -27,8 +27,9 @@
 </div>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.cancel-table-button').forEach(button => {
         button.addEventListener('click', function () {
@@ -51,18 +52,8 @@
             }).then((value) => {
                 if (value === "Delete") {
                     console.log(`Attempting to cancel table: ${tableNumber}`);
-                    fetch(`http://localhost:3000/api/table/cancel/${tableNumber}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                    .then(response => {
-                        console.log("Response received:", response);
-                        if (!response.ok) {
-                            throw new Error('Error canceling the table.');
-                        }
-                        return response.json();
+                    apiFetch(`http://localhost:3000/api/table/cancel/${tableNumber}`, {
+                        method: 'PUT'
                     })
                     .then(data => {
                         console.log("Data received:", data);

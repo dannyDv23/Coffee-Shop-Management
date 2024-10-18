@@ -67,9 +67,9 @@ rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
 rootRouter.use("/employee", manageEmployeeRouter);
 rootRouter.use("/menu", menuRouter);
-rootRouter.use("/material", materialRouter);
+rootRouter.use("/material",auth(["Admin"]), materialRouter);
 rootRouter.use("/report", reportRoutes); // Report routes
-rootRouter.use("/table", tableRouter);
+rootRouter.use("/table",  auth(["Admin", "Employee"]), tableRouter);
 rootRouter.use("/budget", BudgetRouter); // Budget routes
 rootRouter.use("/expenses", ExpenseRouter); // Expense routes
 rootRouter.use("/backup", BackupRouter); //Backup routes

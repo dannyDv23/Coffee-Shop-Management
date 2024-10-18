@@ -30,7 +30,9 @@
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
    document.querySelectorAll('.book-table-button').forEach(button => {
     button.addEventListener('click', function () {
         const tableNumber = button.getAttribute('data-table');
@@ -129,14 +131,10 @@
                 };
 
                 // Step 3: Post the data to the API
-                fetch('http://localhost:3000/api/table/booking', {  // Replace with your actual API endpoint
+                apiFetch('http://localhost:3000/api/table/booking', {  // Replace with your actual API endpoint
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify(bookingData),
                 })
-                .then(response => response.json())
                 .then(data => {
                     if (data.message === 'Booking created successfully') {
                         swal({

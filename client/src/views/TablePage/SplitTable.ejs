@@ -30,7 +30,9 @@
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.querySelectorAll('.split-table-button').forEach(button => {
         button.addEventListener('click', function () {
             const tableName = button.getAttribute('data-table');
@@ -43,11 +45,7 @@
             // Fetch product data for the selected table
             const productdata = async (tableNumber) => {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/order/${tableNumber}`);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
+                     const data = await apiFetch(`http://localhost:3000/api/order/${tableNumber}`);
                     if (data.infoOrder && data.infoOrder.length > 0) {
                         return data.infoOrder[0].product;
                     } else {
@@ -193,15 +191,10 @@
                         console.log("🚀 ~ productdata ~ payload:", payload)
 
                         // Post the payload to the API
-                        fetch('http://localhost:3000/api/table/split', {
+                        apiFetch('http://localhost:3000/api/table/split', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
                             body: JSON.stringify(payload),
-                        })
-                            .then(response => response.json())
-                            .then(data => {
+                        }).then(data => {
                                 swal(`Table split successfully from ${tableName} to Table ${targetTableNumber}!`).then(() => {
                                     // Reload the page after moving table successfully
                                     window.location.reload(); // Reload the current page

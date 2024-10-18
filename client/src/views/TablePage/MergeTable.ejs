@@ -29,8 +29,9 @@
     </div>
 </div>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.querySelectorAll('.merge-table-button').forEach(button => {
         button.addEventListener('click', function () {
             let tableName = button.getAttribute('data-table');
@@ -131,14 +132,10 @@
                         console.log("Payload:", payload);
 
                         // Post the payload to the server
-                        fetch('http://localhost:3000/api/table/merge', {
+                        apiFetch('http://localhost:3000/api/table/merge', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
                             body: JSON.stringify(payload),
-                        }).then(response => response.json())
-                            .then(data => {
+                        }).then(data => {
                                 swal(`Tables merged successfully! Merged tables: ${selectedTables.join(', ')} to 
                                  ${targetTable}.`).then(() => {
                                     window.location.reload();
