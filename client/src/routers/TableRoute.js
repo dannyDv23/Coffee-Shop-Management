@@ -2,56 +2,19 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const axios = require('axios');
-const infomationTable = [
-  { number: 'Table 1', status: 'Empty', textStyle: 'color-sunset', listProduct: [] },
-  { number: 'Table 2', status: 'Empty', textStyle: 'color-sunset', listProduct: [] },
-  {
-    number: 'Table 3', status: 'Available', textStyle: 'color-mint', listProduct: [
-      { name: "Product 1", quantity: 1 },
-      { name: "Product 2", quantity: 2 },
-      { name: "Product 3", quantity: 3 },
-    ]
-  },
-  {
-    number: 'Table 4', status: 'Available', textStyle: 'color-mint', listProduct: [
-      { name: "Product 1", quantity: 4 },
-      { name: "Product 2", quantity: 5 },
-      { name: "Product 3", quantity: 6 },
-    ]
-  },
-  { number: 'Table 5', status: 'Empty', textStyle: 'color-sunset', listProduct: [] },
-  { number: 'Table 6', status: 'Empty', textStyle: 'color-sunset', listProduct: [] },
+const { fetchAvailableTables, fetchBookableTables, fetchAllTables } = require('../untils/tableUtils');
+const addAuthHeaders = require('../middleware/auth');
 
-];
-
-//example when call api
-// router.get('/', async (req, res) => {
-//   try {
-//       const newsAPI = await axios.get('http://localhost:3000/info/namphuong');
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           articles: newsAPI.data 
-//       });
-//   } catch (err) {
-//       console.error('Error fetching data:', err.message);
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           error: 'Error fetching data' 
-//       });
-//   }
-// });
-
+router.use(addAuthHeaders); // Apply auth middleware to all routes
 
 router.get('/view', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/table/all');
-    const listTable = response.data.listTable;
+    const listAllTable = await fetchAllTables(req);
     res.render('../MainLayout', {
-      bodyPage: path.join('views', 'TablePage','ViewTable'),
-      datas: listTable,
+      bodyPage: path.join('views', 'TablePage', 'ViewTable'),
+      datas: listAllTable,
       titleTab: 'View Table'
     });
-
   } catch (err) {
     console.error('Error fetching data:', err.message);
     res.render('../MainLayout', {
@@ -59,17 +22,14 @@ router.get('/view', async (req, res) => {
       error: 'Error fetching data'
     });
   }
-
 });
 
 router.get('/move', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/table/status/Available');
-    const listAvailableTable = response.data.listTable;
+    const listAvailableTable = await fetchAvailableTables(req);
     res.render('../MainLayout', {
-      bodyPage: path.join('views', 'TablePage/TablePage'),
+      bodyPage: path.join('views', 'TablePage', 'MoveTable'),
       datas: listAvailableTable,
-      detailPage: path.join('views', '../../TablePage/MoveTable'),
       titleTab: 'Move Table'
     });
   } catch (err) {
@@ -82,77 +42,116 @@ router.get('/move', async (req, res) => {
 });
 
 router.get('/split', async (req, res) => {
-  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
-  const responseTableBook = await axios.get('http://localhost:3000/api/table/list-can-booking');
-  const listTable = responseAvailableTable.data.listTable;
-  const listTableSelected = responseTableBook.data.listTableCanBook;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','SplitTable'),
-    listTable: listTable,
-    listTableSelected: listTableSelected,
-    titleTab: 'Split Table'
-  });
+  try {
+    const listTable = await fetchAvailableTables(req);
+    const listTableSelected = await fetchBookableTables(req);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'SplitTable'),
+      listTable,
+      listTableSelected,
+      titleTab: 'Split Table'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
-router.get('/merge', async(req, res) => {
-  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
-  const responseTableBook = await axios.get('http://localhost:3000/api/table/list-can-booking');
-  const listTable = responseAvailableTable.data.listTable;
-  const listTableSelected = responseTableBook.data.listTableCanBook;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','MergeTable'),
-    listTable: listTable,
-    listTableSelected: listTableSelected,
-    titleTab: 'Merge Table'
-  });
+router.get('/merge', async (req, res) => {
+  try {
+    const listTable = await fetchAvailableTables(req);
+    const listTableSelected = await fetchBookableTables(req);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'MergeTable'),
+      listTable,
+      listTableSelected,
+      titleTab: 'Merge Table'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
-router.get('/cancel', async(req, res) => {
-  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
-  const listTable = responseAvailableTable.data.listTable;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','CancelTable'),
-    listTable: listTable,
-    titleTab: 'Cancel Table'
-  });
+router.get('/cancel', async (req, res) => {
+  try {
+    const listTable = await fetchAvailableTables(req);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'CancelTable'),
+      listTable,
+      titleTab: 'Cancel Table'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
-router.get('/chooseMenu', async(req, res) => {
-  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
-  const responseProduct = await axios.get('http://localhost:3000/api/product');
-  const listTable = responseAvailableTable.data.listTable;
-  const listproduct = responseProduct.data.listProduct;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','ChooseMenu'),
-    listTable: listTable,
-    listproduct: listproduct,
-    titleTab: 'Choose Menu'
-  });
+router.get('/chooseMenu', async (req, res) => {
+  try {
+    const listTable = await fetchAvailableTables(req);
+    const responseProduct = await req.axios.get('http://localhost:3000/api/product');
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'ChooseMenu'),
+      listTable,
+      listproduct: responseProduct.data.listProduct,
+      titleTab: 'Choose Menu'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
-router.get('/booking', async(req, res) => {
-  const responseEmptyTable = await axios.get('http://localhost:3000/api/table/list-can-booking');
-  const listTable = responseEmptyTable.data.listTableCanBook;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','BookingTable'),
-    listTable: listTable,
-    titleTab: 'Booking Table'
-  });
+router.get('/booking', async (req, res) => {
+  try {
+    const listTable = await fetchBookableTables(req);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'BookingTable'),
+      listTable,
+      titleTab: 'Booking Table'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
-router.get('/payment', async(req, res) => {
-  const responseAvailableTable = await axios.get('http://localhost:3000/api/table/status/Available');
-  const listTable = responseAvailableTable.data.listTable;
-  res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','PaymentTable'),
-    listTable: listTable,
-    titleTab: 'Payment Table'
-  });
+router.get('/payment', async (req, res) => {
+  try {
+    const listTable = await fetchAvailableTables(req);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'PaymentTable'),
+      listTable,
+      titleTab: 'Payment Table'
+    });
+  } catch (err) {
+    console.error('Error fetching data:', err.message);
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'HomePage'),
+      error: 'Error fetching data'
+    });
+  }
 });
 
 router.get('/print', (req, res) => {
   res.render('../MainLayout', {
-    bodyPage: path.join('views', 'TablePage','PrintSetting'),
+    bodyPage: path.join('views', 'TablePage', 'PrintSetting'),
     titleTab: 'Print Setting'
   });
 });

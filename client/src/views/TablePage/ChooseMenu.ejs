@@ -28,7 +28,9 @@
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.querySelectorAll('.choose-menu-button').forEach(button => {
         button.addEventListener('click', function () {
             const tableNumber = button.getAttribute('data-table');
@@ -110,18 +112,9 @@
 
                     if (orderData.productList.length > 0) {
                         // Send the data to the backend using fetch
-                        fetch('http://localhost:3000/api/table/order', {
+                        apiFetch('http://localhost:3000/api/table/order', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
                             body: JSON.stringify(orderData)
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
                         })
                         .then(data => {
                             swal({

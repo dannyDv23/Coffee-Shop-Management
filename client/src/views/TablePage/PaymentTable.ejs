@@ -28,19 +28,15 @@
 </div>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
     document.querySelectorAll('.payment-table-button').forEach(button => {
         button.addEventListener('click', function () {
             let tableNumber = button.getAttribute('data-table');
 
             // Fetch the order data for this table
-            fetch(`http://localhost:3000/api/order/${tableNumber}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // Ensure you parse the JSON response
-                })
+            apiFetch(`http://localhost:3000/api/order/${tableNumber}`)
                 .then(data => {
                     // Assuming the API response structure is like your provided example
                     console.log(data);
@@ -137,22 +133,13 @@
                                 },
                             }).then(() => {
                                 // If checkbox is checked, update order status
-                                fetch(`http://localhost:3000/api/table/${tableNumber}/complete`, {
+                                apiFetch(`http://localhost:3000/api/table/${tableNumber}/complete`, {
                                     method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
                                     body: JSON.stringify({
                                         moneyReceived: cashGiven,   // From the input
                                         moneyRefund: change.toFixed(2),  // Calculated
                                         changeTableStatus: changeTableStatus // From checkbox
                                     })
-                                }).then(response => {
-                                    if (!response.ok) {
-                                        // Handle error response from order fetch
-                                        throw new Error('Table not ordered any drinks or ordered and paid for them.');
-                                    }
-                                    return response.json();
                                 }).then(result => {
                                     location.reload();
                                 })

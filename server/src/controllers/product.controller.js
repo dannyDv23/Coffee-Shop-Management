@@ -5,7 +5,7 @@ const ApiError = require("../utils/ApiError");
 
 
 const viewAllProductController = catchAsync(async (req, res) => {
-    const listProduct = await productService.getAllProduct();
+    const listProduct = await productService.getAllProducts();
     res.status(httpStatus.OK).send({ listProduct });
 });
 

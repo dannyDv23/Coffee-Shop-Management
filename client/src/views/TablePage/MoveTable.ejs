@@ -1,7 +1,133 @@
-<button type="button" class="btn btn-info move-table-button" data-table="<%= data.tableNumber %>"
-    data-status="<%= data.status %>" %>'>
-    <h4>
-       Table <%= data.tableNumber %>
-    </h4>
-    <div class="table-status fw-bold">(<%= data.status %>)</div>
-</button>
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3"><%= titleTab%></h4>
+
+            <div class="row row-demo-grid">
+                <% datas.forEach(data => { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info move-table-button" data-table="<%= data.tableNumber %>"
+                                data-status="<%= data.status %>" %>'>
+                                <h4>
+                                   Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>            
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
+    
+     document.querySelectorAll('.move-table-button').forEach(button => {
+            button.addEventListener('click', async function () {
+                var tableName = button.getAttribute('data-table');
+                var tableStatus = button.getAttribute('data-status');
+
+                try {
+                    // Fetch data for empty tables
+                    const data = await apiFetch(`http://localhost:3000/api/table/list-can-booking`);
+                    const emptyTables = data.listTableCanBook || [];
+                    console.log(emptyTables);
+
+
+                    // Create options for empty tables
+                    let optionsHTML = emptyTables.map(table => `
+                        <option value="${table.tableNumber}">Table ${table.tableNumber}</option>
+                    `).join('');
+
+                    if (optionsHTML === '') {
+                        optionsHTML = '<option value="">No empty tables available</option>';
+                    }
+
+                    // Create the move table modal
+                    var tableHTML = `
+                        <div style="margin-top: 10px;">
+                            <strong>Table Number:</strong>
+                            <select id="tableNumber" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                                <option value="">Select an empty table</option>
+                                ${optionsHTML}
+                            </select>
+                        </div>
+                    `;
+
+                    const content = document.createElement('div');
+                    content.innerHTML = tableHTML;
+
+                    swal({
+                        title: tableName,
+                        text: `Status: ${tableStatus}`,
+                        icon: tableStatus === "Available" ? "success" : (tableStatus === "Empty" ? "warning" : "error"),
+                        content: content,
+                        buttons: {
+                            confirm: {
+                                text: "Close",
+                                className: "btn btn-success"
+                            },
+                            move: {
+                                text: "Move Table",
+                                value: "move",
+                                className: "btn btn-warning"
+                            }
+                        },
+                    }).then(async (value) => {
+                        switch (value) {
+                            case "move":
+                                const selectedTable = document.getElementById('tableNumber').value;
+                                if (selectedTable) {
+                                    try {
+                                        // Call the API to move table data
+                                        const moveResponse = await apiFetch(`http://localhost:3000/api/table/move`, {
+                                            method: 'POST',
+                                            body: JSON.stringify({
+                                                fromTableNumber: tableName, // The current table
+                                                toTableNumber: selectedTable // The new empty table
+                                            }),
+                                        });
+                                        // Show success message
+                                        swal(`Table moved successfully to Table ${selectedTable}!`).then(() => {
+                                            // Reload the page after moving table successfully
+                                            window.location.reload(); // Reload the current page
+                                        });
+                                    } catch (error) {
+                                        swal({
+                                            title: "Error",
+                                            text: `Failed to move table: ${error.message}`,
+                                            icon: "error"
+                                        });
+                                    }
+                                } else {
+                                    swal("Please select an empty table to move!");
+                                }
+                                break;
+                            case "cancel":
+                                swal("Reservation canceled successfully!");
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                    swal({
+                        title: "Error",
+                        text: `Failed to fetch data for empty tables`,
+                        icon: "error"
+                    });
+                }
+            });
+        });
+
+</script>
