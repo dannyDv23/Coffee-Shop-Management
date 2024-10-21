@@ -10,7 +10,7 @@
 # dependencies
 */node_modules
 server/node_modules
-clien/node_modules
+client/node_modules
 /.pnp
 .pnp.js
 
@@ -36,4 +36,4 @@ yarn-error.log*
 server/package-lock.json
 client/package-lock.json
 combined.csv
-/server/src/routes/job/uploads
+server/src/uploads
