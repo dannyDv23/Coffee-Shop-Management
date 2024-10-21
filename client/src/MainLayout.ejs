@@ -553,8 +553,20 @@
                     </div>
                     <span class="profile-username">
                       <span class="op-7">Hi,</span>
-                      <span class="fw-bold">Hizrian</span>
+                      <span id="role-display"></span>
                     </span>
+                    
+                    <script>
+                      window.addEventListener('load', function() {
+                        const name = localStorage.getItem("name");
+                        if (name) {
+                          document.getElementById("role-display").textContent = name;
+                        } else {
+                          document.getElementById("role-display").textContent = "Guest"; // Fallback if no role is set
+                        }
+                      });
+                    </script>
+
                   </a>
                   <ul class="dropdown-menu dropdown-user animated fadeIn">
                     <div class="dropdown-user-scroll scrollbar-outer">
@@ -568,11 +580,10 @@
                             />
                           </div>
                           <div class="u-text">
-                            <h4>Hizrian</h4>
-                            <p class="text-muted">hello@example.com</p>
+                            <p class="col-md-6"></p>
                             <a
                               href="/profile"
-                              class="btn btn-xs btn-secondary btn-sm"
+                              class="btn btn-xs btn-secondary btn-sm align-center"
                               >View Profile</a
                             >
                           </div>
@@ -580,15 +591,10 @@
                       </li>
                       <li>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">My Profile</a>
-                        <a class="dropdown-item" href="#">My Balance</a>
-                        <a class="dropdown-item" href="#">Inbox</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Account Setting</a>
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" onclick="logoutUser()"
                           >Logout</a
                         >
+                        <div class="dropdown-divider"></div>
                       </li>
                     </div>
                   </ul>
@@ -886,5 +892,6 @@
         window.location.href = "/login";
       }
     </script>
+
   </body>
 </html>
