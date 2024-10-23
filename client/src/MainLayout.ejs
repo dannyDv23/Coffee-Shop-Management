@@ -203,7 +203,7 @@
               
               <ul class="nav">
                 <% menuItems.forEach((item, index) => { %>
-                  <li class="nav-item">
+                  <li class="nav-item menu-item" data-management="<%= item.managementName %>">
                     <a data-bs-toggle="collapse" href="#base<%= index %>">
                       <i class="<%= item.icon %>"></i>
                       <p><%= item.managementName %></p>
@@ -223,6 +223,7 @@
                   </li>
                 <% }) %>
               </ul>
+              
             </ul>
           </div>
         </div>
@@ -236,7 +237,7 @@
             <div class="logo-header" data-background-color="dark">
               <a href="index.html" class="logo">
                 <img
-                  src="/img/kaiadmin/logo_light.svg"
+                  src="/img/logo.png"
                   alt="navbar brand"
                   class="navbar-brand"
                   height="20"
@@ -559,11 +560,28 @@
                     <script>
                       window.addEventListener('load', function() {
                         const name = localStorage.getItem("name");
+                        const userRole = localStorage.getItem("role");
                         if (name) {
                           document.getElementById("role-display").textContent = name;
                         } else {
                           document.getElementById("role-display").textContent = "Guest"; // Fallback if no role is set
                         }
+                        // Get all the menu items by their data attribute
+                        const navItems = document.querySelectorAll('.menu-item');
+                        navItems.forEach(item => {
+                          const managementName = item.getAttribute('data-management');
+
+                          if (userRole === 'Admin') {
+                            item.style.display = 'block';
+                          } else if (userRole === 'Employee') {
+                            if (managementName !== 'Sales') {
+                              item.style.display = 'none';
+                            } else {
+                              item.style.display = 'block'; 
+                            }
+                          }
+                        });
+
                       });
                     </script>
 
@@ -891,6 +909,18 @@
         document.cookie = "";
         window.location.href = "/login";
       }
+    </script>
+
+    <script>
+      window.onload = function () {
+        // Check if the token exists in localStorage
+        const token = localStorage.getItem('accessToken');
+
+        // If the token does not exist, redirect to the login page
+        if (!token) {
+          window.location.href = '/login'; // Adjust this URL to your actual login page
+        }
+      };
     </script>
 
   </body>

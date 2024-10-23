@@ -1,12 +1,22 @@
 <div class="page-inner">
   <!-- Card -->
   <h3 class="fw-bold mb-3">
-    <span class="text-primary">Welcome</span>
+    <span class="text-primary">Welcome <span id="name-display"></span></span>
     <span id="typed-name" class="text-uppercase text-success fw-bold"></span
     >,&nbsp;
     <span id="typewriter-text" class="text-info fs-10"></span>
   </h3>
-
+  <script>
+    window.addEventListener('load', function() {
+      const name = localStorage.getItem("name");
+      const userRole = localStorage.getItem("role");
+      if (name) {
+        document.getElementById("name-display").textContent = name;
+      } else {
+        document.getElementById("name-display").textContent = "Guest"; 
+      }
+    });
+  </script>
   <div class="row">
     <% datas.forEach(data=> { %>
     <div class="col-md-4">
