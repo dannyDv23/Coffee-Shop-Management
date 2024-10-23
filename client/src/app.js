@@ -28,7 +28,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 // Set the view engine to EJS
 app.set("view engine", "ejs");
