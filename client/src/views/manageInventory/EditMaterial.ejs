@@ -32,11 +32,11 @@
               <div class="form-group">
                 <label for="defaultSelect">Unit</label>
                 <select class="form-select form-control" id="defaultSelect">
-                  <option value="kg" <%=material.unit==='kg' ? 'selected' : '' %>>kg</option>
-                  <option value="g" <%=material.unit==='g' ? 'selected' : '' %>>g</option>
-                  <option value="barrel" <%=material.unit==='barrel' ? 'selected' : '' %>>barrel</option>
-                  <option value="bottle" <%=material.unit==='bottle' ? 'selected' : '' %>>bottle</option>
-                  <option value="bag" <%=material.unit==='bag' ? 'selected' : '' %>>bag</option>
+                  <option value="kg" <%= material.unit === 'kg' ? 'selected' : '' %>>kg</option>
+                  <option value="g" <%= material.unit === 'g' ? 'selected' : '' %>>g</option>
+                  <option value="barrel" <%= material.unit === 'barrel' ? 'selected' : '' %>>barrel</option>
+                  <option value="bottle" <%= material.unit === 'bottle' ? 'selected' : '' %>>bottle</option>
+                  <option value="bag" <%= material.unit === 'bag' ? 'selected' : '' %>>bag</option>
                 </select>
               </div>
             </div>
@@ -51,7 +51,10 @@
   </div>
 </div>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+  import { apiFetch } from '../js/apiFetchUtils.js';
+
   document.getElementById('submit-btn').addEventListener('click', async function () {
     const id = '<%= material._id %>'; // Assuming you have the material ID available in your template
     const name = document.getElementById('material2').value;
@@ -61,27 +64,20 @@
 
     const updatedMaterial = {
       name: name,
-      pricePerUnit: price,
-      totalQuantity: quantity,
+      pricePerUnit: parseFloat(price), // Ensure the price is a float
+      totalQuantity: parseInt(quantity, 10), // Ensure the quantity is an integer
       unit: unit
     };
 
     try {
-      const response = await fetch(`http://localhost:3000/api/material/${id}`, {
+      const response = await apiFetch(`http://localhost:3000/api/material/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(updatedMaterial),
       });
 
-      if (response.ok) {
-        // Optionally handle success (like redirecting to another page or showing a success message)
-        alert('Material updated successfully!');
-        window.location.href = '/inventory';
-      } else {
-        throw new Error('Failed to update material');
-      }
+      // Handle response from apiFetch
+      alert('Material updated successfully!');
+      window.location.href = '/inventory'; // Redirect to inventory page
     } catch (error) {
       console.error('Error:', error);
       alert('Error updating material: ' + error.message);
@@ -89,7 +85,7 @@
   });
 
   document.getElementById('cancel-btn').addEventListener('click', function () {
-    // Optionally handle cancel (like redirecting back to the materials list)
+    // Redirect back to the inventory page on cancel
     window.location.href = '/inventory';
   });
 </script>

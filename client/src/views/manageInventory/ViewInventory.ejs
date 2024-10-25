@@ -123,7 +123,9 @@
     }
 </script>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
     async function confirmDeleteEmployee(materialId, materialName) {
         swal({
             title: "Are you sure?",
@@ -135,11 +137,10 @@
             if (willDelete) {
                 try {
                     const updatedMaterial = { status: 'Delete' };
-                    const response = await fetch(
+                    const response = await apiFetch(
                         `http://localhost:3000/api/material/delete/${materialId}`,
                         {
                             method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(updatedMaterial),
                         }
                     );
@@ -148,7 +149,7 @@
                         swal("Material status updated to Delete successfully!", { icon: "success" })
                             .then(() => window.location.reload());
                     } else {
-                        const errorData = await response.json();
+                        const errorData = await response;
                         swal("Failed to delete material", errorData.message, "error");
                     }
                 } catch (error) {

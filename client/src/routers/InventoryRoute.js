@@ -1,19 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const axios = require('axios');
+const addAuthHeaders = require('../middleware/auth');
+const { fetchMaterials, fetchMaterialById } = require('../untils/materialUtils');
 
-
-
-// router.get('/', (req, res) => {
-//   res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ViewInventory")});
-// });
-
+router.use(addAuthHeaders);
+// Render inventory view with materials
 router.get('/', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/material');
-    const materials = response.data; // Extract data from the response
-
+    const materials = await fetchMaterials(req); // Pass req to the utility function
     res.render('../MainLayout', { 
       bodyPage: path.join("views", "manageInventory", "ViewInventory"),
       materials: materials 
@@ -24,16 +19,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-
+// Render import view
 router.get('/import', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ImportMaterial")});
+  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ImportMaterial") });
 });
 
+// Render export view with materials
 router.get('/export', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/material');
-    const materials = response.data; // Extract data from the response
-
+    const materials = await fetchMaterials(req); // Pass req to the utility function
     res.render('../MainLayout', { 
       bodyPage: path.join("views", "manageInventory", "ExportMaterial"),
       materials: materials 
@@ -44,14 +38,12 @@ router.get('/export', async (req, res) => {
   }
 });
 
-
+// Render edit view for a specific material
 router.get('/edit', async (req, res) => {
   const id = req.query.id;
 
   try {
-    const response = await axios.get(`http://localhost:3000/api/material/${id}`);
-    const material = response.data;
-
+    const material = await fetchMaterialById(req, id); // Pass req and id to the utility function
     res.render('../MainLayout', {
       bodyPage: path.join('views', 'manageInventory', 'EditMaterial'),
       material: material
@@ -62,32 +54,9 @@ router.get('/edit', async (req, res) => {
   }
 });
 
-
+// Render delete view (if needed, otherwise you might implement delete functionality)
 router.get('/delete', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ViewInventory")});
+  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ViewInventory") });
 });
-
-router.get('/find', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "FindMaterial")});
-});
-
-//example when call api
-// router.get('/', async (req, res) => {
-//   try {
-//       const newsAPI = await axios.get('http://localhost:3000/info/namphuong');
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           articles: newsAPI.data 
-//       });
-//   } catch (err) {
-//       console.error('Error fetching data:', err.message);
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           error: 'Error fetching data' 
-//       });
-//   }
-// });
-
-// Define other route relate to this router
 
 module.exports = router;
