@@ -156,4 +156,20 @@ router.get('/print', (req, res) => {
   });
 });
 
+router.get('/managerBooking', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:3000/api/booking');
+    const infoBooking = response.data.infoBooking;
+
+    res.render('../MainLayout', {
+      bodyPage: path.join('views', 'TablePage', 'ManagerBookingTable'),
+      infoBooking: infoBooking
+    });
+  } catch (err) {
+    console.error('Error fetching materials:', err);
+    res.status(500).send('Error fetching materials');
+  }
+});
+
+
 module.exports = router;
