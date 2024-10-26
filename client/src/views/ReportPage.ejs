@@ -51,6 +51,19 @@
       margin-bottom: 10px;
       color: #362c5f;
     }
+    button {
+      background-color: #362c5f;
+      color: white;
+      border: none;
+      padding: 5px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2d234c;
+    }
   
   </style>
 </head>
@@ -142,8 +155,12 @@
     // Gọi API để lấy dữ liệu Bar Chart với ngày tùy chọn
     async function fetchBarChartData(startDate, endDate) {
       try {
+        const token = localStorage.getItem("accessToken");
         const response = await fetch(`http://127.0.0.1:3000/api/report/bar-chart?startDate=${startDate}&endDate=${endDate}`, {
           method: 'GET',
+          headers: {
+                Authorization: `Bearer ${token}`,
+              },
         });
 
         if (!response.ok) {
@@ -160,8 +177,12 @@
     // Gọi API để lấy dữ liệu Pie Chart với ngày tùy chọn
     async function fetchPieChartData(startDate, endDate) {
       try {
+        const token = localStorage.getItem("accessToken");
         const response = await fetch(`http://127.0.0.1:3000/api/report/pie-chart?startDate=${startDate}&endDate=${endDate}`, {
           method: 'GET',
+          headers: {
+                Authorization: `Bearer ${token}`,
+              },
         });
 
         if (!response.ok) {
@@ -177,8 +198,12 @@
     // Gọi API để lấy dữ liệu Table với ngày tùy chọn
     async function fetchReportTableData(startDate, endDate) {
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await fetch(`http://127.0.0.1:3000/api/report/report-table?startDate=${startDate}&endDate=${endDate}`, {
         method: 'GET',
+        headers: {
+                Authorization: `Bearer ${token}`,
+              },
       });
 
       if (!response.ok) {
@@ -192,47 +217,106 @@
     }
   }
 
-    // Xuất excel
-    async function exportExcel() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
+    // // Xuất excel
+    // async function exportExcel() {
+    //   const startDate = document.getElementById('startDate').value;
+    //   const endDate = document.getElementById('endDate').value;
 
-      if (startDate && endDate) {
+    //   if (startDate && endDate) {
+    //     const url = `http://127.0.0.1:3000/api/report/export-excel?startDate=${startDate}&endDate=${endDate}`;
+    //     window.open(url, '_blank'); // Mở file Excel trong tab mới hoặc tải về
+    //   } else {
+    //     alert('Please select a start and end date');
+    //   }
+    // }
+
+    // // Xuất PDF
+    // async function exportPDF() {
+    //   const startDate = document.getElementById('startDate').value;
+    //   const endDate = document.getElementById('endDate').value;
+
+    //   if (startDate && endDate) {
+    //   const url = `http://127.0.0.1:3000/api/report/export-pdf?startDate=${startDate}&endDate=${endDate}`;
+    //   window.open(url, '_blank'); // Mở file PDF trong tab mới hoặc tải về
+    //   } else {
+    //     alert('Please select a start and end date');
+    //   }
+    // }
+
+    // Xuất Excel
+async function exportExcel() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const token = localStorage.getItem("accessToken");
+
+    if (startDate && endDate) {
         const url = `http://127.0.0.1:3000/api/report/export-excel?startDate=${startDate}&endDate=${endDate}`;
-        window.open(url, '_blank'); // Mở file Excel trong tab mới hoặc tải về
-      } else {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to export Excel file');
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            const filename = contentDisposition?.split('filename=')[1] || `report_${startDate}_to_${endDate}.xlsx`;
+
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename.replace(/"/g, '');  // Xóa dấu ngoặc kép nếu có
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+        }
+    } else {
         alert('Please select a start and end date');
-      }
     }
+}
 
-    // Xuất PDF
-    async function exportPDF() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
+// Xuất PDF
+async function exportPDF() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const token = localStorage.getItem("accessToken");
 
-      if (!startDate || !endDate) {
+    if (startDate && endDate) {
+        const url = `http://127.0.0.1:3000/api/report/export-pdf?startDate=${startDate}&endDate=${endDate}`;
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to export PDF file');
+
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            const filename = contentDisposition?.split('filename=')[1] || `report_${startDate}_to_${endDate}.pdf`;
+
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename.replace(/"/g, '');  // Xóa dấu ngoặc kép nếu có
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+        }
+    } else {
         alert('Please select a start and end date');
-        return;
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-
-      // Kiểm tra xem endDate có vượt quá ngày hiện tại không
-      if (endDate > today) {
-        alert('End date cannot be greater than today');
-        return;
-      }
-
-      // Kiểm tra xem endDate có nhỏ hơn startDate không
-      if (endDate < startDate) {
-        alert('End date cannot be earlier than start date');
-        return;
-      }
-
-      // Gọi API để xuất PDF
-      const url = `http://127.0.0.1:3000/api/report/export-pdf?startDate=${startDate}&endDate=${endDate}`;
-      window.open(url, '_blank'); // Mở file PDF trong tab mới hoặc tải về
     }
+}
+
 
     const chartColors = {
       'Income': 'rgba(255, 99, 132, 0.3)',     // Màu hồng
