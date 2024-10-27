@@ -86,7 +86,7 @@
                                   <button type="button" class="btn btn-link btn-primary btn-lg" onclick="redirectToEdit('<%= material._id %>')">
                                         <i class="fa fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-link btn-danger"  onclick="confirmDeleteEmployee('<%= material._id %>', '<%= material.name %>');">
+                                    <button type="button" class="btn btn-link btn-danger"  onclick="confirmDeleteMaterial('<%= material._id %>', '<%= material.name %>');">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
@@ -126,7 +126,7 @@
 <script type="module" src="../js/apiFetchUtils.js"></script>
 <script type="module">
     import { apiFetch } from '../js/apiFetchUtils.js';
-    async function confirmDeleteEmployee(materialId, materialName) {
+    async function confirmDeleteMaterial(materialId, materialName) {
         swal({
             title: "Are you sure?",
             text: `Do you really want to delete ${materialName}?`,
@@ -144,14 +144,8 @@
                             body: JSON.stringify(updatedMaterial),
                         }
                     );
-
-                    if (response.ok) {
-                        swal("Material status updated to Delete successfully!", { icon: "success" })
-                            .then(() => window.location.reload());
-                    } else {
-                        const errorData = await response;
-                        swal("Failed to delete material", errorData.message, "error");
-                    }
+                    swal("Material status updated to Delete successfully!", { icon: "success" })
+                    .then(() => window.location.reload());
                 } catch (error) {
                     swal("Error", "An error occurred while deleting the material.", "error");
                 }
@@ -160,6 +154,7 @@
             }
         });
     }
+    window.confirmDeleteMaterial = confirmDeleteMaterial
 </script>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
