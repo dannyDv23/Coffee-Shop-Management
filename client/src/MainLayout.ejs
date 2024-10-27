@@ -912,17 +912,5 @@
       }
     </script>
 
-    <script>
-      window.onload = function () {
-        // Check if the token exists in localStorage
-        const token = localStorage.getItem('accessToken');
-
-        // If the token does not exist, redirect to the login page
-        if (!token) {
-          window.location.href = '/login'; // Adjust this URL to your actual login page
-        }
-      };
-    </script>
-
   </body>
 </html>

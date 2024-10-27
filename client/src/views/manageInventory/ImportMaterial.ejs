@@ -74,7 +74,9 @@
   </div>
 </div>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
   document.getElementById('importMaterialForm').addEventListener('submit', async function (event) {
   event.preventDefault();
 
@@ -111,20 +113,10 @@
 
   // Send the data to the API
   try {
-    const response = await fetch('http://localhost:3000/api/material', {
+    const responseData = await apiFetch('http://localhost:3000/api/material', {
       method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(materialData)
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error while importing material.');
-    }
-
-    const responseData = await response.json();
     console.log('Material imported successfully:', responseData);
 
     // Optionally, redirect or show a success message
