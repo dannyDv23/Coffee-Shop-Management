@@ -215,8 +215,8 @@ const employeeData = [
 ];
 
 const equipmentData = [
-  { name: 'Coffee Machine', quantity: 5, price: 300, totalPrice: 1500, date: new Date(), status: 'Active' },
-  { name: 'Oven', quantity: 2, price: 500, totalPrice: 1000, date: new Date(), status: 'Pending' }
+  { name: 'Coffee Machine', quantity: 5, price: 300, totalPrice: 1500, date: new Date() },
+  { name: 'Oven', quantity: 2, price: 500, totalPrice: 1000, date: new Date() }
 ];
 
 const materialData = [

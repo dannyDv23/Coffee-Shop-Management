@@ -47,7 +47,7 @@
                     <th>Price</th>
                     <th>Total Price</th>
                     <th>Date</th>
-                    <th>Status</th>
+                    
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -69,9 +69,7 @@
                         <td data-label="Date">
                             <%= new Date(equipment.date).toLocaleDateString() %>
                         </td>
-                        <td data-label="Status">
-                            <%= equipment.status %>
-                        </td>
+                       
                         <td data-label="Actions">
                             <button class="btn btn-warning btn-sm"
                                 onclick="navigateToUpdate('<%= equipment._id %>')">Update</button>
