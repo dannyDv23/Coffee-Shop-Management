@@ -114,7 +114,7 @@ const getBudgetTable = async (req, res) => {
 // Hàm lấy lịch sử chi phí từ bảng historymoneys
 const getExpenseHistory = async (req, res) => {
   try {
-    const expenses = await HistoryMoney.find({}).select('name money date -_id').exec();
+    const expenses = await HistoryMoney.find({}).select('name money date').exec();
     res.status(200).json(expenses);
   } catch (err) {
     console.error('Error in getExpenseHistory:', err);
@@ -122,7 +122,34 @@ const getExpenseHistory = async (req, res) => {
   }
 };
 
+// Hàm cập nhật chi phí
+const updateExpense = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, money } = req.body;
+    await HistoryMoney.findByIdAndUpdate(id, { name, money });
+    res.status(200).json({ message: 'Expense updated successfully' });
+  } catch (err) {
+    console.error('Error in updateExpense:', err);
+    res.status(500).json({ error: 'Cannot update expense' });
+  }
+};
+
+// Hàm xóa chi phí
+const deleteExpense = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await HistoryMoney.findByIdAndDelete(id);
+    res.status(200).json({ message: 'Expense deleted successfully' });
+  } catch (err) {
+    console.error('Error in deleteExpense:', err);
+    res.status(500).json({ error: 'Cannot delete expense' });
+  }
+};
+
 module.exports = {
   getBudgetTable,
   getExpenseHistory,
+  updateExpense,
+  deleteExpense,
 };

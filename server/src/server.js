@@ -65,14 +65,14 @@ rootRouter.use(express.json());
 rootRouter.use("/auth", authRouter);
 rootRouter.use("/equipments", equipmentRouter);
 rootRouter.use("/sales", salesRouter);
-rootRouter.use("/employee", auth(["Admin"]), manageEmployeeRouter);
+rootRouter.use("/employee", manageEmployeeRouter);
 rootRouter.use("/menu", auth(["Admin"]), menuRouter);
 rootRouter.use("/material", auth(["Admin"]), materialRouter);
-rootRouter.use("/report", reportRoutes); // Report routes
-rootRouter.use("/table",  auth(["Admin", "Employee"]), tableRouter);
-rootRouter.use("/budget", BudgetRouter); // Budget routes
-rootRouter.use("/expenses", ExpenseRouter); // Expense routes
-rootRouter.use("/backup", BackupRouter); //Backup routes
+rootRouter.use("/table", auth(["Admin", "Employee"]), tableRouter);
+rootRouter.use("/report", auth(["Admin"]), reportRoutes); // Report routes
+rootRouter.use("/budget", auth(["Admin"]), BudgetRouter); // Budget routes
+rootRouter.use("/expenses", auth(["Admin"]), ExpenseRouter); // Expense routes
+rootRouter.use("/backup", auth(["Admin"]), BackupRouter); //Backup routes
 rootRouter.use("/order", auth(["Admin", "Employee"]), orderRouter);
 rootRouter.use("/booking", auth(["Admin", "Employee"]), bookingRouter);
 rootRouter.use("/product", productRouter);
