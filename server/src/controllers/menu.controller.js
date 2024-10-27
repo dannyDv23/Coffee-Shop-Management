@@ -9,9 +9,8 @@ const createNewProduct = catchAsync(async (req, res) => {
         name: req.body?.name,
         price: req.body?.price,
         status: 'Available',
-        material: req.body?.material
+        material: req.body?.materials
       };
-
         const product = await productService.createProduct(productBody);
         res.status(201).json(product);
 })

@@ -218,30 +218,33 @@
     });
 
     // Function to load materials into the table
-    function loadMaterials() {
-        const tableBody = document.getElementById('materialTableBody');
-        tableBody.innerHTML = ''; // Clear existing rows
+    // Function to load materials into the table
+function loadMaterials() {
+    const tableBody = document.getElementById('materialTableBody');
+    tableBody.innerHTML = ''; // Clear existing rows
 
-        materials.forEach((material, index) => {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>${material.name}</td>
-                <td>${material.quantity}</td>
-                <td>${material.unit}</td>
-                <td>
-                    <div class="form-button-action">
-                        <button type="button" class="btn btn-link btn-primary btn-lg" onclick="editRow(${index})">
-                            <i class="fa fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-link btn-danger" onclick="removeRow(${index})">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tableBody.appendChild(newRow);
-        });
-    }
+    materials.forEach((material, index) => {
+        const newRow = document.createElement('tr');
+        newRow.setAttribute('data-id', material.id); // Store material ID in row data attribute
+        newRow.setAttribute('data-quantity', material.quantity);
+        newRow.innerHTML = `
+            <td>${material.name}</td>
+            <td>${material.quantity}</td>
+            <td>${material.unit}</td>
+            <td>
+                <div class="form-button-action">
+                    <button type="button" class="btn btn-link btn-primary btn-lg" onclick="editRow(${index})">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-link btn-danger" onclick="removeRow(${index})">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+    });
+}
 
     // Function to remove a row
     function removeRow(index) {
@@ -282,54 +285,51 @@
     }
 </script>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
     document.getElementById('submitFormButton').addEventListener('click', function (event) {
-        // Prevent default behavior
-        event.preventDefault();
+    // Prevent default behavior
+    event.preventDefault();
 
-        // Collect form data
-        const productName = document.getElementById('name-product').value;
-        const productPrice = document.getElementById('price-product').value;
-        const materials = [];
+    // Collect form data
+    const productName = document.getElementById('name-product').value;
+    const productPrice = document.getElementById('price-product').value;
+    const materials = [];
 
-        // Collect materials from the table
-        const materialRows = document.querySelectorAll('#materialTableBody tr');
-        materialRows.forEach(row => {
-            const materialName = row.querySelector('td:nth-child(1)').textContent;
-            const quantity = row.querySelector('td:nth-child(2)').textContent;
-            const unit = row.querySelector('td:nth-child(3)').textContent;
+    // Collect materials from the table
+    const materialRows = document.querySelectorAll('#materialTableBody tr');
+    materialRows.forEach(row => {
+        const materialId = row.getAttribute('data-id'); // Get material ID from data attribute
+        const quantity = row.querySelector('td:nth-child(2)').textContent;
 
-            materials.push({ materialName, quantity, unit });
-        });
-
-        // Create data object
-        const data = {
-            name: productName,
-            price: productPrice,
-            materials: materials
-        };
-
-        console.log(data)
-
-        // Send data via AJAX POST request
-        fetch('http://localhost:3000/api/menu', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            // Handle success
-            console.log('Success:', result);
-            location.reload();
-            alert('Data submitted successfully');
-        })
-        .catch(error => {
-            // Handle error
-            console.error('Error:', error);
-            alert('There was an error submitting the data');
-        });
+        materials.push({ materialId, quantityUsed: quantity }); // Push material ID and quantity
     });
+
+    // Create data object
+    const data = {
+        name: productName,
+        price: productPrice,
+        materials: materials
+    };
+
+    console.log("data", data);
+
+    // Send data via AJAX POST request
+    apiFetch('http://localhost:3000/api/menu', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+    .then(result => {
+        // Handle success
+        console.log('Success:', result);
+        location.reload();
+        alert('Data submitted successfully');
+    })
+    .catch(error => {
+        // Handle error
+        console.error('Error:', error);
+        alert('There was an error submitting the data');
+    });
+});
 </script>
