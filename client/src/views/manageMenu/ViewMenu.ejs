@@ -43,77 +43,78 @@
                                 </div>
                             </td>
                         </tr>
-                        <% }) %>
+                    <% }) %>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-    <script>
-        // Search function to filter table by name
-        function filterTable() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById('add-row');
-            const rows = table.getElementsByTagName('tr');
+<script>
+    // Search function to filter table by name
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('add-row');
+        const rows = table.getElementsByTagName('tr');
 
-            for (let i = 1; i < rows.length; i++) {  // Skip header row
-                const nameCell = rows[i].getElementsByClassName('material-name')[0];
-                if (nameCell) {
-                    const nameText = nameCell.textContent || nameCell.innerText;
-                    rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
-                }
+        for (let i = 1; i < rows.length; i++) {  // Skip header row
+            const nameCell = rows[i].getElementsByClassName('material-name')[0];
+            if (nameCell) {
+                const nameText = nameCell.textContent || nameCell.innerText;
+                rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
             }
         }
-    </script>
+    }
+</script>
 
-    <script>
-        function redirectToEdit(id) {
-            window.location.href = `/menu/edit?id=${id}`;
-        }
-    </script>
+<script>
+    function redirectToEdit(id) {
+        window.location.href = `/menu/edit?id=${id}`;
+    }
+</script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
 
-    <script>
-        async function confirmDeleteMenu(menuId, menuName) {
-            swal({
-                title: "Are you sure?",
-                text: `Do you really want to delete ${menuName}?`,
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            }).then(async (willDelete) => {
-                if (willDelete) {
-                    try {
-                        const updatedMaterial = { status: 'Delete' };
+    async function confirmDeleteMenu(menuId, menuName) {
+        swal({
+            title: "Are you sure?",
+            text: `Do you really want to delete ${menuName}?`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                try {
+                    const updatedMaterial = { status: 'Delete' };
 
-                        const response = await fetch(
-                            `http://localhost:3000/api/menu/${menuId}`,
-                            {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(updatedMaterial),
-                            }
-                        );
-
-                        if (response.ok) {
-                            swal("Menu status updated to Delete successfully!", {
-                                icon: "success",
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            const errorData = await response.json();
-                            swal("Failed to delete menu", errorData.message, "error");
+                    const response = await apiFetch(
+                        `http://localhost:3000/api/menu/${menuId}`,
+                        {
+                            method: 'PUT',
+                            body: JSON.stringify(updatedMaterial),
                         }
-                    } catch (error) {
-                        swal("Error", "An error occurred while deleting the menu.", "error");
-                    }
-                } else {
-                    swal("Action canceled", "The menu was not deleted.", "info");
-                }
-            });
-        }
-    </script>
+                    );
 
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+                    if (response) {
+                        swal("Menu status updated to Delete successfully!", {
+                            icon: "success",
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                } catch (error) {
+                    swal("Error", "An error occurred while deleting the menu.", "error");
+                }
+            } else {
+                swal("Action canceled", "The menu was not deleted.", "info");
+            }
+        });
+    }
+
+    // Attach the function to the window object so it's globally available
+    window.confirmDeleteMenu = confirmDeleteMenu;
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

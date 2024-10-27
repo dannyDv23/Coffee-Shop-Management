@@ -51,7 +51,9 @@
   </div>
 </div>
 
-<script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
   document.getElementById('submit-export').addEventListener('click', async function () {
     const selectedMaterialId = document.getElementById('material-selected').value;
     const quantity = document.getElementById('quantity-export').value;
@@ -64,19 +66,10 @@
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/material/export', {
+      const data = await apiFetch('http://localhost:3000/api/material/export', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(body)
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to export material.');
-      }
 
       console.log(data);
       // Show success alert and reload the page
