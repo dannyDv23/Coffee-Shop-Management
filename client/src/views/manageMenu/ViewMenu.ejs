@@ -1,0 +1,120 @@
+<div class="container my-4">
+    <!-- Search box -->
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name..."
+                    onkeyup="filterTable()">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="add-row" class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th style="width: 10%">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% menus.forEach((menu, index)=> { %>
+                        <tr>
+                            <td class="table-cell-fixed">
+                                <%= index + 1 %>
+                            </td>
+                            <td class="table-cell-fixed material-name">
+                                <%= menu.name %>
+                            </td>
+                            <td class="table-cell-fixed">
+                                <%= menu.price %>
+                            </td>
+                            <td>
+                                <div class="form-button-action">
+                                    <button type="button" class="btn btn-link btn-primary btn-lg"
+                                        onclick="redirectToEdit('<%= menu._id %>')">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-link btn-danger"
+                                        onclick="confirmDeleteMenu('<%= menu._id %>', '<%= menu.name %>');">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search function to filter table by name
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('add-row');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {  // Skip header row
+            const nameCell = rows[i].getElementsByClassName('material-name')[0];
+            if (nameCell) {
+                const nameText = nameCell.textContent || nameCell.innerText;
+                rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
+            }
+        }
+    }
+</script>
+
+<script>
+    function redirectToEdit(id) {
+        window.location.href = `/menu/edit?id=${id}`;
+    }
+</script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
+
+    async function confirmDeleteMenu(menuId, menuName) {
+        swal({
+            title: "Are you sure?",
+            text: `Do you really want to delete ${menuName}?`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                try {
+                    const updatedMaterial = { status: 'Delete' };
+
+                    const response = await apiFetch(
+                        `http://localhost:3000/api/menu/${menuId}`,
+                        {
+                            method: 'PUT',
+                            body: JSON.stringify(updatedMaterial),
+                        }
+                    );
+
+                    if (response) {
+                        swal("Menu status updated to Delete successfully!", {
+                            icon: "success",
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                } catch (error) {
+                    swal("Error", "An error occurred while deleting the menu.", "error");
+                }
+            } else {
+                swal("Action canceled", "The menu was not deleted.", "info");
+            }
+        });
+    }
+
+    // Attach the function to the window object so it's globally available
+    window.confirmDeleteMenu = confirmDeleteMenu;
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

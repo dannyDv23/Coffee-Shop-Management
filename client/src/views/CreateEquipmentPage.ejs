@@ -1,0 +1,90 @@
+<div class="page-inner">
+    <h1 class="mb-4">Create New Equipment</h1>
+    <form onsubmit="createEquipment(event)">
+        <div class="form-group mb-3">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="quantity">Quantity</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="price">Price</label>
+            <input type="number" class="form-control" id="price" name="price" required>
+        </div>
+        <div class="form-group mb-3">
+            <label for="date">Date</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+    <div id="error" class="error-message text-danger mt-2"></div>
+    <div id="success" class="success-message text-success mt-2"></div>
+</div>
+<script>
+    window.onload = function () {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+            const userRole = getRoleFromToken(token);
+            redirectUserByRole(userRole);
+        }
+    };
+    async function createEquipment(event) {
+        event.preventDefault();
+        const quantity = parseInt(document.getElementById("quantity").value);
+        if (quantity <= 0) {
+            document.getElementById("error").textContent = "Quantity must be a positive number.";
+            return;
+        }
+        const price = parseFloat(document.getElementById("price").value);
+        if (price <= 0) {
+            document.getElementById("error").textContent = "Price must be a positive number.";
+            return;
+        }
+        const totalPrice = price * quantity;
+        try {
+            const response = await fetch("http://127.0.0.1:3000/api/equipments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+                body: JSON.stringify({
+                    name: document.getElementById("name").value,
+                    quantity: document.getElementById("quantity").value,
+                    price: document.getElementById("price").value,
+                    totalPrice,
+                    date: document.getElementById("date").value,
+                    status: document.getElementById("status").value,
+                }),
+            })
+            const result = await response.json();
+            if (response.status === 201) {
+                document.getElementById("success").textContent = "Equipment created successfully.";
+                window.location.href = `/equipment/view-all`;
+            } else {
+                document.getElementById("error").textContent = result.message;
+            }
+        } catch (error) {
+            document.getElementById("error").textContent =
+                "An unexpected error occurred.";
+        }
+    }
+    function getRoleFromToken(token) {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split("")
+                .map(function (c) {
+                    return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join("")
+        );
+        const decodedToken = JSON.parse(jsonPayload);
+
+        return decodedToken.sub.role;
+    }
+</script>

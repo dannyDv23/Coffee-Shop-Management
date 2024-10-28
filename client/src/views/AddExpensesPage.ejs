@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Expense</title>
+  <style>
+    .form-container {
+      width: 900px;
+      margin: 0 auto;
+      padding: 50px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color:#362c5f
+    }
+
+    .form-container input, .form-container button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .form-container .back-button {
+      background-color: #362c5f;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+  </style>
+  </head>
+  <body>
+    <br><br>
+    <div class="form-container">
+      <h2>Add Expense</h2>
+      <label for="name">Expense Name:</label>
+      <input type="text" id="name" name="name" placeholder="Enter expense name" required>
+  
+      <label for="money">Amount:</label>
+      <input type="number" id="money" name="money" placeholder="Enter amount" required>
+  
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" required >
+      <!-- <input type="date" id="date" name="date" required disabled> -->
+      <button onclick="addExpense()">Add Expense</button> 
+      <a href="/budget" class="back-button">Back to Budget Management</a>
+    </div>
+    
+  
+    <script>
+    //     document.addEventListener('DOMContentLoaded', () => {
+    //   const dateInput = document.getElementById('date');
+    //   const today = new Date().toISOString().split('T')[0];
+    //   dateInput.value = today;
+    // });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('date');
+      const today = new Date().toISOString().split('T')[0];
+    //  dateInput.value = today;
+      dateInput.setAttribute('max', today);
+    });
+
+      async function addExpense() {
+        const name = document.getElementById('name').value;
+        const money = document.getElementById('money').value;
+        const date = document.getElementById('date').value;
+  
+        if (!name || !money || !date) {
+          alert('Please fill in all fields with valid values');
+          return;
+        }
+        if (money <= 0) {
+        alert('Amount must be a positive number');
+        return;
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      if (date > today) {
+        alert('Date cannot be in the future');
+        return;
+      }
+  
+        try {
+          const token = localStorage.getItem("accessToken");
+          const response = await fetch('http://127.0.0.1:3000/api/expenses/add-expenses', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name, money, date })
+          });
+  
+          if (!response.ok) {
+            throw new Error('Failed to add expense');
+          }
+  
+          const data = await response.json();
+          alert(data.message);
+           // Xóa dữ liệu trong các input sau khi thêm thành công
+        document.getElementById('name').value = '';
+        document.getElementById('money').value = '';
+        document.getElementById('date').value = '';
+        // document.getElementById('date').value = today;
+      } catch (error) {
+        console.error('Error adding expense:', error);
+        // alert('Cannot add expense');
+      }
+    }
+  </script>
+</body>
+</html>

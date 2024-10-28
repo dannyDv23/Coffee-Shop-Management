@@ -1,26 +1,22 @@
-# Log file
-*.log
-
-# Package Files #
-*.zip
-*.tar.gz
-*.rar
-*.7z
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-server/node_modules
-client/node_modules
+/node_modules
 /.pnp
 .pnp.js
 
 # testing
 /coverage
 
+src/uploads
+src/logs
+
 # production
-client/dist
+/build
 
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -29,7 +25,3 @@ client/dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-server/package-lock.json
-client/package-lock.json
-combined.csv
-/server/src/routes/job/uploads

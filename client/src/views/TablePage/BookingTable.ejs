@@ -1,0 +1,187 @@
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+
+            <!-- Pass `listTableSelected` as a JSON string into the data attribute -->
+            <div class="row row-demo-grid">
+                <% listTable.forEach(data => { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info book-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
+   document.querySelectorAll('.book-table-button').forEach(button => {
+    button.addEventListener('click', function () {
+        const tableNumber = button.getAttribute('data-table');
+
+        // Get current date for the default date input
+        const today = new Date().toISOString().split('T')[0];  // Format: YYYY-MM-DD
+
+        // Create the HTML for the form, including the selection for booking status
+        const reservationForm = `
+            <div style="margin-top: 10px;">
+                <strong>Customer Name:</strong>
+                <input id="customerName" class="form-control" type="text" placeholder="Input Customer Name" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-top: 10px;">
+                <strong>Phone Number:</strong>
+                <input id="customerPhone" class="form-control" type="tel" placeholder="Input Phone Number" pattern="[0-9]{10}" title="Please enter a 10-digit phone number" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-top: 10px;">
+                <strong>Date:</strong>
+                <input id="reservationDate" class="form-control" type="date" value="${today}" min="${today}" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-top: 10px;">
+                <strong>Time:</strong>
+                <input id="reservationTime" class="form-control" type="time" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-top: 10px;">
+                <strong>Status:</strong>
+                <select id="bookingStatus" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+                    <option value="Now">Now</option>
+                    <option value="Appointment">Appointment</option>
+                </select>
+            </div>
+        `;
+
+        const content = document.createElement('div');
+        content.innerHTML = reservationForm;
+
+        swal({
+            title: `Booking Table ${tableNumber}`, // Custom title for the table
+            content: content,  // Inject the form content
+            buttons: {
+                confirm: {
+                    text: "Booking",  // Button text for confirming
+                    className: "btn btn-success",
+                },
+                cancel: {
+                    text: "Cancel",  // Button text for canceling
+                    className: "btn btn-danger",
+                    visible: true,
+                },
+            },
+        }).then((confirmBooking) => {
+            if (confirmBooking) {
+                // Step 1: Capture form values
+                const name = document.getElementById('customerName').value;
+                const phone = document.getElementById('customerPhone').value;
+                const date = document.getElementById('reservationDate').value;
+                const time = document.getElementById('reservationTime').value;
+                const status = document.getElementById('bookingStatus').value;
+
+                // Phone number validation (for example, check if it's a 10-digit number)
+                const phonePattern = /^[0-9]{10}$/;
+                if (!phonePattern.test(phone)) {
+                    swal({
+                        title: "Invalid Phone Number!",
+                        text: "Please enter a valid 10-digit phone number.",
+                        icon: "warning",
+                        buttons: {
+                            confirm: {
+                                className: "btn btn-warning",
+                            },
+                        },
+                    });
+                    return; // Stop execution if the phone number is invalid
+                }
+
+                // Determine statusBooking and statusTable based on the user's selection
+                let statusBooking, statusTable;
+                if (status === 'Now') {
+                    statusBooking = 'Now';
+                    statusTable = 'Available';
+                } else if (status === 'Appointment') {
+                    statusBooking = 'Appointment';
+                    statusTable = 'Booked';
+                }
+
+                // Step 2: Create booking data object
+                const bookingData = {
+                    customerName: name,
+                    phoneNumber: phone,
+                    date: date,
+                    time: time,
+                    tableNumber: tableNumber,
+                    statusBooking: statusBooking,  // Include the status of the booking
+                    statusTable: statusTable  // Include the status of the table
+                };
+
+                // Step 3: Post the data to the API
+                apiFetch('http://localhost:3000/api/table/booking', {  // Replace with your actual API endpoint
+                    method: 'POST',
+                    body: JSON.stringify(bookingData),
+                })
+                .then(data => {
+                    if (data.message === 'Booking created successfully') {
+                        swal({
+                            title: "Success!",
+                            text: `Table has been booked for ${name}, Phone: ${phone}, Date: ${date}, Time: ${time}, Status: ${status}`,
+                            icon: "success",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-success",
+                                },
+                            },
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        // Handle case if booking fails
+                        swal({
+                            title: "Booking Failed!",
+                            text: data.message || 'Something went wrong!',
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-danger",
+                                },
+                            },
+                        });
+                    }
+                })
+                .catch(error => {
+                    // Handle network or server errors
+                    swal({
+                        title: "Error!",
+                        text: "Could not book the table, please try again later.",
+                        icon: "error",
+                        buttons: {
+                            confirm: {
+                                className: "btn btn-danger",
+                            },
+                        },
+                    });
+                    console.error('Error:', error);
+                });
+            } else {
+                swal.close();
+            }
+        });
+    });
+});
+
+</script>

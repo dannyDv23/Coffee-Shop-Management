@@ -1,0 +1,93 @@
+<div class="page-inner">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Table Manager</div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title mt-3">
+                <%= titleTab %>
+            </h4>
+            <div class="row row-demo-grid">
+                <% listTable.forEach(data=> { %>
+                    <div class="col-xl-4 mb-3">
+                        <div class="card text-center">
+                            <button type="button" class="btn btn-info cancel-table-button"
+                                data-table="<%= data.tableNumber %>" data-status="<%= data.status %>">
+                                <h4>
+                                    Table <%= data.tableNumber %>
+                                </h4>
+                                <div class="table-status fw-bold">(<%= data.status %>)</div>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script  type="module">
+     import { apiFetch } from '../js/apiFetchUtils.js';
+    document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.cancel-table-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const tableNumber = button.getAttribute('data-table');
+            swal({
+                title: `Table ${tableNumber}?`,
+                text: "Are you sure you want to cancel this table?",
+                icon: "warning",
+                buttons: {
+                    confirm: {
+                        text: "Yes, cancel it!",
+                        className: "btn btn-success",
+                        value: "Delete",
+                    },
+                    cancel: {
+                        visible: true,
+                        className: "btn btn-danger",
+                    },
+                },
+            }).then((value) => {
+                if (value === "Delete") {
+                    console.log(`Attempting to cancel table: ${tableNumber}`);
+                    apiFetch(`http://localhost:3000/api/table/cancel/${tableNumber}`, {
+                        method: 'PUT'
+                    })
+                    .then(data => {
+                        console.log("Data received:", data);
+                        swal({
+                            title: "Canceled!",
+                            text: "Table has been canceled.",
+                            icon: "success",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-success",
+                                },
+                            },
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error during fetch:", error);
+                        swal({
+                            title: "Error!",
+                            text: "There was a problem canceling the table. Please try again.",
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-danger",
+                                },
+                            },
+                        });
+                    });
+                } else {
+                    swal.close();
+                }
+            });
+        });
+    });
+});
+</script>
