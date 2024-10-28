@@ -46,12 +46,20 @@ deploy_to_server:
     #   "
     - sudo npm install -g nodemon
     - sudo -u coffeeshop bash -c "
+        
         cd /datas/coffeeshop/server &&
         npm install &&
         npm install nodemon --save-dev &&
         chmod 644 .env &&
         pm2 stop coffee-shop &&  
         pm2 start index.js --name coffee-shop -- run start -f
+        
+        cd /datas/coffeeshop/client/src &&
+        npm install &&
+        npm install nodemon --save-dev &&
+        chmod 644 .env &&
+        pm2 stop coffee-shop-client &&
+        pm2 start app.js --name coffee-shop-client -- run start -f
 
       "
 
