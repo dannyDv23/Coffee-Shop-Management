@@ -51,14 +51,27 @@
       <input type="number" id="money" name="money" placeholder="Enter amount" required>
   
       <label for="date">Date:</label>
-      <input type="date" id="date" name="date" required>
-  
-      <button onclick="addExpense()">Add Expense</button>
+      <input type="date" id="date" name="date" required >
+      <!-- <input type="date" id="date" name="date" required disabled> -->
+      <button onclick="addExpense()">Add Expense</button> 
       <a href="/budget" class="back-button">Back to Budget Management</a>
     </div>
     
   
     <script>
+    //     document.addEventListener('DOMContentLoaded', () => {
+    //   const dateInput = document.getElementById('date');
+    //   const today = new Date().toISOString().split('T')[0];
+    //   dateInput.value = today;
+    // });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('date');
+      const today = new Date().toISOString().split('T')[0];
+    //  dateInput.value = today;
+      dateInput.setAttribute('max', today);
+    });
+
       async function addExpense() {
         const name = document.getElementById('name').value;
         const money = document.getElementById('money').value;
@@ -72,12 +85,20 @@
         alert('Amount must be a positive number');
         return;
       }
+      
+      const today = new Date().toISOString().split('T')[0];
+      if (date > today) {
+        alert('Date cannot be in the future');
+        return;
+      }
   
         try {
+          const token = localStorage.getItem("accessToken");
           const response = await fetch('http://127.0.0.1:3000/api/expenses/add-expenses', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({ name, money, date })
           });
@@ -92,9 +113,10 @@
         document.getElementById('name').value = '';
         document.getElementById('money').value = '';
         document.getElementById('date').value = '';
+        // document.getElementById('date').value = today;
       } catch (error) {
         console.error('Error adding expense:', error);
-        alert('Cannot add expense');
+        // alert('Cannot add expense');
       }
     }
   </script>

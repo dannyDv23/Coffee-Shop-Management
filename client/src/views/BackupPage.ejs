@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,4 +16,110 @@
         }
     </script>
 </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Backup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #362c5f;
+            margin-bottom: 20px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .btn-backup {
+            background-color: #362c5f;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-backup:hover {
+            background-color: #2d234c;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-backup i {
+            margin-right: 10px;
+            color: #ffffff; /* Màu biểu tượng trên nút Sao Lưu */
+        }
+
+        .database-icon {
+            font-size: 3rem;
+            color: #362c5f; /* Màu của biểu tượng database */
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-database database-icon"></i>
+        <div class="title">Backup Data</div>
+        <p class="description">Oversee the organization and control of business-related data <br>
+            Click the button below to back up all the necessary data for safekeeping.</p>
+        <button class="btn-backup" onclick="backupData()">
+            <i class="fas fa-cloud-download-alt"></i> Back Up
+        </button>
+    </div>
+
+    <script>
+        async function backupData() {
+            const token = localStorage.getItem("accessToken");
+            const url = 'http://127.0.0.1:3000/api/backup/backup-data';
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch backup data');
+
+                // Tạo một URL từ nội dung response để tải xuống file
+                const blob = await response.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+
+                // Tạo thẻ <a> để tải file
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = 'backup_data.txt';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(downloadUrl); // Hủy URL blob sau khi tải
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Backup failed. Please try again.');
+            }
+        }
+    </script>
+</body>
 </html>
+
+

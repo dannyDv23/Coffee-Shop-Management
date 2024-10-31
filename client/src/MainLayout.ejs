@@ -65,6 +65,7 @@
                 { name: "Cancel table", link: "/table/cancel" },
                 { name: "Choose menu", link: "/table/chooseMenu" },
                 { name: "Booking table", link: "/table/booking" },
+                { name: "Manage Booking table", link: "/table/managerBooking" },
                 { name: "Payment", link: "/table/payment" },
                 { name: "Print settings", link: "/table/print" },
               ],
@@ -203,7 +204,7 @@
               
               <ul class="nav">
                 <% menuItems.forEach((item, index) => { %>
-                  <li class="nav-item">
+                  <li class="nav-item menu-item" data-management="<%= item.managementName %>">
                     <a data-bs-toggle="collapse" href="#base<%= index %>">
                       <i class="<%= item.icon %>"></i>
                       <p><%= item.managementName %></p>
@@ -223,6 +224,7 @@
                   </li>
                 <% }) %>
               </ul>
+              
             </ul>
           </div>
         </div>
@@ -236,7 +238,7 @@
             <div class="logo-header" data-background-color="dark">
               <a href="index.html" class="logo">
                 <img
-                  src="/img/kaiadmin/logo_light.svg"
+                  src="/img/logo.png"
                   alt="navbar brand"
                   class="navbar-brand"
                   height="20"
@@ -553,8 +555,37 @@
                     </div>
                     <span class="profile-username">
                       <span class="op-7">Hi,</span>
-                      <span class="fw-bold">Hizrian</span>
+                      <span id="role-display"></span>
                     </span>
+                    
+                    <script>
+                      window.addEventListener('load', function() {
+                        const name = localStorage.getItem("name");
+                        const userRole = localStorage.getItem("role");
+                        if (name) {
+                          document.getElementById("role-display").textContent = name;
+                        } else {
+                          document.getElementById("role-display").textContent = "Guest"; // Fallback if no role is set
+                        }
+                        // Get all the menu items by their data attribute
+                        const navItems = document.querySelectorAll('.menu-item');
+                        navItems.forEach(item => {
+                          const managementName = item.getAttribute('data-management');
+
+                          if (userRole === 'Admin') {
+                            item.style.display = 'block';
+                          } else if (userRole === 'Employee') {
+                            if (managementName !== 'Sales') {
+                              item.style.display = 'none';
+                            } else {
+                              item.style.display = 'block'; 
+                            }
+                          }
+                        });
+
+                      });
+                    </script>
+
                   </a>
                   <ul class="dropdown-menu dropdown-user animated fadeIn">
                     <div class="dropdown-user-scroll scrollbar-outer">
@@ -568,11 +599,10 @@
                             />
                           </div>
                           <div class="u-text">
-                            <h4>Hizrian</h4>
-                            <p class="text-muted">hello@example.com</p>
+                            <p class="col-md-6"></p>
                             <a
                               href="/profile"
-                              class="btn btn-xs btn-secondary btn-sm"
+                              class="btn btn-xs btn-secondary btn-sm align-center"
                               >View Profile</a
                             >
                           </div>
@@ -580,15 +610,10 @@
                       </li>
                       <li>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">My Profile</a>
-                        <a class="dropdown-item" href="#">My Balance</a>
-                        <a class="dropdown-item" href="#">Inbox</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Account Setting</a>
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" onclick="logoutUser()"
                           >Logout</a
                         >
+                        <div class="dropdown-divider"></div>
                       </li>
                     </div>
                   </ul>
@@ -886,5 +911,6 @@
         window.location.href = "/login";
       }
     </script>
+
   </body>
 </html>

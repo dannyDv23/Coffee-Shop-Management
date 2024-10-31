@@ -1,0 +1,147 @@
+<div class="container my-4">
+    <!-- Search box -->
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by customer name..." onkeyup="filterTable()">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="add-row" class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Customer Name</th>
+                        <th>Phone Number</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Table Number</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer Name</th>
+                        <th>Phone Number</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Table Number</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    <% infoBooking.forEach((bookingInfo, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td class="customer-name"><%= bookingInfo.customerName %></td>
+                            <td><%= bookingInfo.phoneNumber %></td>
+                            <td><%= new Date(bookingInfo.date).toISOString().substring(0, 10) %></td>
+                            <td><%= bookingInfo.time %></td>
+                            <td><%= bookingInfo.tableId[0].tableNumber %></td>
+                            <td id="status-<%= bookingInfo._id %>"><%= bookingInfo.status %></td>
+                            <td><%= bookingInfo.reason %></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-link btn-primary btn-lg" onclick="openStatusSwal('<%= bookingInfo._id %>', '<%= bookingInfo.customerName %>', '<%= bookingInfo.status %>')">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-link btn-danger" onclick="confirmDeleteBooking('<%= bookingInfo._id %>', '<%= bookingInfo.customerName %>');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Search filter script -->
+<script>
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('add-row');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {  // Skip header row
+            const nameCell = rows[i].getElementsByClassName('customer-name')[0];
+            if (nameCell) {
+                const nameText = nameCell.textContent || nameCell.innerText;
+                rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
+            }
+        }
+    }
+
+    // Function to open SweetAlert for updating status
+    function openStatusSwal(bookingId, customerName, currentStatus) {
+        const statusOptions = ["Cancelled", "Completed", "Now"];
+        
+        swal({
+            title: `Update status for ${customerName}`,
+            text: "Select a new status:",
+            content: {
+                element: "select",
+                attributes: {
+                    id: "statusSelect",
+                    innerHTML: statusOptions.map(option => `<option value="${option}" ${option === currentStatus ? 'selected' : ''}>${option}</option>`).join("")
+                }
+            },
+            buttons: {
+                cancel: "Cancel",
+                confirm: {
+                    text: "Save changes",
+                    closeModal: false
+                }
+            }
+        }).then((willConfirm) => {
+            if (willConfirm) {
+                const status = document.getElementById('statusSelect').value;
+                updateBookingStatus(bookingId, status);
+            } else {
+                // If the user cancels, close the modal without action
+                swal.close();
+            }
+        });
+    }
+
+    // Function to update the booking status
+    async function updateBookingStatus(bookingId, status) {
+        try {
+            const response = await fetch('http://localhost:3000/api/booking/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    bookingId: bookingId,
+                    status: status
+                })
+            });
+
+            if (response.ok) {
+                // Update status in the table
+                document.getElementById(`status-${bookingId}`).textContent = status;
+
+                // Show success message
+                swal("Success", "Booking status updated successfully!", "success");
+                window.location.reload()
+            } else {
+                const errorData = await response.json();
+                swal("Error", errorData.message, "error");
+            }
+        } catch (error) {
+            swal("Error", "An error occurred while updating the booking status.", "error");
+        }
+    }
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

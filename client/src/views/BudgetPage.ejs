@@ -31,8 +31,31 @@
       margin-top: 20px;
       margin-bottom: 10px;
       color: #362c5f;
+      
     }
-  
+    .back-button {
+      background-color: #362c5f;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    } 
+    button {
+      background-color: #362c5f;
+      color: white;
+      border: none;
+      padding: 5px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2d234c;
+    }
   </style>
 </head>
 <body>
@@ -82,11 +105,13 @@
                         <th>Name</th>
                         <th>Price</th>
                         <th>Date</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
                   </table>
                   <div id="totalExpense" class="total-expense"></div>
+                  <a href="/expenses" class="back-button">Add new expenses</a>
                 </div>
               </div>
             </div>
@@ -119,19 +144,35 @@
     }
 
     async function fetchBudgetTableData(startDate, endDate) {
-      try {
-        const response = await fetch(`http://127.0.0.1:3000/api/budget/budget-table?startDate=${startDate}&endDate=${endDate}`);
-        if (!response.ok) throw new Error('Failed to fetch budget table data');
-        const data = await response.json();
-        populateTable(data, 'reportTable');
-      } catch (error) {
-        console.error(error);
+        try {
+          const token = localStorage.getItem("accessToken");
+          const response = await fetch(
+            `http://127.0.0.1:3000/api/budget/budget-table?startDate=${startDate}&endDate=${endDate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok)
+            throw new Error("Failed to fetch budget table data");
+          const data = await response.json();
+          populateTable(data, "reportTable");
+        } catch (error) {
+          console.error(error);
+        }
       }
-    }
 
     async function fetchExpenseHistory() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/budget/expense-history');
+        const token = localStorage.getItem("accessToken");
+        const response = await fetch('http://127.0.0.1:3000/api/budget/expense-history', 
+        {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+        );
         if (!response.ok) throw new Error('Failed to fetch expense history');
         const data = await response.json();
         populateTable(data, 'expenseTable', true);
@@ -151,10 +192,22 @@
           const nameCell = document.createElement('td');
           const priceCell = document.createElement('td');
           const dateCell = document.createElement('td');
+          const actionCell = document.createElement('td');
           nameCell.textContent = row.name;
           priceCell.textContent = row.money.toLocaleString('en-US');
           dateCell.textContent = new Date(row.date).toLocaleDateString();
-          tableRow.append(nameCell, priceCell, dateCell);
+           // Nút Sửa
+           const editButton = document.createElement('button');
+          editButton.textContent = 'Edit';
+          editButton.onclick = () => editExpense(row._id);
+          actionCell.appendChild(editButton);
+          // Nút Xóa
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.onclick = () => deleteExpense(row._id);
+          actionCell.appendChild(deleteButton);
+
+          tableRow.append(nameCell, priceCell, dateCell, actionCell);
         } else {
           const categoryCell = document.createElement('td');
           const amountCell = document.createElement('td');
@@ -169,6 +222,77 @@
         tableBody.appendChild(tableRow);
       });
     }
+    async function editExpense(id) {
+  let newName = prompt("Enter new name for the expense:");
+  let newAmount = prompt("Enter new amount for the expense:");
+
+  // Ràng buộc dữ liệu
+  if (!newName || newName.trim() === "") {
+    alert("Expense name cannot be empty.");
+    return;
+  }
+  if (!newAmount || isNaN(newAmount) || Number(newAmount) <= 0) {
+    alert("Amount must be a valid number greater than 0.");
+    return;
+  }
+
+  // Loại bỏ khoảng trắng thừa
+  newName = newName.trim();
+  newAmount = Number(newAmount);
+
+  try {
+    const token = localStorage.getItem("accessToken");
+    const response = await fetch(`http://127.0.0.1:3000/api/budget/expense-history/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name: newName, money: newAmount }),
+    });
+    if (!response.ok) throw new Error('Failed to update expense');
+    fetchExpenseHistory();
+  } catch (error) {
+    console.error(error);
+    alert('Failed to update expense. Please try again later.');
+  }
+}
+
+
+    async function deleteExpense(id) {
+  // Xác nhận với người dùng trước khi xóa
+  if (confirm("Are you sure you want to delete this expense?")) {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      // Kiểm tra token
+      if (!token) {
+        alert("You need to log in to perform this action.");
+        return;
+      }
+
+      // Gọi API để xóa khoản chi
+      const response = await fetch(`http://127.0.0.1:3000/api/budget/expense-history/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // Kiểm tra phản hồi từ server
+      if (!response.ok) {
+        throw new Error('Failed to delete expense');
+      }
+
+      // Tải lại danh sách khoản chi sau khi xóa thành công
+      fetchExpenseHistory();
+    } catch (error) {
+      console.error("Error in deleteExpense:", error);
+      alert('Failed to delete the expense. Please try again.');
+    }
+  }
+}
+
 
     function displayTotalExpense(expenses) {
       const totalExpense = expenses.reduce((sum, expense) => sum + expense.money, 0);

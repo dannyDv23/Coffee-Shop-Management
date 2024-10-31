@@ -1,39 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const axios = require('axios');
+const addAuthHeaders = require('../middleware/auth');
+const { getMenuData, getMaterialsData, getMenuById } = require('../untils/menuUtils'); // Assuming you placed the helper functions in `menuService.js`
 
+// Apply authentication headers
+router.use(addAuthHeaders);
 
-
-// router.get('/', (req, res) => {
-//   res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ViewInventory")});
-// });
-
+// Route to view the menu
 router.get('/', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/menu');
-    const menu = response.data; // Extract data from the response
+    // Fetch menu data using helper function
+    const menu = await getMenuData(req);
 
+    // Render the view with the fetched menu data
     res.render('../MainLayout', { 
       bodyPage: path.join("views", "manageMenu", "ViewMenu"),
-      menus: menu 
+      menus: menu
     });
   } catch (err) {
-    console.error('Error fetching materials:', err);
-    res.status(500).send('Error fetching materials');
+    console.error('Error fetching menu:', err);
+    res.status(500).send('Error fetching menu');
   }
 });
 
-
+// Route to add a new menu
 router.get('/add', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/material');
-    console.log("🚀 ~ router.get ~ response:", response)
-    const material = response.data;
-    console.log("🚀 ~ router.get ~ material:", material)
+    // Fetch materials data using helper function
+    const materials = await getMaterialsData(req);
+
+    // Render the view with the fetched materials data
     res.render('../MainLayout', { 
       bodyPage: path.join("views", "manageMenu", "AddMenu"),
-      materials: material 
+      materials: materials 
     });
   } catch (err) {
     console.error('Error fetching materials:', err);
@@ -41,55 +41,33 @@ router.get('/add', async (req, res) => {
   }
 });
 
-
+// Route to edit a menu
 router.get('/edit', async (req, res) => {
   const id = req.query.id;
 
   try {
-    const responseMenu = await axios.get(`http://localhost:3000/api/menu/${id}`);
-    const responseMaterial = await axios.get('http://localhost:3000/api/material');
-    const menus = responseMenu.data;
-    const materials = responseMaterial.data;
+    // Fetch menu and materials data using helper functions
+    const menu = await getMenuById(req, id);
+    const materials = await getMaterialsData(req);
+    
 
-    // Pass the materials from the menus object directly
+    // Render the view with the fetched menu and materials data
     res.render('../MainLayout', {
       bodyPage: path.join('views', 'manageMenu', 'EditMenu'),
-      menus: menus,
+      menus: menu,
       materials: materials
     });
-  } catch (error) {
-    console.error('Error fetching menu details:', error);
+  } catch (err) {
+    console.error('Error fetching menu details:', err);
     res.status(500).send('Failed to fetch menu details');
   }
 });
 
-
-
+// Route to delete a menu
 router.get('/delete', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "ViewInventory")});
+  res.render('../MainLayout', { 
+    bodyPage: path.join("views", "manageInventory", "ViewInventory")
+  });
 });
-
-router.get('/find', (req, res) => {
-  res.render('../MainLayout', { bodyPage: path.join("views", "manageInventory", "FindMaterial")});
-});
-
-//example when call api
-// router.get('/', async (req, res) => {
-//   try {
-//       const newsAPI = await axios.get('http://localhost:3000/info/namphuong');
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           articles: newsAPI.data 
-//       });
-//   } catch (err) {
-//       console.error('Error fetching data:', err.message);
-//       res.render('../MainLayout', { 
-//           bodyPage: path.join('views', 'HomePage'),
-//           error: 'Error fetching data' 
-//       });
-//   }
-// });
-
-// Define other route relate to this router
 
 module.exports = router;

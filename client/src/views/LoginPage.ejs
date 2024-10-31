@@ -65,6 +65,8 @@
           const result = await response.json();
           if (response.ok) {
             localStorage.setItem("accessToken", result.tokens.access.token);
+            localStorage.setItem("name", result.employee.name);
+            localStorage.setItem("role", result.employee.role);
             const userRole = result.employee.role;
             redirectUserByRole(userRole);
           } else {
