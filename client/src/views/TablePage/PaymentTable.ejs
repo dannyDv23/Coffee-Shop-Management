@@ -39,10 +39,10 @@
             apiFetch(`http://localhost:3000/api/order/${tableNumber}`)
                 .then(data => {
                     // Assuming the API response structure is like your provided example
-                    console.log(data);
+                    console.log(data.infoOrder[0]);
                     let order = data.infoOrder[0];
                     let products = order.product;
-                    let totalPrice = order.price || 0;
+                    let totalPrice = 0;
 
                     // Generate the table rows dynamically based on product data
                     let productRows = '';
@@ -50,6 +50,7 @@
                         let { name, price } = item.productId;
                         let quantity = item.numberProduct;
                         let itemTotalPrice = price * quantity;
+                        totalPrice = totalPrice + itemTotalPrice;
                         productRows += `
                             <tr>
                                 <td>${name}</td>

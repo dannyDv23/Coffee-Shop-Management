@@ -3,7 +3,8 @@
     <div class="card">
         <div class="card-body">
             <div class="form-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search by customer name..." onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by customer name..."
+                    onkeyup="filterTable()">
             </div>
         </div>
 
@@ -36,28 +37,42 @@
                     </tr>
                 </tfoot>
                 <tbody>
-                    <% infoBooking.forEach((bookingInfo, index) => { %>
+                    <% infoBooking.forEach((bookingInfo, index)=> { %>
                         <tr>
-                            <td><%= index + 1 %></td>
-                            <td class="customer-name"><%= bookingInfo.customerName %></td>
-                            <td><%= bookingInfo.phoneNumber %></td>
-                            <td><%= new Date(bookingInfo.date).toISOString().substring(0, 10) %></td>
-                            <td><%= bookingInfo.time %></td>
-                            <td><%= bookingInfo.tableId[0].tableNumber %></td>
-                            <td id="status-<%= bookingInfo._id %>"><%= bookingInfo.status %></td>
-                            <td><%= bookingInfo.reason %></td>
+                            <td>
+                                <%= index + 1 %>
+                            </td>
+                            <td class="customer-name">
+                                <%= bookingInfo.customerName %>
+                            </td>
+                            <td>
+                                <%= bookingInfo.phoneNumber %>
+                            </td>
+                            <td>
+                                <%= new Date(bookingInfo.date).toISOString().substring(0, 10) %>
+                            </td>
+                            <td>
+                                <%= bookingInfo.time %>
+                            </td>
+                            <td>
+                                <%= bookingInfo.tableId[0].tableNumber %>
+                            </td>
+                            <td id="status-<%= bookingInfo._id %>">
+                                <%= bookingInfo.status %>
+                            </td>
+                            <td>
+                                <%= bookingInfo.reason %>
+                            </td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-link btn-primary btn-lg" onclick="openStatusSwal('<%= bookingInfo._id %>', '<%= bookingInfo.customerName %>', '<%= bookingInfo.status %>')">
+                                    <button type="button" class="btn btn-link btn-primary btn-lg"
+                                        onclick="openStatusSwal('<%= bookingInfo._id %>', '<%= bookingInfo.customerName %>', '<%= bookingInfo.status %>')">
                                         <i class="fa fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-link btn-danger" onclick="confirmDeleteBooking('<%= bookingInfo._id %>', '<%= bookingInfo.customerName %>');">
-                                        <i class="fa fa-trash"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                    <% }) %>
+                        <% }) %>
                 </tbody>
             </table>
         </div>
@@ -65,26 +80,25 @@
 </div>
 
 <!-- Search filter script -->
-<script>
-    function filterTable() {
-        const input = document.getElementById('searchInput');
-        const filter = input.value.toLowerCase();
-        const table = document.getElementById('add-row');
-        const rows = table.getElementsByTagName('tr');
+<script type="module" src="../js/apiFetchUtils.js"></script>
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
 
-        for (let i = 1; i < rows.length; i++) {  // Skip header row
-            const nameCell = rows[i].getElementsByClassName('customer-name')[0];
-            if (nameCell) {
-                const nameText = nameCell.textContent || nameCell.innerText;
-                rows[i].style.display = nameText.toLowerCase().includes(filter) ? '' : 'none';
-            }
-        }
+    function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#add-row tbody tr');
+
+        rows.forEach(row => {
+            const nameCell = row.querySelector('.customer-name');
+            const nameText = nameCell ? nameCell.textContent.toLowerCase() : '';
+            row.style.display = nameText.includes(input) ? '' : 'none';
+        });
     }
 
     // Function to open SweetAlert for updating status
     function openStatusSwal(bookingId, customerName, currentStatus) {
         const statusOptions = ["Cancelled", "Completed", "Now"];
-        
+
         swal({
             title: `Update status for ${customerName}`,
             text: "Select a new status:",
@@ -105,43 +119,27 @@
         }).then((willConfirm) => {
             if (willConfirm) {
                 const status = document.getElementById('statusSelect').value;
-                updateBookingStatus(bookingId, status);
+                const data = { bookingId, status };
+
+                apiFetch('http://localhost:3000/api/booking/update', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                }).then(data => {
+                    swal("Success", "Booking status updated successfully!", "success").then(() => {
+                        window.location.reload();
+                    });
+
+                }).catch(error => {
+                        console.error("Error updating booking:", error);
+                        swal("Error", "An error occurred while updating the booking status.", "error");
+                    });
             } else {
-                // If the user cancels, close the modal without action
                 swal.close();
             }
         });
     }
 
-    // Function to update the booking status
-    async function updateBookingStatus(bookingId, status) {
-        try {
-            const response = await fetch('http://localhost:3000/api/booking/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    bookingId: bookingId,
-                    status: status
-                })
-            });
-
-            if (response.ok) {
-                // Update status in the table
-                document.getElementById(`status-${bookingId}`).textContent = status;
-
-                // Show success message
-                swal("Success", "Booking status updated successfully!", "success");
-                window.location.reload()
-            } else {
-                const errorData = await response.json();
-                swal("Error", errorData.message, "error");
-            }
-        } catch (error) {
-            swal("Error", "An error occurred while updating the booking status.", "error");
-        }
-    }
+    window.openStatusSwal = openStatusSwal;
 </script>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

@@ -161,6 +161,7 @@
                             quantity: product.quantity
                         }));
 
+                       
                         const keepProduct = leftTableProducts;
                         if (!targetTableNumber || !customerName || !phoneNumber) {
                             swal("Please fill in all fields before proceeding.");
@@ -233,6 +234,7 @@
                                 rightTableProducts.push({ name: productName, quantity: inputQuantity });
                             }
 
+                            console.log(leftTableProducts);
                             renderTables();
                         } else {
                             swal("Quantity exceeds available amount!");
