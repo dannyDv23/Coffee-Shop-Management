@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const axios = require('axios');
-const { fetchAvailableTables, fetchBookableTables, fetchAllTables } = require('../untils/tableUtils');
+const { fetchAvailableTables, fetchBookableTables, fetchAllTables, fetchBooking, fetchAllProduct } = require('../untils/tableUtils');
 const addAuthHeaders = require('../middleware/auth');
 
 router.use(addAuthHeaders); // Apply auth middleware to all routes
@@ -17,10 +17,6 @@ router.get('/view', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -34,10 +30,6 @@ router.get('/move', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -53,10 +45,6 @@ router.get('/split', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -72,10 +60,6 @@ router.get('/merge', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -89,29 +73,21 @@ router.get('/cancel', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
 router.get('/chooseMenu', async (req, res) => {
   try {
     const listTable = await fetchAvailableTables(req);
-    const responseProduct = await req.axios.get('http://localhost:3000/api/product');
+    const listproduct = await fetchAllProduct(req);
     res.render('../MainLayout', {
       bodyPage: path.join('views', 'TablePage', 'ChooseMenu'),
       listTable,
-      listproduct: responseProduct.data.listProduct,
+      listproduct,
       titleTab: 'Choose Menu'
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -125,10 +101,6 @@ router.get('/booking', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -142,10 +114,6 @@ router.get('/payment', async (req, res) => {
     });
   } catch (err) {
     console.error('Error fetching data:', err.message);
-    res.render('../MainLayout', {
-      bodyPage: path.join('views', 'HomePage'),
-      error: 'Error fetching data'
-    });
   }
 });
 
@@ -158,8 +126,7 @@ router.get('/print', (req, res) => {
 
 router.get('/managerBooking', async (req, res) => {
   try {
-    const response = await axios.get('http://localhost:3000/api/booking');
-    const infoBooking = response.data.infoBooking;
+    const infoBooking = await fetchBooking(req);
 
     res.render('../MainLayout', {
       bodyPage: path.join('views', 'TablePage', 'ManagerBookingTable'),
