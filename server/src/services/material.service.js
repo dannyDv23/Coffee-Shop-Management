@@ -24,7 +24,7 @@ const findIdMaterialByName = async (materialName) => {
 
 
 const findMaterialByName = async (materialName) => {
-  return await Material.findOne({ name: materialName });
+  return await Material.findOne({ name: materialName, status: 'Active' });
 };
 
 

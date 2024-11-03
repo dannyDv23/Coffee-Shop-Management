@@ -6,44 +6,48 @@ const ApiError = require("../utils/ApiError");
 // Create a new Material
 const createMaterial = catchAsync(async (req, res) => {
     const { name, unit, totalQuantity, pricePerUnit } = req.body;
-    // Check if the material already exists by name
     const existingMaterial = await materialService.findMaterialByName(name);
-
     const dateImport = new Date();
-    console.log(totalQuantity)
     const importEntry = {
-        dateImport: dateImport,
+        dateImport,
         quantity: totalQuantity,
-        price: pricePerUnit * totalQuantity,
+        price: pricePerUnit,
     };
 
     if (existingMaterial) {
-        // Update the total quantity
-        const newTotalQuantity = Number(existingMaterial.totalQuantity) + Number(totalQuantity);
-        console.log(newTotalQuantity)
-
-        // Update the material with the new total quantity and add the import history
-        const updatedMaterial = await materialService.updateNewQuantity(existingMaterial._id, {
-            totalQuantity: newTotalQuantity,
-            $push: { importHistory: importEntry }  // Push the new import entry into the importHistory array
-        });
-
-        return res.status(200).json(updatedMaterial);
+        if (existingMaterial.unit !== unit) {
+            return res.status(400).json({
+                message: `Material "${name}" already exists with the unit "${existingMaterial.unit}". Please choose the unit "${existingMaterial.unit}" to import.`,
+                existingMaterialUnit: existingMaterial.unit
+            });
+        }
+            return updateExistingMaterial(existingMaterial, totalQuantity, importEntry, res);
     } else {
-        // If the material does not exist, create a new one with import history
-        const material = await materialService.createMaterial({
-            name,
-            unit,
-            totalQuantity,
-            pricePerUnit,
-            status: 'Active',
-            importHistory: [importEntry]  // Initialize importHistory with the first entry
-        });
-
-        return res.status(201).json(material);
+        return createNewMaterial(name, unit, totalQuantity, pricePerUnit, importEntry, res);
     }
 });
 
+const createNewMaterial = async (name, unit, totalQuantity, pricePerUnit, importEntry, res) => {
+    const material = await materialService.createMaterial({
+        name,
+        unit,
+        totalQuantity,
+        pricePerUnit,
+        status: 'Active',
+        importHistory: [importEntry],  // Initialize importHistory with the first entry
+    });
+    return res.status(201).json(material);
+};
+
+const updateExistingMaterial = async (existingMaterial, totalQuantity, importEntry, res) => {
+    const newTotalQuantity = Number(existingMaterial.totalQuantity) + Number(totalQuantity);
+    
+    const updatedMaterial = await materialService.updateNewQuantity(existingMaterial._id, {
+        totalQuantity: newTotalQuantity,
+        $push: { importHistory: importEntry },  // Push the new import entry into the importHistory array
+    });
+    return res.status(200).json(updatedMaterial);
+};
 
 
 // Get all Materials
