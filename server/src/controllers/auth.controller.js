@@ -69,7 +69,7 @@ const login = catchAsync(async (req, res) => {
     secure: false, // Set to true in production
     maxAge: 60 * 60 * 1000,
     sameSite: "Lax",
-    domain: "localhost", // Domain should match the frontend domain
+    domain: "152.42.165.4", // Domain should match the frontend domain
   });
   res
     .status(httpStatus.OK)
@@ -94,7 +94,7 @@ const logout = catchAsync(async (req, res) => {
     httpOnly: true,
     secure: false,
     sameSite: "Lax",
-    domain: "localhost",
+    domain: "152.42.165.4",
   });
   res.status(httpStatus.OK).send({ message: "Logged out successfully" });
 });

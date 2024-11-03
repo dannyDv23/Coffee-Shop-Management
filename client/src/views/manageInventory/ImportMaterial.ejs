@@ -115,7 +115,7 @@
 
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch('http://localhost:3000/api/material', {
+      const response = await fetch('http://152.42.165.4:3000/api/material', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -893,7 +893,7 @@
               localStorage.clear();
 
               // Send logout request to the server to clear httpOnly cookies
-              const response = await fetch("http://localhost:3000/api/auth/logout", {
+              const response = await fetch("http://152.42.165.4:3000/api/auth/logout", {
                 method: "POST",
                 credentials: "include",
               });

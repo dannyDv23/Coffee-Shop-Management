@@ -132,7 +132,7 @@
                         console.log("Payload:", payload);
 
                         // Post the payload to the server
-                        apiFetch('http://localhost:3000/api/table/merge', {
+                        apiFetch('http://152.42.165.4:3000/api/table/merge', {
                             method: 'POST',
                             body: JSON.stringify(payload),
                         }).then(data => {

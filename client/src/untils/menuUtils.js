@@ -1,6 +1,6 @@
 const getMenuData = async (req) => {
     try {
-      const response = await req.axios.get('http://localhost:3000/api/menu');
+      const response = await req.axios.get('http://152.42.165.4:3000/api/menu');
       return response.data; // Return the fetched data
     } catch (err) {
       console.error('Error fetching menu data:', err.message);
@@ -10,7 +10,7 @@ const getMenuData = async (req) => {
   
   const getMaterialsData = async (req) => {
     try {
-      const response = await req.axios.get('http://localhost:3000/api/material');
+      const response = await req.axios.get('http://152.42.165.4:3000/api/material');
       return response.data; // Return the fetched materials data
     } catch (err) {
       console.error('Error fetching materials data:', err.message);
@@ -20,7 +20,7 @@ const getMenuData = async (req) => {
   
   const getMenuById = async (req, id) => {
     try {
-      const response = await req.axios.get(`http://localhost:3000/api/menu/${id}`);
+      const response = await req.axios.get(`http://152.42.165.4:3000/api/menu/${id}`);
       return response.data; // Return the fetched menu by ID
     } catch (err) {
       console.error('Error fetching menu by ID:', err.message);

@@ -36,7 +36,7 @@
             let tableNumber = button.getAttribute('data-table');
 
             // Fetch the order data for this table
-            apiFetch(`http://localhost:3000/api/order/${tableNumber}`)
+            apiFetch(`http://152.42.165.4:3000/api/order/${tableNumber}`)
                 .then(data => {
                     // Assuming the API response structure is like your provided example
                     console.log(data.infoOrder[0]);
@@ -134,7 +134,7 @@
                                 },
                             }).then(() => {
                                 // If checkbox is checked, update order status
-                                apiFetch(`http://localhost:3000/api/table/${tableNumber}/complete`, {
+                                apiFetch(`http://152.42.165.4:3000/api/table/${tableNumber}/complete`, {
                                     method: 'POST',
                                     body: JSON.stringify({
                                         moneyReceived: cashGiven,   // From the input

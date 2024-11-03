@@ -52,7 +52,7 @@
             }).then((value) => {
                 if (value === "Delete") {
                     console.log(`Attempting to cancel table: ${tableNumber}`);
-                    apiFetch(`http://localhost:3000/api/table/cancel/${tableNumber}`, {
+                    apiFetch(`http://152.42.165.4:3000/api/table/cancel/${tableNumber}`, {
                         method: 'PUT'
                     })
                     .then(data => {

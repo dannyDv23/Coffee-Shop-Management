@@ -121,7 +121,7 @@
                 const status = document.getElementById('statusSelect').value;
                 const data = { bookingId, status };
 
-                apiFetch('http://localhost:3000/api/booking/update', {
+                apiFetch('http://152.42.165.4:3000/api/booking/update', {
                     method: 'POST',
                     body: JSON.stringify(data)
                 }).then(data => {

@@ -6,7 +6,7 @@ const axios = require("axios");
 async function getEmployee(req) {
   try {
     const token = req.cookies["accessToken"];
-    const { data } = await axios.get("http://localhost:3000/api/profile", {
+    const { data } = await axios.get("http://152.42.165.4:3000/api/profile", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

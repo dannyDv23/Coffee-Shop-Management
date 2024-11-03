@@ -38,7 +38,7 @@
             if (tableStatus !== 'Empty') {
                 try {
                     // Fetch data from the API
-                    const data = await apiFetch(`http://localhost:3000/api/table/${tableNumber}`);
+                    const data = await apiFetch(`http://152.42.165.4:3000/api/table/${tableNumber}`);
                     const tableData = data.infoTable?.[0];
                     console.log(tableData);
                     // Extract bookings and orders from the tableData

@@ -38,7 +38,7 @@
 
                 try {
                     // Fetch data for empty tables
-                    const data = await apiFetch(`http://localhost:3000/api/table/list-can-booking`);
+                    const data = await apiFetch(`http://152.42.165.4:3000/api/table/list-can-booking`);
                     const emptyTables = data.listTableCanBook || [];
                     console.log(emptyTables);
 
@@ -89,7 +89,7 @@
                                 if (selectedTable) {
                                     try {
                                         // Call the API to move table data
-                                        const moveResponse = await apiFetch(`http://localhost:3000/api/table/move`, {
+                                        const moveResponse = await apiFetch(`http://152.42.165.4:3000/api/table/move`, {
                                             method: 'POST',
                                             body: JSON.stringify({
                                                 fromTableNumber: tableName, // The current table
