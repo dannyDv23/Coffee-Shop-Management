@@ -17,44 +17,23 @@
                   <label for="price2">Price</label>
                   <div class="input-group mb-3">
                     <span class="input-group-text">$</span>
-                    <input type="number" id="price2" class="form-control" aria-label="Amount (to the nearest dollar)" min="0" required />
+                    <input type="number" id="price2" class="form-control" min="0" step="0.01" placeholder="Enter Price" required />
                     <span class="input-group-text">.000</span>
-                    <script>
-                      document.getElementById('price2').addEventListener('input', function () {
-                        if (this.value < 0) {
-                          this.value = 0;
-                        }
-                      });
-                    </script>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="Date">Date import</label>
-                  <input type="date" class="form-control" id="Date" placeholder="Date" required />
-                  <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                      var today = new Date().toISOString().split('T')[0];
-                      document.getElementById('Date').setAttribute('min', today);
-                    });
-                  </script>
+                  <input type="date" class="form-control" id="Date" required />
                 </div>
               </div>
               <div class="col-md-6 col-lg-6">
                 <div class="form-group">
                   <label for="quantity2">Quantity</label>
-                  <input type="number" class="form-control" id="quantity2" placeholder="Enter Quantity" min="0" required />
-                  <script>
-                    document.getElementById('quantity2').addEventListener('input', function () {
-                      if (this.value < 0) {
-                        this.value = 0;
-                      }
-                    });
-                  </script>
+                  <input type="number" class="form-control" id="quantity2" min="0" placeholder="Enter Quantity" required />
                 </div>
                 <div class="form-group">
                   <label for="defaultSelect">Unit</label>
-                  <select class="form-select form-control" id="defaultSelect">
-                    <option value="kg">kg</option>
+                  <select class="form-select form-control" id="defaultSelect" required>
                     <option value="g">g</option>
                     <option value="barrel">barrel</option>
                     <option value="bottle">bottle</option>
@@ -65,7 +44,7 @@
             </div>
             <div class="card-action">
               <button type="submit" class="btn btn-success">Submit</button>
-              <button type="button" class="btn btn-danger">Cancel</button>
+              <button type="button" class="btn btn-danger" onclick="window.location.href='/inventory'">Cancel</button>
             </div>
           </form>
         </div>
@@ -76,56 +55,86 @@
 
 <script type="module" src="../js/apiFetchUtils.js"></script>
 <script type="module">
-    import { apiFetch } from '../js/apiFetchUtils.js';
+  import { apiFetch } from '../js/apiFetchUtils.js';
+
+  // Set minimum date to today
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('Date').setAttribute('min', new Date().toISOString().split('T')[0]);
+  });
+
+  // Helper function for validation
+  function validateForm() {
+    const name = document.getElementById('material2').value.trim();
+    const price = parseFloat(document.getElementById('price2').value);
+    const date = document.getElementById('Date').value;
+    const quantity = parseInt(document.getElementById('quantity2').value, 10);
+    const unit = document.getElementById('defaultSelect').value;
+
+    if (!name) {
+      alert("Material name is required.");
+      return false;
+    }
+    if (isNaN(price) || price < 0) {
+      alert("Price must be a non-negative number.");
+      return false;
+    }
+    if (!date) {
+      alert("Date is required.");
+      return false;
+    }
+    if (isNaN(quantity) || quantity < 0) {
+      alert("Quantity must be a non-negative integer.");
+      return false;
+    }
+    if (!unit) {
+      alert("Please select a unit.");
+      return false;
+    }
+    return true;
+  }
+
   document.getElementById('importMaterialForm').addEventListener('submit', async function (event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  // Gather form data
-  const name = document.getElementById('material2').value;
-  const price = parseFloat(document.getElementById('price2').value);
-  const date = document.getElementById('Date').value;
-  const quantity = parseInt(document.getElementById('quantity2').value, 10);
-  const unit = document.getElementById('defaultSelect').value;
+    if (!validateForm()) return;
 
-  // Validate the inputs
-  if (!name || isNaN(price) || isNaN(quantity) || !unit || !date) {
-    alert('Please fill all the fields correctly.');
-    return;
-  }
+    const materialData = {
+      name: document.getElementById('material2').value.trim(),
+      pricePerUnit: parseFloat(document.getElementById('price2').value),
+      unit: document.getElementById('defaultSelect').value,
+      totalQuantity: parseInt(document.getElementById('quantity2').value, 10),
+      importHistory: [
+        {
+          dateImport: document.getElementById('Date').value,
+          quantity: parseInt(document.getElementById('quantity2').value, 10),
+          price: parseFloat(document.getElementById('price2').value)
+        }
+      ],
+      exportHistory: []
+    };
 
-  // Create the material data structure
-  const materialData = {
-    name: name,
-    unit: unit,
-    totalQuantity: quantity,
-    pricePerUnit: price,
-    importHistory: [
-      {
-        dateImport: date,
-        quantity: quantity,
-        price: price * quantity  // Backend could recalculate this
+    const token = localStorage.getItem('accessToken');
+    try {
+      const response = await fetch('http://localhost:3000/api/material', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(materialData)
+      });
+
+      if (response.ok) {
+        alert('Material imported successfully!');
+        location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to import material. Please try again.');
       }
-    ],
-    exportHistory: []
-  };
 
-  console.log('Sending data:', materialData);
-
-  // Send the data to the API
-  try {
-    const responseData = await apiFetch('http://localhost:3000/api/material', {
-      method: 'POST',
-      body: JSON.stringify(materialData)
-    });
-    console.log('Material imported successfully:', responseData);
-
-    // Optionally, redirect or show a success message
-    alert('Material imported successfully!');
-    location.reload();
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Failed to import material. Please try again.');
-  }
-});
-
+    } catch (error) {
+      alert('Failed to import material. Please check your network and try again.');
+      console.error('Error:', error);
+    }
+  });
 </script>

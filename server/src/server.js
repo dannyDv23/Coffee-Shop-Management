@@ -75,7 +75,7 @@ rootRouter.use("/expenses", auth(["Admin"]), ExpenseRouter); // Expense routes
 rootRouter.use("/backup", auth(["Admin"]), BackupRouter); //Backup routes
 rootRouter.use("/order", auth(["Admin", "Employee"]), orderRouter);
 rootRouter.use("/booking", auth(["Admin", "Employee"]), bookingRouter);
-rootRouter.use("/product", productRouter);
+rootRouter.use("/product", auth(["Admin", "Employee"]), productRouter);
 rootRouter.use("/profile", profileRouter);
 
 app.use((req, res, next) => {

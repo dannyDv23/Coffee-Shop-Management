@@ -99,6 +99,8 @@ const getBookingByTableNumber = async (tableNumbe) => {
             }
         });
 
+        return { message: 'updated successfully.' };
+
     } catch (error) {
         console.error('Error updating booking status:', error);
         throw error;

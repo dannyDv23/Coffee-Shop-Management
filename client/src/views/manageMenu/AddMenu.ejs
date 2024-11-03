@@ -10,23 +10,16 @@
                         <div class="row">
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
-                                    <label for="name-product">Name product</label>
+                                    <label for="name-product">Name Product</label>
                                     <input type="text" class="form-control" id="name-product"
-                                        placeholder="Enter Name Material" required />
+                                        placeholder="Enter Product Name" required />
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
                                     <label for="price-product">Price</label>
                                     <input type="number" class="form-control" id="price-product"
-                                        placeholder="Enter Quantity" min="0" required />
-                                    <script>
-                                        document.getElementById('price-product').addEventListener('input', function () {
-                                            if (this.value < 0) {
-                                                this.value = 0;
-                                            }
-                                        });
-                                    </script>
+                                        placeholder="Enter Price" min="0" required />
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -36,8 +29,7 @@
                                             <h4 class="card-title">Add Material</h4>
                                             <button type="button" class="btn btn-primary btn-round ms-auto"
                                                 data-bs-toggle="modal" data-bs-target="#addRowModal">
-                                                <i class="fa fa-plus"></i>
-                                                Add Row
+                                                <i class="fa fa-plus"></i> Add Row
                                             </button>
                                         </div>
                                     </div>
@@ -48,20 +40,14 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header border-0">
-                                                        <h5 class="modal-title">
-                                                            <span class="fw-mediumbold"> New</span>
+                                                        <h5 class="modal-title"><span class="fw-mediumbold"> New</span>
                                                             <span class="fw-light"> Row </span>
                                                         </h5>
-                                                        <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
+                                                        <button type="button" class="close" data-bs-dismiss="modal"
+                                                            aria-label="Close"><span
+                                                                aria-hidden="true">&times;</span></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p class="small">
-                                                            Create a new row using this form, make sure you fill them
-                                                            all
-                                                        </p>
                                                         <form id="materialSelectionForm">
                                                             <div class="row">
                                                                 <div class="col-sm-12">
@@ -82,30 +68,15 @@
                                                                                 </option>
                                                                                 <% }) %>
                                                                         </select>
-
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-6 pe-0 d-none">
-                                                                    <div class="form-group form-group-default">
-                                                                        <label>name</label>
-                                                                        <input id="addMaterialName" type="text"
-                                                                            class="form-control"
-                                                                            placeholder="Enter name" />
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-6 pe-0">
+                                                                <div class="col-md-6">
                                                                     <div class="form-group form-group-default">
                                                                         <label>Quantity</label>
                                                                         <input id="addMaterialQuantity" type="number"
                                                                             class="form-control"
-                                                                            placeholder="Enter quantity" min="1" />
-                                                                            <script>
-                                                                                document.getElementById('addMaterialQuantity').addEventListener('input', function () {
-                                                                                    if (this.value < 0) {
-                                                                                        this.value = 0;
-                                                                                    }
-                                                                                });
-                                                                            </script>
+                                                                            placeholder="Enter quantity" min="1"
+                                                                            required />
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -120,13 +91,10 @@
                                                         </form>
                                                     </div>
                                                     <div class="modal-footer border-0">
-                                                        <button type="button" id="addRowButton" class="btn btn-primary">
-                                                            Add
-                                                        </button>
+                                                        <button type="button" id="addRowButton"
+                                                            class="btn btn-primary">Add</button>
                                                         <button type="button" class="btn btn-danger"
-                                                            data-bs-dismiss="modal">
-                                                            Close
-                                                        </button>
+                                                            data-bs-dismiss="modal">Close</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -136,7 +104,7 @@
                                             <table id="add-row" class="display table table-striped table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th>Name material</th>
+                                                        <th>Name Material</th>
                                                         <th>Quantity</th>
                                                         <th>Unit</th>
                                                         <th style="width: 10%">Action</th>
@@ -153,7 +121,7 @@
                         </div>
                         <div class="card-action">
                             <button type="button" id="submitFormButton" class="btn btn-success">Submit</button>
-                            <button type="button" class="btn btn-danger">Cancel</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -162,174 +130,130 @@
     </div>
 </div>
 
-<script>
-    // Array to hold materials
+<script type="module">
+    import { apiFetch } from '../js/apiFetchUtils.js';
+
     let materials = [];
 
-    document.getElementById('addRowButton').addEventListener('click', function () {
-        // Get selected material
-        const selectedMaterial = document.getElementById('materialSelect');
-        const materialId = selectedMaterial.value;
-        const materialName = document.getElementById('addMaterialName').value;
-        const materialQuantity = document.getElementById('addMaterialQuantity').value;
-        const materialUnit = document.getElementById('addMaterialUnit').value;
-        const availableQuantity = selectedMaterial.options[selectedMaterial.selectedIndex].getAttribute('data-quantity');
+    document.getElementById('addRowButton').addEventListener('click', addRow);
+    document.getElementById('submitFormButton').addEventListener('click', submitForm);
 
-        // Ensure all fields are filled
-        if (!materialId || !materialQuantity || !materialUnit) {
-            alert('Please fill all fields before adding.');
+    function addRow() {
+        const materialSelect = document.getElementById('materialSelect');
+        const quantityInput = document.getElementById('addMaterialQuantity');
+        const unitInput = document.getElementById('addMaterialUnit');
+        const materialId = materialSelect.value;
+        const quantity = parseInt(quantityInput.value, 10);
+
+        if (!materialId || quantity <= 0 || isNaN(quantity)) {
+            alert('Please select a valid material and enter a positive quantity.');
             return;
         }
 
-        // Check if quantity exceeds available quantity
-        if (parseInt(materialQuantity) > parseInt(availableQuantity)) {
+        const availableQuantity = parseInt(materialSelect.options[materialSelect.selectedIndex].getAttribute('data-quantity'), 10);
+
+        if (quantity > availableQuantity) {
             alert(`Quantity exceeds available stock. Available: ${availableQuantity}`);
             return;
         }
 
-        // Check if the material name already exists in the materials array
-        const materialExists = materials.some(material => material.name === materialName);
-        if (materialExists) {
-            alert('Material with this name already exists. Please choose a different name.');
-            return; // Exit if material already exists
+        const existingMaterialIndex = materials.findIndex(material => material.id === materialId);
+        if (existingMaterialIndex !== -1) {
+            alert('This material has already been added. Please edit the existing entry if needed.');
+            return;
         }
 
-        // Create a new material object
         const newMaterial = {
             id: materialId,
-            name: materialName,
-            quantity: materialQuantity,
-            unit: materialUnit
+            name: materialSelect.options[materialSelect.selectedIndex].dataset.name,
+            quantity: quantity,
+            unit: unitInput.value
         };
 
-        // Push the new material to the array
         materials.push(newMaterial);
-
-        // Load the materials into the table
         loadMaterials();
-
-        // Clear the input fields
-        document.getElementById('addMaterialQuantity').value = '';
-        document.getElementById('addMaterialUnit').value = '';
-        selectedMaterial.selectedIndex = 0; // Reset the dropdown
-
-        // Close the modal
+        clearModalFields();
         $('#addRowModal').modal('hide');
-    });
-
-    // Function to load materials into the table
-    // Function to load materials into the table
-function loadMaterials() {
-    const tableBody = document.getElementById('materialTableBody');
-    tableBody.innerHTML = ''; // Clear existing rows
-
-    materials.forEach((material, index) => {
-        const newRow = document.createElement('tr');
-        newRow.setAttribute('data-id', material.id); // Store material ID in row data attribute
-        newRow.setAttribute('data-quantity', material.quantity);
-        newRow.innerHTML = `
-            <td>${material.name}</td>
-            <td>${material.quantity}</td>
-            <td>${material.unit}</td>
-            <td>
-                <div class="form-button-action">
-                    <button type="button" class="btn btn-link btn-primary btn-lg" onclick="editRow(${index})">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <button type="button" class="btn btn-link btn-danger" onclick="removeRow(${index})">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-            </td>
-        `;
-        tableBody.appendChild(newRow);
-    });
-}
-
-    // Function to remove a row
-    function removeRow(index) {
-        materials.splice(index, 1); // Remove material from the array
-        loadMaterials(); // Reload the materials in the table
     }
 
-    // Function to edit a row
+    function loadMaterials() {
+        const tableBody = document.getElementById('materialTableBody');
+        tableBody.innerHTML = '';
+
+        materials.forEach((material, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${material.name}</td>
+                <td>${material.quantity}</td>
+                <td>${material.unit}</td>
+                <td style="display: flex;">
+                    <button type="button" class="btn btn-link btn-primary" onclick="editRow(${index})"><i class="fa fa-edit"></i></button>
+                    <button type="button" class="btn btn-link btn-danger" onclick="removeRow(${index})"><i class="fa fa-times"></i></button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function removeRow(index) {
+        materials.splice(index, 1);
+        loadMaterials();
+    }
+
     function editRow(index) {
         const material = materials[index];
-        // Set the input fields with the material's current values
         document.getElementById('materialSelect').value = material.id;
         document.getElementById('addMaterialQuantity').value = material.quantity;
         document.getElementById('addMaterialUnit').value = material.unit;
-
-        // Remove the item from the array before editing
-        materials.splice(index, 1); // Optional: Remove it if you want to avoid duplicates when re-adding
-
-        // Close the modal and reopen it for editing
-        $('#addRowModal').modal('hide');
+        materials.splice(index, 1);
         $('#addRowModal').modal('show');
     }
 
-    // Function to update the unit input based on selected material
     function updateMaterialUnit() {
         const selectedMaterial = document.getElementById('materialSelect');
         const unitInput = document.getElementById('addMaterialUnit');
-        const nameInput = document.getElementById('addMaterialName');
-        const selectedOption = selectedMaterial.options[selectedMaterial.selectedIndex];
-
-        if (selectedOption.value) {
-            unitInput.value = selectedOption.dataset.unit; // Assuming unit is stored in data-unit attribute
-            nameInput.value = selectedOption.dataset.name;
-        } else {
-            unitInput.value = ''; // Clear unit if no material is selected
-            nameInput.value = '';
-        }
+        unitInput.value = selectedMaterial.options[selectedMaterial.selectedIndex].dataset.unit || '';
     }
-</script>
 
-<script type="module" src="../js/apiFetchUtils.js"></script>
-<script type="module">
-    import { apiFetch } from '../js/apiFetchUtils.js';
-    document.getElementById('submitFormButton').addEventListener('click', function (event) {
-    // Prevent default behavior
-    event.preventDefault();
+    function clearModalFields() {
+        document.getElementById('materialSelect').selectedIndex = 0;
+        document.getElementById('addMaterialQuantity').value = '';
+        document.getElementById('addMaterialUnit').value = '';
+    }
 
-    // Collect form data
-    const productName = document.getElementById('name-product').value;
-    const productPrice = document.getElementById('price-product').value;
-    const materials = [];
+    function submitForm(event) {
+        event.preventDefault();
+        const productName = document.getElementById('name-product').value;
+        const productPrice = parseFloat(document.getElementById('price-product').value);
 
-    // Collect materials from the table
-    const materialRows = document.querySelectorAll('#materialTableBody tr');
-    materialRows.forEach(row => {
-        const materialId = row.getAttribute('data-id'); // Get material ID from data attribute
-        const quantity = row.querySelector('td:nth-child(2)').textContent;
+        if (!productName || isNaN(productPrice) || productPrice <= 0 || materials.length === 0) {
+            alert('Please complete all fields and add at least one material.');
+            return;
+        }
 
-        materials.push({ materialId, quantityUsed: quantity }); // Push material ID and quantity
-    });
+        const data = {
+            name: productName,
+            price: productPrice,
+            materials: materials.map(material => ({
+                materialId: material.id,
+                quantityUsed: material.quantity
+            }))
+        };
 
-    // Create data object
-    const data = {
-        name: productName,
-        price: productPrice,
-        materials: materials
-    };
+        console.log("Submitting data:", data);
 
-    console.log("data", data);
-
-    // Send data via AJAX POST request
-    apiFetch('http://localhost:3000/api/menu', {
-        method: 'POST',
-        body: JSON.stringify(data)
-    })
-    .then(result => {
-        // Handle success
-        console.log('Success:', result);
-        location.reload();
-        alert('Data submitted successfully');
-    })
-    .catch(error => {
-        // Handle error
-        console.error('Error:', error);
-        alert('There was an error submitting the data');
-    });
-});
+        apiFetch('http://localhost:3000/api/menu', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            console.log('Success:', response);
+            alert('Data submitted successfully!');
+            location.reload(); // Refresh the page or clear fields as needed
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error submitting the data');
+        });
+    }
 </script>
