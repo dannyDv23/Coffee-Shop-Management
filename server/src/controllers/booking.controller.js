@@ -15,14 +15,17 @@ const getAllBooking = catchAsync(async (req, res) => {
 });
 
 const updateBookingById = catchAsync(async (req, res) => {
-    const { bookingId, status } = req.body;
-
     try {
+        const { bookingId, status } = req.body;
         const result = await bookingService.updateStatusBookingById(bookingId, status);
-        return res.json(result);
+        res.status(201).json({
+            message: 'update successfully',
+            data: result,
+        });
     } catch (error) {
-        console.error('Error completing order:', error);
-        return res.status(500).json({ message: error.message });
+        res.status(400).json({
+            message: error.message,
+        });
     }
 });
 

@@ -12,10 +12,23 @@ const fetchAvailableTables = async (req) => {
     const response = await req.axios.get('http://localhost:3000/api/table/all');
     return response.data.listTable;
   };
+
+  const fetchBooking = async (req) => {
+    const response = await req.axios.get('http://localhost:3000/api/booking');
+    return response.data.infoBooking;
+  };
+
+  const fetchAllProduct = async (req) => {
+    const response = await req.axios.get('http://localhost:3000/api/product');
+    return response.data.listProduct;
+  };
+
   
   module.exports = {
     fetchAvailableTables,
     fetchBookableTables,
-    fetchAllTables
+    fetchAllTables,
+    fetchBooking,
+    fetchAllProduct
   };
   

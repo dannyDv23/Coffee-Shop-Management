@@ -202,7 +202,6 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
 
     // Save the booking to the database
     const savedBooking = await booking.save();
-    // console.log('Booking created:', savedBooking);
 
     // Step 2: Create a new order for the destination table (toTableNumber) using splitProduct
     const newOrder = new Order({
@@ -231,34 +230,27 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
 
     // Save the new order to the database
     const savedOrder = await newOrder.save();
-    // console.log('Order created:', savedOrder);
 
     // Step 3: Update the existing order for the source table (fromTableNumber) using keepProduct
-    for (const product of arrayProduct.keepProduct) {
-      const foundProduct = await Product.findOne({ name: product.name });
-      if (foundProduct) {
-        // Find the existing order(s) for the fromTable
-        const existingOrders = await Order.find({ tableId: idTableFrom });
+    const existingOrders = await Order.find({ tableId: idTableFrom });
 
-        // Update each existing order to include the keepProduct
-        for (const existingOrder of existingOrders) {
-          const existingProductIndex = existingOrder.product.findIndex(p => p.productId.equals(foundProduct._id));
+    for (const existingOrder of existingOrders) {
+      // Clear the existing products in the order
+      existingOrder.product = [];
 
-          if (existingProductIndex > -1) {
-            // If the product exists, override the quantity
-            existingOrder.product[existingProductIndex].numberProduct = product.quantity; // Override the quantity
-          } else {
-            // If the product does not exist, add it to the product array
-            existingOrder.product.push({
-              productId: foundProduct._id, // Use the correct Product ID
-              numberProduct: product.quantity
-            });
-          }
-
-          // Save the updated existing order
-          await existingOrder.save();
+      // Add all products from keepProduct to the cleared order
+      for (const product of arrayProduct.keepProduct) {
+        const foundProduct = await Product.findOne({ name: product.name });
+        if (foundProduct) {
+          existingOrder.product.push({
+            productId: foundProduct._id, // Use the correct Product ID
+            numberProduct: product.quantity
+          });
         }
       }
+
+      // Save the updated existing order
+      await existingOrder.save();
     }
 
     // Step 4: Update the status of the destination table (toTableNumber) to 'Available'
@@ -271,9 +263,10 @@ const splitTableData = async (fromTableNumber, toTableNumber, arrayProduct, newI
 
   } catch (error) {
     console.error("Error splitting table:", error);
-    throw error; // It's important to throw the error again or handle it as needed
+    throw error; // Re-throw the error or handle it as needed
   }
 };
+
 
 const mergeTables = async (fromTables, toTableNumber, newBookingDetails) => {
   try {
