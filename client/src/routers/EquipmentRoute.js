@@ -4,7 +4,7 @@ const path = require("path");
 const axios = require("axios");
 
 router.get("/view-all", async (req, res) => {
-    const response = await fetch("http://127.0.0.1:3000/api/equipments", {
+    const response = await fetch("http://152.42.165:3000/api/equipments", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });
@@ -17,7 +17,7 @@ router.get("/create", (req, res) => {
 });
 
 router.get("/update/:id", async (req, res) => {
-    const response = await fetch(`http://127.0.0.1:3000/api/equipments/${req.params.id}`, {
+    const response = await fetch(`http://152.42.165:3000/api/equipments/${req.params.id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });
