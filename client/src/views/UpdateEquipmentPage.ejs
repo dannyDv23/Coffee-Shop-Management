@@ -63,7 +63,7 @@
         }
         const totalPrice = price * quantity;
         try {
-            const response = await fetch("http://152.42.165:3000/api/equipments/<%= equipment._id %>", {
+            const response = await fetch("http://152.42.165.4:3000/api/equipments/<%= equipment._id %>", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require("path");
 
 router.get("/view-all", async (req, res) => {
-    const response = await fetch("http://152.42.165:3000/api/sales", {
+    const response = await fetch("http://152.42.165.4:3000/api/sales", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });
@@ -16,7 +16,7 @@ router.get("/create", (req, res) => {
 });
 
 router.get("/update/:id", async (req, res) => {
-    const response = await fetch(`http://152.42.165:3000/api/sales/${req.params.id}`, {
+    const response = await fetch(`http://152.42.165.4:3000/api/sales/${req.params.id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
     });

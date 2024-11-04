@@ -110,7 +110,7 @@
     }
     function deleteEquipment(id) {
         if (confirm('Are you sure you want to delete this equipment?')) {
-            fetch(`http://152.42.165:3000/api/equipments/${id}`, {
+            fetch(`http://152.42.165.4:3000/api/equipments/${id}`, {
                 method: 'DELETE',
             })
                 .then(response => {
